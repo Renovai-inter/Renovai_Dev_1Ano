@@ -2,6 +2,9 @@
 package model;
 
 public class EnderecoRota {
+
+    // ATRIBUTOS
+
     private Long idEndereco;
     private Long idRota;
     private String nomeLocal;
@@ -12,6 +15,7 @@ public class EnderecoRota {
     private String observacoes;
     private Integer ordem;
 
+    // GETTERS E SETTERS
 
     public Long getIdEndereco() { return idEndereco; }
 
@@ -48,4 +52,5 @@ public class EnderecoRota {
     public Integer getOrdem() { return ordem; }
 
     public void setOrdem(Integer ordem) { this.ordem = ordem; }
+
 }

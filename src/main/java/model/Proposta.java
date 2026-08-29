@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Proposta {
+
+    // ATRIBUTOS
+
     private Long idProposta;
     private Long idNegociacao;
     private String autor;
@@ -13,6 +16,7 @@ public class Proposta {
     private String observacoes;
     private LocalDateTime dataProposta;
 
+    // GETTERS E SETTERS
 
     public Long getIdProposta() { return idProposta; }
 
@@ -41,4 +45,5 @@ public class Proposta {
     public LocalDateTime getDataProposta() { return dataProposta; }
 
     public void setDataProposta(LocalDateTime dataProposta) { this.dataProposta = dataProposta; }
+
 }

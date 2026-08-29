@@ -4,6 +4,9 @@ package model;
 import java.time.LocalDateTime;
 
 public class EmpresaRecicladora {
+
+    // ATRIBUTOS
+
     private Long idEmpresa;
     private String nome;
     private String cnpj;
@@ -17,6 +20,7 @@ public class EmpresaRecicladora {
     private String estado;
     private LocalDateTime dataCadastro;
 
+    // GETTERS E SETTERS
 
     public Long getIdEmpresa() { return idEmpresa; }
 
@@ -65,4 +69,5 @@ public class EmpresaRecicladora {
     public LocalDateTime getDataCadastro() { return dataCadastro; }
 
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
+
 }

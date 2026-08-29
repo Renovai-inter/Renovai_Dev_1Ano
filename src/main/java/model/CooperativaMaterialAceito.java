@@ -2,9 +2,13 @@
 package model;
 
 public class CooperativaMaterialAceito {
+
+    // ATRIBUTOS
+
     private Long idCooperativa;
     private Long idMaterial;
 
+    // GETTERS E SETTERS
 
     public Long getIdCooperativa() { return idCooperativa; }
 
@@ -13,4 +17,5 @@ public class CooperativaMaterialAceito {
     public Long getIdMaterial() { return idMaterial; }
 
     public void setIdMaterial(Long idMaterial) { this.idMaterial = idMaterial; }
+
 }

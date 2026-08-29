@@ -2,10 +2,14 @@
 package model;
 
 public class InformacaoPublicaConfig {
+
+    // ATRIBUTOS
+
     private Long idCooperativa;
     private String campo;
     private boolean visivel;
 
+    // GETTERS E SETTERS
 
     public Long getIdCooperativa() { return idCooperativa; }
 
@@ -18,4 +22,5 @@ public class InformacaoPublicaConfig {
     public boolean isVisivel() { return visivel; }
 
     public void setVisivel(boolean visivel) { this.visivel = visivel; }
+
 }

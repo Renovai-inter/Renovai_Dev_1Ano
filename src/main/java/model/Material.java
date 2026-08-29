@@ -2,10 +2,14 @@
 package model;
 
 public class Material {
+
+    // ATRIBUTOS
+
     private Long idMaterial;
     private String nome;
     private String categoria;
 
+    // GETTERS E SETTERS
 
     public Long getIdMaterial() { return idMaterial; }
 
@@ -18,4 +22,5 @@ public class Material {
     public String getCategoria() { return categoria; }
 
     public void setCategoria(String categoria) { this.categoria = categoria; }
+
 }

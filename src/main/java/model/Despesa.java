@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Despesa {
+
+    // ATRIBUTOS
     private Long idDespesa;
     private Long idPeriodo;
     private String categoria;
@@ -13,6 +15,7 @@ public class Despesa {
     private String descricao;
     private String observacoes;
 
+    // GETTERS E SETTERS
 
     public Long getIdDespesa() { return idDespesa; }
 
@@ -41,4 +44,5 @@ public class Despesa {
     public String getObservacoes() { return observacoes; }
 
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+
 }

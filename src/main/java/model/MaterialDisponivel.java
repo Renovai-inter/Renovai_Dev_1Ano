@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class MaterialDisponivel {
+
+    // ATRIBUTOS
+
     private Long idDisponibilidade;
     private Long idCooperativa;
     private Long idMaterial;
@@ -12,6 +15,7 @@ public class MaterialDisponivel {
     private String observacoes;
     private LocalDateTime dataAtualizacao;
 
+    // GETTERS E SETTERS
 
     public Long getIdDisponibilidade() { return idDisponibilidade; }
 
@@ -36,4 +40,5 @@ public class MaterialDisponivel {
     public LocalDateTime getDataAtualizacao() { return dataAtualizacao; }
 
     public void setDataAtualizacao(LocalDateTime dataAtualizacao) { this.dataAtualizacao = dataAtualizacao; }
+
 }

@@ -4,6 +4,9 @@ package model;
 import java.time.LocalDateTime;
 
 public class Relatorio {
+
+    // ATRIBUTOS
+
     private Long idRelatorio;
     private Long idCooperativa;
     private Long idCooperadoGerador;
@@ -11,6 +14,7 @@ public class Relatorio {
     private String formatoExportacao;
     private LocalDateTime dataGeracao;
 
+    // GETTERS E SETTERS
 
     public Long getIdRelatorio() { return idRelatorio; }
 
@@ -35,4 +39,5 @@ public class Relatorio {
     public LocalDateTime getDataGeracao() { return dataGeracao; }
 
     public void setDataGeracao(LocalDateTime dataGeracao) { this.dataGeracao = dataGeracao; }
+
 }

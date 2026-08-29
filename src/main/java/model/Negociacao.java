@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Negociacao {
+
+    // ATRIBUTOS
+
     private Long idNegociacao;
     private Long idCooperativa;
     private Long idEmpresa;
@@ -16,6 +19,7 @@ public class Negociacao {
     private LocalDateTime dataCriacao;
     private LocalDateTime dataConclusao;
 
+    // GETTERS E SETTERS
 
     public Long getIdNegociacao() { return idNegociacao; }
 
@@ -56,4 +60,5 @@ public class Negociacao {
     public LocalDateTime getDataConclusao() { return dataConclusao; }
 
     public void setDataConclusao(LocalDateTime dataConclusao) { this.dataConclusao = dataConclusao; }
+
 }

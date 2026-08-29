@@ -4,6 +4,9 @@ package model;
 import java.time.LocalTime;
 
 public class HorarioFuncionamento {
+
+    // ATRIBUTOS
+
     private Long idHorario;
     private Long idCooperativa;
     private String diaSemana;
@@ -11,6 +14,7 @@ public class HorarioFuncionamento {
     private LocalTime horarioEncerramento;
     private boolean fechado;
 
+    // GETTERS E SETTERS
 
     public Long getIdHorario() { return idHorario; }
 
@@ -35,4 +39,5 @@ public class HorarioFuncionamento {
     public boolean isFechado() { return fechado; }
 
     public void setFechado(boolean fechado) { this.fechado = fechado; }
+
 }

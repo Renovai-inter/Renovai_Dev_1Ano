@@ -4,6 +4,9 @@ package model;
 import java.math.BigDecimal;
 
 public class AlertaInteresse {
+
+    // ATRIBUTOS
+
     private Long idAlerta;
     private Long idEmpresa;
     private Long idMaterial;
@@ -12,6 +15,7 @@ public class AlertaInteresse {
     private boolean notificarEmail;
     private boolean notificarApp;
 
+    // GETTERS E SETTERS
 
     public Long getIdAlerta() { return idAlerta; }
 
@@ -40,4 +44,5 @@ public class AlertaInteresse {
     public boolean isNotificarApp() { return notificarApp; }
 
     public void setNotificarApp(boolean notificarApp) { this.notificarApp = notificarApp; }
+
 }

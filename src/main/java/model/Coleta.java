@@ -6,6 +6,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Coleta {
+
+    // ATRIBUTOS
+
     private Long idColeta;
     private Long idCooperativa;
     private String tipo;
@@ -21,6 +24,7 @@ public class Coleta {
     private BigDecimal pesoTotalKg;
     private String observacoes;
 
+    // GETTERS E SETTERS
 
     public Long getIdColeta() { return idColeta; }
 
@@ -77,4 +81,5 @@ public class Coleta {
     public String getObservacoes() { return observacoes; }
 
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+
 }

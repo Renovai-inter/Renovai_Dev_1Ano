@@ -2,6 +2,9 @@
 package model;
 
 public class Rota {
+
+    // ATRIBUTOS
+
     private Long idRota;
     private Long idCooperativa;
     private String nomeRota;
@@ -18,4 +21,5 @@ public class Rota {
     public String getNomeRota() { return nomeRota; }
 
     public void setNomeRota(String nomeRota) { this.nomeRota = nomeRota; }
+
 }

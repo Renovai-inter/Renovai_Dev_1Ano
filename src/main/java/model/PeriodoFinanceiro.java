@@ -6,6 +6,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class PeriodoFinanceiro {
+
+    // ATRIBUTOS
+
     private Long idPeriodo;
     private Long idCooperativa;
     private LocalDate dataInicio;
@@ -18,6 +21,7 @@ public class PeriodoFinanceiro {
     private Integer qtdCooperadosParticipantes;
     private LocalDateTime dataFechamento;
 
+    // GETTERS E SETTERS
 
     public Long getIdPeriodo() { return idPeriodo; }
 
@@ -62,4 +66,5 @@ public class PeriodoFinanceiro {
     public LocalDateTime getDataFechamento() { return dataFechamento; }
 
     public void setDataFechamento(LocalDateTime dataFechamento) { this.dataFechamento = dataFechamento; }
+
 }

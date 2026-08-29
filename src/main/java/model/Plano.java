@@ -4,12 +4,16 @@ package model;
 import java.math.BigDecimal;
 
 public class Plano {
+
+    // ATRIBUTOS
+
     private Long idPlano;
     private String nome;
     private BigDecimal valor;
     private String periodicidade;
     private String descricaoRecursos;
 
+    // GETTERS E SETTERS
 
     public Long getIdPlano() { return idPlano; }
 
@@ -30,4 +34,5 @@ public class Plano {
     public String getDescricaoRecursos() { return descricaoRecursos; }
 
     public void setDescricaoRecursos(String descricaoRecursos) { this.descricaoRecursos = descricaoRecursos; }
+
 }

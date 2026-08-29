@@ -2,6 +2,9 @@
 package model;
 
 public class Comprador {
+
+    // ATRIBUTOS
+
     private Long idComprador;
     private Long idCooperativa;
     private Long idEmpresaRecicladora;
@@ -13,6 +16,7 @@ public class Comprador {
     private String cidade;
     private String observacoes;
 
+    // GETTERS E SETTERS
 
     public Long getIdComprador() { return idComprador; }
 
@@ -53,4 +57,5 @@ public class Comprador {
     public String getObservacoes() { return observacoes; }
 
     public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+
 }

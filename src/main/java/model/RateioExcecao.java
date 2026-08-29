@@ -4,12 +4,16 @@ package model;
 import java.math.BigDecimal;
 
 public class RateioExcecao {
+
+    // ATRIBUTOS
+
     private Long idExcecao;
     private Long idCooperativa;
     private Long idCooperado;
     private String tipo;
     private BigDecimal valor;
 
+    // GETTERS E SETTERS
 
     public Long getIdExcecao() { return idExcecao; }
 
@@ -30,4 +34,5 @@ public class RateioExcecao {
     public BigDecimal getValor() { return valor; }
 
     public void setValor(BigDecimal valor) { this.valor = valor; }
+
 }

@@ -2,9 +2,13 @@
 package model;
 
 public class EmpresaMaterialInteresse {
+
+    // ATRIBUTOS
+
     private Long idEmpresa;
     private Long idMaterial;
 
+    // GETTERS E SETTERS
 
     public Long getIdEmpresa() { return idEmpresa; }
 
@@ -13,4 +17,5 @@ public class EmpresaMaterialInteresse {
     public Long getIdMaterial() { return idMaterial; }
 
     public void setIdMaterial(Long idMaterial) { this.idMaterial = idMaterial; }
+
 }

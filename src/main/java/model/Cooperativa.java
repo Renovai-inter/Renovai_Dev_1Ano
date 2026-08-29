@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Cooperativa {
+
+    // ATRIBUTOS
+
     private Long idCooperativa;
     private String nome;
     private String cnpj;
@@ -23,6 +26,7 @@ public class Cooperativa {
     private String status;
     private LocalDateTime dataCadastro;
 
+    // GETTERS E SETTERS
 
     public Long getIdCooperativa() { return idCooperativa; }
 
@@ -91,4 +95,5 @@ public class Cooperativa {
     public LocalDateTime getDataCadastro() { return dataCadastro; }
 
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
+
 }

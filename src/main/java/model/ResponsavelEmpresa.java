@@ -2,11 +2,15 @@
 package model;
 
 public class ResponsavelEmpresa {
+
+    // ATRIBUTOS
+
     private Long idResponsavel;
     private Long idUsuario;
     private Long idEmpresa;
     private String cargo;
 
+    // GETTERS E SETTERS
 
     public Long getIdResponsavel() { return idResponsavel; }
 
@@ -23,4 +27,5 @@ public class ResponsavelEmpresa {
     public String getCargo() { return cargo; }
 
     public void setCargo(String cargo) { this.cargo = cargo; }
+
 }

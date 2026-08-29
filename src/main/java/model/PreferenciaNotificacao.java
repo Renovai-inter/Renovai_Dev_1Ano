@@ -2,6 +2,9 @@
 package model;
 
 public class PreferenciaNotificacao {
+
+    // ATRIBUTOS
+
     private Long idPreferencia;
     private Long idCooperativa;
     private Long idEmpresa;
@@ -9,6 +12,7 @@ public class PreferenciaNotificacao {
     private boolean receberEmail;
     private boolean receberApp;
 
+    // GETTERS E SETTERS
 
     public Long getIdPreferencia() { return idPreferencia; }
 
@@ -33,4 +37,5 @@ public class PreferenciaNotificacao {
     public boolean isReceberApp() { return receberApp; }
 
     public void setReceberApp(boolean receberApp) { this.receberApp = receberApp; }
+
 }

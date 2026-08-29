@@ -4,6 +4,9 @@ package model;
 import java.time.LocalDate;
 
 public class Assinatura {
+
+    // ATRIBUTOS
+
     private Long idAssinatura;
     private Long idEmpresa;
     private Long idPlano;
@@ -11,6 +14,7 @@ public class Assinatura {
     private LocalDate dataInicio;
     private LocalDate dataVencimento;
 
+    // GETTERS E SETTERS
 
     public Long getIdAssinatura() { return idAssinatura; }
 
@@ -35,4 +39,5 @@ public class Assinatura {
     public LocalDate getDataVencimento() { return dataVencimento; }
 
     public void setDataVencimento(LocalDate dataVencimento) { this.dataVencimento = dataVencimento; }
+
 }

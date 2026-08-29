@@ -4,10 +4,14 @@ package model;
 import java.math.BigDecimal;
 
 public class RateioDistribuicao {
+
+    // ATRIBUTOS
+
     private Long idPeriodo;
     private Long idCooperado;
     private BigDecimal valorRecebido;
 
+    // GETTERS E SETTERS
 
     public Long getIdPeriodo() { return idPeriodo; }
 
@@ -20,4 +24,5 @@ public class RateioDistribuicao {
     public BigDecimal getValorRecebido() { return valorRecebido; }
 
     public void setValorRecebido(BigDecimal valorRecebido) { this.valorRecebido = valorRecebido; }
+
 }

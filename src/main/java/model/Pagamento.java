@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Pagamento {
+
+    // ATRIBUTOS
+
     private Long idPagamento;
     private Long idAssinatura;
     private LocalDate dataPagamento;
@@ -13,6 +16,7 @@ public class Pagamento {
     private String formaPagamento;
     private String identificadorTransacao;
 
+    // GETTERS E SETTERS
 
     public Long getIdPagamento() { return idPagamento; }
 
@@ -41,4 +45,5 @@ public class Pagamento {
     public String getIdentificadorTransacao() { return identificadorTransacao; }
 
     public void setIdentificadorTransacao(String identificadorTransacao) { this.identificadorTransacao = identificadorTransacao; }
+
 }

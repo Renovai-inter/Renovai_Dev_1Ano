@@ -4,6 +4,9 @@ package model;
 import java.time.LocalDateTime;
 
 public class Usuario {
+
+    // ATRIBUTOS
+
     private Long idUsuario;
     private String nomeCompleto;
     private String nomeUsuario;
@@ -13,6 +16,7 @@ public class Usuario {
     private String tipoUsuario;
     private LocalDateTime dataCriacao;
 
+    // GETTERS E SETTERS
 
     public Long getIdUsuario() { return idUsuario; }
 
@@ -45,4 +49,5 @@ public class Usuario {
     public LocalDateTime getDataCriacao() { return dataCriacao; }
 
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
+
 }

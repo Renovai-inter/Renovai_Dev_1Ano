@@ -5,6 +5,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class Venda {
+
+    // ATRIBUTOS
+
     private Long idVenda;
     private Long idCooperativa;
     private Long idComprador;
@@ -20,6 +23,7 @@ public class Venda {
     private String observacoes;
     private String status;
 
+    // GETTERS E SETTERS
 
     public Long getIdVenda() { return idVenda; }
 
@@ -76,4 +80,5 @@ public class Venda {
     public String getStatus() { return status; }
 
     public void setStatus(String status) { this.status = status; }
+
 }

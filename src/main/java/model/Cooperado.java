@@ -4,6 +4,9 @@ package model;
 import java.time.LocalDateTime;
 
 public class Cooperado {
+
+    // ATRIBUTOS
+
     private Long idCooperado;
     private Long idUsuario;
     private Long idCooperativa;
@@ -12,6 +15,7 @@ public class Cooperado {
     private String status;
     private LocalDateTime dataCadastro;
 
+    // GETTERS E SETTERS
 
     public Long getIdCooperado() { return idCooperado; }
 
@@ -40,4 +44,5 @@ public class Cooperado {
     public LocalDateTime getDataCadastro() { return dataCadastro; }
 
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
+
 }

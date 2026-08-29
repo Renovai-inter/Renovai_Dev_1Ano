@@ -4,11 +4,15 @@ package model;
 import java.time.LocalDateTime;
 
 public class PesquisaRecente {
+
+    // ATRIBUTOS
+
     private Long idPesquisa;
     private Long idEmpresa;
     private String termoPesquisa;
     private LocalDateTime dataPesquisa;
 
+    // GETTERS E SETTERS
 
     public Long getIdPesquisa() { return idPesquisa; }
 
@@ -25,4 +29,5 @@ public class PesquisaRecente {
     public LocalDateTime getDataPesquisa() { return dataPesquisa; }
 
     public void setDataPesquisa(LocalDateTime dataPesquisa) { this.dataPesquisa = dataPesquisa; }
+
 }

@@ -2,10 +2,14 @@
 package model;
 
 public class AreaAtuacao {
+
+    // ATRIBUTOS
+
     private Long idArea;
     private Long idCooperativa;
     private String municipioRegiao;
 
+    // GETTERS E SETTERS
 
     public Long getIdArea() { return idArea; }
 
@@ -18,4 +22,5 @@ public class AreaAtuacao {
     public String getMunicipioRegiao() { return municipioRegiao; }
 
     public void setMunicipioRegiao(String municipioRegiao) { this.municipioRegiao = municipioRegiao; }
+
 }

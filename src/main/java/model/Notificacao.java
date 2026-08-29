@@ -4,6 +4,9 @@ package model;
 import java.time.LocalDateTime;
 
 public class Notificacao {
+
+    // ATRIBUTOS
+
     private Long idNotificacao;
     private String destinatarioTipo;
     private Long idCooperativa;
@@ -16,6 +19,7 @@ public class Notificacao {
     private String referenciaTipo;
     private Long referenciaId;
 
+    // GETTERS E SETTERS
 
     public Long getIdNotificacao() { return idNotificacao; }
 
@@ -60,4 +64,5 @@ public class Notificacao {
     public Long getReferenciaId() { return referenciaId; }
 
     public void setReferenciaId(Long referenciaId) { this.referenciaId = referenciaId; }
+
 }

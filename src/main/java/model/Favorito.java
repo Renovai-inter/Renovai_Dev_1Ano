@@ -4,10 +4,14 @@ package model;
 import java.time.LocalDateTime;
 
 public class Favorito {
+
+    // ATRIBUTOS
+
     private Long idEmpresa;
     private Long idCooperativa;
     private LocalDateTime dataAdicao;
 
+    // GETTERS E SETTERS
 
     public Long getIdEmpresa() { return idEmpresa; }
 
@@ -20,4 +24,5 @@ public class Favorito {
     public LocalDateTime getDataAdicao() { return dataAdicao; }
 
     public void setDataAdicao(LocalDateTime dataAdicao) { this.dataAdicao = dataAdicao; }
+
 }
