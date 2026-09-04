@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal" created-in="IU-262.9437.185">
+    <data-source name="defaultdb@pg-27a0b4e6-institutojef-c8b8.f.aivencloud.com" uuid="e584b6ef-e13e-4c1b-8e56-dc93aa5a6f0f">
+      <database-info product="" version="" jdbc-version="" driver-name="" driver-version="" dbms="POSTGRES" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>avnadmin</user-name>
+      <schema-mapping />
+    </data-source>
+  </component>
+</project>
