@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="defaultdb@pg-27a0b4e6-institutojef-c8b8.f.aivencloud.com" uuid="e584b6ef-e13e-4c1b-8e56-dc93aa5a6f0f">
+    <data-source source="LOCAL" name="inter2@pg-27a0b4e6-institutojef-c8b8.f.aivencloud.com" uuid="e584b6ef-e13e-4c1b-8e56-dc93aa5a6f0f">
       <driver-ref>postgresql</driver-ref>
       <synchronize>true</synchronize>
+      <configured-by-url>true</configured-by-url>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://pg-27a0b4e6-institutojef-c8b8.f.aivencloud.com:26787/defaultdb?ssl=require</jdbc-url>
+      <jdbc-url>jdbc:postgresql://pg-27a0b4e6-institutojef-c8b8.f.aivencloud.com:26787/inter2</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
