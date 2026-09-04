@@ -21,26 +21,44 @@ public class CooperativaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma nova cooperativa e todos os seus respectivos dados
-    public String cadastrarCooperativa() {
+    public int cadastrarCooperativa(String nome, String cnpj, String emailInstitucional, String telefoneWhatsapp,
+                                       String cep) {
 
         Connection conexao = conn.conectar();
 
-        String sql = "INSERT INTO cooperativa " +
-                "                (id_cooperativa, nome, cnpj," +
-                "                        nome_publico, email_institucional," +
-                "                        telefone_whatsapp, cep) VALUES" +
-                "                (?, ?, ?, ?, ?, ?, ?)";
-
-        String ultimo_id = "SELECT id_cooperativa FROM cooperativa ORDER BY id_cooperativa DESC LIMIT 1";
+        String sql =
+                "INSERT INTO cooperativa " +
+                    "(id_cooperativa, nome, cnpj, " +
+                    "nome_publico, email_institucional, telefone_whatsapp, " +
+                    "cep, endereco, cidade, estado) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-            pstmt.setInt(1, );
+            int ultimoId = getUltimoId();
+
+            // Verifica se o ultimoId foi encontrado (-1) se não
+            if (ultimoId == -1) {
+                return 0;
+            } else {
+                pstmt.setInt(1, getUltimoId()+1);
+            }
+            pstmt.setString(2, nome);
+            pstmt.setString(3, cnpj);
+            pstmt.setString(4, nome);
+            pstmt.setString(5, emailInstitucional);
+            pstmt.setString(6, telefoneWhatsapp);
+            pstmt.setString(7, cep);
+            pstmt.setString(8, "ENDERECO");
+            pstmt.setString(9, "CIDADE");
+            pstmt.setString(10, "ESTADO");
+
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return 0;
         }
 
     }
