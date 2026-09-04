@@ -201,7 +201,7 @@ public class CooperativaDAO {
     // === METODOS READ ================================================================================================
 
     // Static que retorna o último índice de ID das cooperativas
-    private static int getUltimoId() {
+    public int getUltimoId() {
 
         Connection conexao = conn.conectar();
 
