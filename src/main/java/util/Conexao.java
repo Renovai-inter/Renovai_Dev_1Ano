@@ -10,9 +10,9 @@ public class Conexao {
     // DECLARACAO
 
     // Variaveis estaticas usadas para estabelecer a conexao com o banco
-    private static final String URL = "jdbc:postgresql://pg-27a0b4e6-institutojef-c8b8.f.aivencloud.com:26787/defaultdb?ssl=require&user=avnadmin&password=AVNS_Z8SXBKA_tLRt9haYRNs";
+    private static final String URL = "http://2a8ff530-renovai-3741.c.aivencloud.com:18259/defaultdb?user=avnadmin&password=SUA_SENHA&sslmode=require";
     private static final String USER = "avnadmin";
-    private static final String PASSWORD = "AVNS_Z8SXBKA_tLRt9haYRNs";
+    private static final String PASSWORD = "SUA_SENHA";
 
     // METODOS
 
@@ -21,7 +21,6 @@ public class Conexao {
 
         try {
 
-            System.out.println("Conectado com sucesso!");
             return DriverManager.getConnection(URL, USER, PASSWORD);
 
         } catch (SQLException e) {
@@ -39,7 +38,6 @@ public class Conexao {
             try {
 
                 conn.close();
-                System.out.println("Desconectado com sucesso!");
 
             } catch (SQLException e) {
 
