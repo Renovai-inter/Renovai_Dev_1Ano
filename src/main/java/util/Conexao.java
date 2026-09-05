@@ -10,9 +10,9 @@ public class Conexao {
     // DECLARACAO
 
     // Variaveis estaticas usadas para estabelecer a conexao com o banco
-    private static final String URL = "http://2a8ff530-renovai-3741.c.aivencloud.com:18259/defaultdb?user=avnadmin&password=SUA_SENHA&sslmode=require";
+    private static final String URL = "jdbc:postgresql://pg-2a8ff530-renovai-3741.c.aivencloud.com:18259/defaultdb?ssl=require&user=avnadmin&password=AVNS_Xvlv8rkRH-2JwXE3yHi";
     private static final String USER = "avnadmin";
-    private static final String PASSWORD = "SUA_SENHA";
+    private static final String PASSWORD = "AVNS_Xvlv8rkRH-2JwXE3yHi";
 
     // METODOS
 
