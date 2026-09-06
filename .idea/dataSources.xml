@@ -6,7 +6,7 @@
       <synchronize>true</synchronize>
       <configured-by-url>true</configured-by-url>
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
-      <jdbc-url>jdbc:postgresql://pg-2a8ff530-renovai-3741.c.aivencloud.com:18259/defaultdb?ssl=require&amp;user=avnadmin&amp;password=AVNS_Xvlv8rkRH-2JwXE3yHi</jdbc-url>
+      <jdbc-url>jdbc:postgresql://pg-2a8ff530-renovai-3741.c.aivencloud.com:18259/defaultdb</jdbc-url>
       <jdbc-additional-properties>
         <property name="com.intellij.clouds.kubernetes.db.host.port" />
         <property name="com.intellij.clouds.kubernetes.db.enabled" value="false" />
