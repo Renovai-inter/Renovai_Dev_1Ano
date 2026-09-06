@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="dataSourceStorageLocal" created-in="IU-262.9437.185">
-    <data-source name="inter2@pg-27a0b4e6-institutojef-c8b8.f.aivencloud.com" uuid="e584b6ef-e13e-4c1b-8e56-dc93aa5a6f0f">
-      <database-info product="PostgreSQL" version="17.11" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.7.13" dbms="POSTGRES" exact-version="17.11" exact-driver-version="42.7">
+    <data-source name="dbRenovai" uuid="26d6ae31-952d-4a78-8651-6d04c1e62c58">
+      <database-info product="PostgreSQL" version="18.6" jdbc-version="4.2" driver-name="PostgreSQL JDBC Driver" driver-version="42.7.13" dbms="POSTGRES" exact-version="18.6" exact-driver-version="42.7">
         <identifier-quote-string>&quot;</identifier-quote-string>
       </database-info>
       <case-sensitivity plain-identifiers="lower" quoted-identifiers="exact" />
