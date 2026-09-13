@@ -92,10 +92,61 @@ public class MaterialDAO {
 
 
     // === METODOS UPDATE ==============================================================================================
+    public int atualizarRota(Material material) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE material\n" +
+                "SET nome = ?, categoria = ?\n" +
+                "WHERE id_material = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1,material.getNome());
+            pstmt.setString(2,material.getCategoria());
+            pstmt.setLong(3,material.getIdMaterial());
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            return -1;
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
 
 
 
     // === METODOS DELETE ==============================================================================================
+    public int excluirRota(Material material) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "DELETE FROM material\n" +
+                "WHERE id_material = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+
+            pstmt.setLong(1,material.getIdMaterial());
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            return -1;
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
 
     // Retorna o último índice de ID dos materiais
     public long getUltimoIdMaterial () {
