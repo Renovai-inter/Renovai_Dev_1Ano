@@ -1,13 +1,12 @@
 package dao;
 
-import model.Material;
+import model.Coleta;
 import util.Conexao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ColetaDAO {
 
@@ -22,14 +21,14 @@ public class ColetaDAO {
 
     // === METODOS CREATE ==============================================================================================
 
-    public int registrarColeta(String tipo, String status, String origem_entrega, String nome_local_origem, String observacoes){
+    public int registrarColeta(String tipo, String status, String origem_entrega, String nome_local_origem, String observacoes) {
 
         String sql = "INSERT INTO coleta(id_coleta, id_cooperativa, tipo, status, id_rota, id_endereco_rota, id_cooperado_responsavel," +
                 "origem_entrega, nome_local_origem, data_agendada, data_inicio, data_fim, peso_total_kg, observacoes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         Connection conexao = conn.conectar();
 
-        try{
+        try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
             //valores esperados pela query
             pstm.setString(1, tipo);
@@ -47,19 +46,20 @@ public class ColetaDAO {
         return 0;
     }
 
-    }
-
 
     // === METODOS READ ================================================================================================
-    public ArrayList<Material> listarColetas() {
+    public ArrayList<Coleta> listarColetas() {
 
-        ArrayList<Material> materiais = new ArrayList<>();
+        ArrayList<Coleta> coletas = new ArrayList<>();
 
         Connection conexao = conn.conectar();
 
         String sql = "SELECT " +
-                "id_material," +
-                "nome,categoria FROM material";
+                "id_coleta, id_cooperativa," +
+                "tipo,status,id_rota," + "id_endereco_rota,id_cooperado_responsavel," +
+                "origem_entrega,nome_local_origem,data_agendada,data_inicio,data_fim" +
+                ",peso_total_kg,observacoes " +
+                "FROM coleta";
 
         try {
 
@@ -67,33 +67,59 @@ public class ColetaDAO {
 
             ResultSet rs = pstmt.executeQuery();
 
-            while (rs.next()){
-                Material material = new Material();
-                Long idMaterial = rs.getLong("id_material");
-                String nomeMaterial = rs.getString("nome");
-                String categoria = rs.getString("categoria");
-                material.setIdMaterial(idMaterial);
-                material.setNome(nomeMaterial);
-                material.setCategoria(categoria);
-                materiais.add(material);
+            while (rs.next()) {
+                Coleta coleta = new Coleta();
+                Long id_coleta = rs.getLong("id_coleta");
+                Long id_cooperativa = rs.getLong("id_cooperativa");
+                String tipo = rs.getString("tipo");
+                String status = rs.getString("status");
+                Long id_rota = rs.getLong("id_rota");
+                Long id_endereco_rota = rs.getLong("id_endereco_rota");
+                Long id_cooperado_responsavel = rs.getLong("id_cooperado_responsavel");
+                String origem = rs.getString("origem_entrega");
+                String nome_local_origem = rs.getString("nome_local_origem");
+                Date data_agendada = rs.getDate("data_agendada");
+                Timestamp data_inicio = rs.getTimestamp("data_inicio");
+                Timestamp data_fim = rs.getTimestamp("data_fim");
+                BigDecimal peso_total_kg = rs.getBigDecimal("peso_total_kg");
+                String observacoes = rs.getString("observacoes");
+
+
+                coleta.setIdColeta(id_coleta);
+                coleta.setIdCooperativa(id_cooperativa);
+                coleta.setTipo(tipo);
+                coleta.setStatus(status);
+                coleta.setIdRota(id_rota);
+                coleta.setIdEnderecoRota(id_endereco_rota);
+                coleta.setIdCooperadoResponsavel(id_cooperado_responsavel);
+                coleta.setOrigemEntrega(origem);
+                coleta.setNomeLocalOrigem(nome_local_origem);
+                coleta.setDataAgendada(data_agendada);
+                coleta.setDataInicio(data_inicio);
+                coleta.setDataFim(data_fim);
+                coleta.setPesoTotalKg(peso_total_kg);
+                coleta.setObservacoes(observacoes);
+
+
+                coletas.add(coleta);
             }
-            return materiais;
-        }catch (SQLException e) {
-            return new ArrayList<>();
+
+            rs.close();
+            pstmt.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         } finally {
             conn.desconectar(conexao);
         }
+        return coletas;
     }
-
-
 
 
 // === METODOS UPDATE ==============================================================================================
 
 
-
     // === METODOS DELETE ==============================================================================================
 
 
-
+}
 
