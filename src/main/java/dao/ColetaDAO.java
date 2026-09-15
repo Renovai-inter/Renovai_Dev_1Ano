@@ -1,6 +1,7 @@
 package dao;
 
 import model.Coleta;
+import model.Material;
 import util.Conexao;
 
 import java.math.BigDecimal;
@@ -115,7 +116,44 @@ public class ColetaDAO {
     }
 
 
-// === METODOS UPDATE ==============================================================================================
+    // === METODOS UPDATE ==============================================================================================
+    public int atualizarColeta(Coleta coleta) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE coleta\n" +
+                "SET tipo = ?, status = ?," +
+                "\n origem_entrega = ?,nome_local_origem = ?," +
+                "data_agendada = ?, data_inicio = ?, data_fim = ?," +
+                "peso_total_kg = ?, observacoes = ? " +
+                "WHERE id_coleta = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1,coleta.getTipo());
+            pstmt.setString(2,coleta.getStatus());
+            pstmt.setString(3,coleta.getOrigemEntrega());
+            pstmt.setString(4,coleta.getNomeLocalOrigem());
+            pstmt.setDate(5, new java.sql.Date(coleta.getDataAgendada().getTime()));
+            pstmt.setTimestamp(6,coleta.getDataInicio());
+            pstmt.setTimestamp(7,coleta.getDataFim());
+            pstmt.setBigDecimal(8,coleta.getPesoTotalKg());
+            pstmt.setString(9,coleta.getObservacoes());
+            pstmt.setLong(10,coleta.getIdColeta());
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
 
 
     // === METODOS DELETE ==============================================================================================
