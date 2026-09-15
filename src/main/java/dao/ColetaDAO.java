@@ -1,10 +1,13 @@
 package dao;
 
+import model.Material;
 import util.Conexao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class ColetaDAO {
 
@@ -48,10 +51,44 @@ public class ColetaDAO {
 
 
     // === METODOS READ ================================================================================================
+    public ArrayList<Material> listarColetas() {
+
+        ArrayList<Material> materiais = new ArrayList<>();
+
+        Connection conexao = conn.conectar();
+
+        String sql = "SELECT " +
+                "id_material," +
+                "nome,categoria FROM material";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()){
+                Material material = new Material();
+                Long idMaterial = rs.getLong("id_material");
+                String nomeMaterial = rs.getString("nome");
+                String categoria = rs.getString("categoria");
+                material.setIdMaterial(idMaterial);
+                material.setNome(nomeMaterial);
+                material.setCategoria(categoria);
+                materiais.add(material);
+            }
+            return materiais;
+        }catch (SQLException e) {
+            return new ArrayList<>();
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
 
 
 
-    // === METODOS UPDATE ==============================================================================================
+
+// === METODOS UPDATE ==============================================================================================
 
 
 
