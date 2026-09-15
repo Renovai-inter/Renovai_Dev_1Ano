@@ -1,7 +1,6 @@
 package dao;
 
 import model.Coleta;
-import model.Material;
 import util.Conexao;
 
 import java.math.BigDecimal;
@@ -22,29 +21,39 @@ public class ColetaDAO {
 
     // === METODOS CREATE ==============================================================================================
 
-    public int registrarColeta(String tipo, String status, String origem_entrega, String nome_local_origem, String observacoes) {
-
-        String sql = "INSERT INTO coleta(id_coleta, id_cooperativa, tipo, status, id_rota, id_endereco_rota, id_cooperado_responsavel," +
-                "origem_entrega, nome_local_origem, data_agendada, data_inicio, data_fim, peso_total_kg, observacoes) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    public int cadastrarColeta(Coleta coleta) {
 
         Connection conexao = conn.conectar();
 
+        String sql = "INSERT INTO coleta " + "(id_coleta, id_cooperativa," +
+                "tipo, status, id_rota, id_endereco_rota, id_cooperado_responsavel,"
+                + "origem_entrega, nome_local_origem, data_agendada, data_inicio" +
+                ",data_fim, peso_total_kg, observacoes)" +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         try {
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-            //valores esperados pela query
-            pstm.setString(1, tipo);
-            pstm.setString(2, status);
-            pstm.setString(3, origem_entrega);
-            pstm.setString(4, nome_local_origem);
-            pstm.setString(5, observacoes);
-            //executando a query
-            pstm.execute();
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            long ultimoIdColeta = getUltimoIdColeta();
+
+            if (ultimoIdColeta == -1) {
+                pstmt.setLong(1,1);
+            } else {
+                pstmt.setLong(1,ultimoIdColeta + 1);
+            }
+
+            pstmt.setString(2, material.getNome());
+
+            pstmt.setString(3, material.getCategoria());
+
+            return pstmt.executeUpdate();
+
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            return 0;
         } finally {
             conn.desconectar(conexao);
         }
-        return 0;
     }
 
 
@@ -157,7 +166,55 @@ public class ColetaDAO {
 
 
     // === METODOS DELETE ==============================================================================================
+    public int excluirColeta(Coleta coleta) {
 
+        Connection conexao = conn.conectar();
+
+        String sql = "DELETE FROM coleta\n" +
+                "WHERE id_coleta = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+
+            pstmt.setLong(1,coleta.getIdColeta());
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+    // Retorna o último índice de ID dos materiais
+    public long getUltimoIdColeta () {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "SELECT id_coleta " +
+                "FROM coleta " +
+                "ORDER BY coleta.id_coleta DESC LIMIT 1";
+
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()){
+                return rs.getLong("id_coleta");
+            }
+            else {
+                return -1;
+            }
+        }
+        catch (SQLException e) {
+            return -1;
+        } finally { conn.desconectar(conexao); } }
 
 }
 
