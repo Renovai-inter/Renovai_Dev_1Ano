@@ -43,9 +43,31 @@ public class ColetaDAO {
                 pstmt.setLong(1,ultimoIdColeta + 1);
             }
 
-            pstmt.setString(2, material.getNome());
+            pstmt.setLong(2, coleta.getIdCooperativa());
 
-            pstmt.setString(3, material.getCategoria());
+            pstmt.setString(3, coleta.getTipo());
+
+            pstmt.setString(4,coleta.getStatus());
+
+            pstmt.setLong(5, coleta.getIdRota());
+
+            pstmt.setLong(6, coleta.getIdEnderecoRota());
+
+            pstmt.setLong(7, coleta.getIdCooperadoResponsavel());
+
+            pstmt.setString(8, coleta.getOrigemEntrega());
+
+            pstmt.setString(9, coleta.getNomeLocalOrigem());
+
+            pstmt.setDate(10, new java.sql.Date(coleta.getDataAgendada().getTime()));
+
+            pstmt.setTimestamp(11, coleta.getDataInicio());
+
+            pstmt.setTimestamp(12, coleta.getDataFim());
+
+            pstmt.setBigDecimal(13,coleta.getPesoTotalKg());
+
+            pstmt.setString(14,coleta.getObservacoes());
 
             return pstmt.executeUpdate();
 
@@ -191,7 +213,7 @@ public class ColetaDAO {
             conn.desconectar(conexao);
         }
     }
-    // Retorna o último índice de ID dos materiais
+    // Retorna o último índice de ID das coletas
     public long getUltimoIdColeta () {
 
         Connection conexao = conn.conectar();
