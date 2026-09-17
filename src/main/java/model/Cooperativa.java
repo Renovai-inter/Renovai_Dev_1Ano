@@ -29,23 +29,23 @@ public class Cooperativa {
     // CONSTRUTOR
 
     public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro) {
-        this.idCooperativa = idCooperativa;
-        this.nome = nome;
-        this.cnpj = cnpj;
-        this.nomePublico = nomePublico;
-        this.descricaoInstitucional = descricaoInstitucional;
-        this.logoUrl = logoUrl;
-        this.emailInstitucional = emailInstitucional;
-        this.telefoneWhatsapp = telefoneWhatsapp;
-        this.cep = cep;
-        this.endereco = endereco;
-        this.cidade = cidade;
-        this.estado = estado;
-        this.dataFundacao = dataFundacao;
-        this.canalContatoPreferencial = canalContatoPreferencial;
-        this.linkWhatsapp = linkWhatsapp;
-        this.status = status;
-        this.dataCadastro = dataCadastro;
+        this.idCooperativa = idCooperativa; // pk - obrigatorio
+        this.nome = nome; // obrigatorio
+        this.cnpj = cnpj; // opcional
+        this.nomePublico = nomePublico;  // obrigatorio
+        this.descricaoInstitucional = descricaoInstitucional; // opcional
+        this.logoUrl = logoUrl; // opcional
+        this.emailInstitucional = emailInstitucional; // obrigatorio
+        this.telefoneWhatsapp = telefoneWhatsapp; // obrigatorio
+        this.cep = cep; // obrigatorio
+        this.endereco = endereco; // obrigatorio
+        this.cidade = cidade; // obrigatorio
+        this.estado = estado; // orbigatorio
+        this.dataFundacao = dataFundacao; // opcional
+        this.canalContatoPreferencial = canalContatoPreferencial; // obrigatorio (c/default)
+        this.linkWhatsapp = linkWhatsapp; // opcional
+        this.status = status; // obrigatorio (c/default)
+        this.dataCadastro = dataCadastro; // obrigatorio (c/default)
     }
 
     public Cooperativa() {

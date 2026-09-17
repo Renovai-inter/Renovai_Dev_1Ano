@@ -1,5 +1,6 @@
 package dao;
 
+import model.Cooperativa;
 import util.Conexao;
 
 import java.sql.Connection;
@@ -20,9 +21,8 @@ public class CooperativaDAO {
 
     // === METODOS CREATE ==============================================================================================
 
-    // Metodo de cadastrar cooperativa
-    public int cadastrarCooperativa(String nome, String cnpj, String emailInstitucional, String telefoneWhatsapp,
-                                       String cep) {
+    // Metodo de cadastrar cooperativa | todo: implementar API de buscar endereço por CEP
+    public int cadastrarCooperativa(Cooperativa cooperativa) {
 
         Connection conexao = conn.conectar();
 
