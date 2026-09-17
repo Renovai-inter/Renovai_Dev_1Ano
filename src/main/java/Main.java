@@ -9,6 +9,10 @@ public class Main {
 
     public static void main(String[] args) {
 
+        String PASSWORD = System.getenv("DB_PASSWORD");
+
+        System.out.println();
+
         CooperativaDAO c = new CooperativaDAO();
 
         Rota rota = new Rota();

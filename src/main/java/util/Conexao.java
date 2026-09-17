@@ -14,6 +14,8 @@ public class Conexao {
     private static final String USER = System.getenv("DB_USER");
     private static final String PASSWORD = System.getenv("DB_PASSWORD");
 
+
+
     // METODOS
 
     // Metodo para estabelecer conexao com o banco de dados
