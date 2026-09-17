@@ -5,7 +5,6 @@ import util.Conexao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CooperativaDAO {
@@ -17,6 +16,27 @@ public class CooperativaDAO {
     // CONSTRUTOR
 
     public CooperativaDAO() {
+    }
+
+    // === METODOS DE VALIDACAO E REGEX ================================================================================
+
+    // Filtrar o CNPJ para retornar apenas valores numéricos
+    private static String validarCnpj(String cnpj) {
+
+        // Tratamento inicial
+        cnpj.trim();
+
+        // Retirar "." e "-"
+        cnpj.replace(".", "");
+        cnpj.replace("-", "");
+
+        // Verificar formato (regex) correto
+        if (cnpj.matches("^\\d{11}$")) {
+            return cnpj;
+        } else {
+            return "cnpj invalido";
+        }
+
     }
 
     // === METODOS CREATE ==============================================================================================
