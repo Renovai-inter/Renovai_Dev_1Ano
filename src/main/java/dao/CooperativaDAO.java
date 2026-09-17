@@ -5,6 +5,7 @@ import util.Conexao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class CooperativaDAO {
@@ -38,6 +39,33 @@ public class CooperativaDAO {
         }
 
     }
+
+    // === OUTROS METODOS ==============================================================================================
+
+    // Retorna o último índice de ID das cooperativas
+    public long getUltimoIdMaterial () {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "SELECT id_cooperativa " +
+                "FROM cooperativa " +
+                "ORDER BY 1 DESC LIMIT 1";
+
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()){
+                return rs.getLong("id_material");
+            }
+            else {
+                return -1;
+            }
+        }
+        catch (SQLException e) {
+            return -1;
+        } finally { conn.desconectar(conexao); } }
 
     // === METODOS CREATE ==============================================================================================
 
