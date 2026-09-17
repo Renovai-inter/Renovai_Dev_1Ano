@@ -70,16 +70,38 @@ public class CooperativaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Metodo de cadastrar cooperativa | todo: implementar API de buscar endereço por CEP
-    public int cadastrarCooperativa(Cooperativa cooperativa) {
+    public int cadastrarCooperativa(Cooperativa coop) {
+
+        // DECLARACAO
 
         Connection conexao = conn.conectar();
+        String sql;
 
-        String sql =
-                "INSERT INTO cooperativa " +
+        // VALIDAÇÃO DE VALORES OPCIONAIS PARA CRIAR COMANDO SQL
+
+        // CNPJ como valor opcional
+
+        if (coop.getCnpj().isEmpty()) {
+            sql = "INSERT INTO cooperativa " +
+                    "(id_cooperativa, nome, " +
+                    "nome_publico, email_institucional, telefone_whatsapp, " +
+                    "cep, endereco, cidade, estado) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        } else {
+            sql = "INSERT INTO cooperativa " +
                     "(id_cooperativa, nome, cnpj, " +
                     "nome_publico, email_institucional, telefone_whatsapp, " +
                     "cep, endereco, cidade, estado) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        }
+
+        // todo: Descrição como valor opcional
+
+        // todo: Logo como valor opcional
+
+
+
+        if ()
 
         try {
 
