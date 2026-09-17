@@ -26,6 +26,31 @@ public class Cooperativa {
     private String status;
     private LocalDateTime dataCadastro;
 
+    // CONSTRUTOR
+
+    public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro) {
+        this.idCooperativa = idCooperativa;
+        this.nome = nome;
+        this.cnpj = cnpj;
+        this.nomePublico = nomePublico;
+        this.descricaoInstitucional = descricaoInstitucional;
+        this.logoUrl = logoUrl;
+        this.emailInstitucional = emailInstitucional;
+        this.telefoneWhatsapp = telefoneWhatsapp;
+        this.cep = cep;
+        this.endereco = endereco;
+        this.cidade = cidade;
+        this.estado = estado;
+        this.dataFundacao = dataFundacao;
+        this.canalContatoPreferencial = canalContatoPreferencial;
+        this.linkWhatsapp = linkWhatsapp;
+        this.status = status;
+        this.dataCadastro = dataCadastro;
+    }
+
+    public Cooperativa() {
+    }
+
     // GETTERS E SETTERS
 
     public Long getIdCooperativa() { return idCooperativa; }
