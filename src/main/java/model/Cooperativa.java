@@ -30,17 +30,17 @@ public class Cooperativa {
 
     public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro) {
         this.idCooperativa = idCooperativa; // pk - obrigatorio
-        this.nome = nome; // obrigatorio
-        this.cnpj = cnpj; // opcional
+        this.nome = nome; // obrigatorio | CREATE
+        this.cnpj = cnpj; // opcional | CREATE
         this.nomePublico = nomePublico;  // obrigatorio
-        this.descricaoInstitucional = descricaoInstitucional; // opcional
-        this.logoUrl = logoUrl; // opcional
-        this.emailInstitucional = emailInstitucional; // obrigatorio
-        this.telefoneWhatsapp = telefoneWhatsapp; // obrigatorio
-        this.cep = cep; // obrigatorio
-        this.endereco = endereco; // obrigatorio
-        this.cidade = cidade; // obrigatorio
-        this.estado = estado; // orbigatorio
+        this.descricaoInstitucional = descricaoInstitucional; // opcional | CREATE
+        this.logoUrl = logoUrl; // opcional | CREATE
+        this.emailInstitucional = emailInstitucional; // obrigatorio | CREATE
+        this.telefoneWhatsapp = telefoneWhatsapp; // obrigatorio | CREATE
+        this.cep = cep; // obrigatorio | CREATE
+        this.endereco = endereco; // obrigatorio | CREATE
+        this.cidade = cidade; // obrigatorio | CREATE
+        this.estado = estado; // obrigatorio | CREATE
         this.dataFundacao = dataFundacao; // opcional
         this.canalContatoPreferencial = canalContatoPreferencial; // obrigatorio (c/default)
         this.linkWhatsapp = linkWhatsapp; // opcional

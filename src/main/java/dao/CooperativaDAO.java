@@ -61,10 +61,12 @@ public class CooperativaDAO {
 
     }
 
+    // todo: Validar Cidade e UF
+
     // === OUTROS METODOS ==============================================================================================
 
     // Retorna o último índice de ID das cooperativas
-    public long getUltimoIdMaterial () {
+    public long getUltimoIdCooperativa() {
 
         Connection conexao = conn.conectar();
 
@@ -96,29 +98,25 @@ public class CooperativaDAO {
         // DECLARACAO
 
         Connection conexao = conn.conectar();
+
         String sql;
 
-        // VALIDAÇÃO DE VALORES OPCIONAIS PARA CRIAR COMANDO SQL
+        boolean contemCnpj = coop.getCnpj().isEmpty();
+        boolean contemDescricao;
+        boolean contemLogo;
 
-        // CNPJ como valor opcional
+        // COMANDO SQL PADRÃO
 
-        if (coop.getCnpj().isEmpty()) {
-            sql = "INSERT INTO cooperativa " +
-                    "(id_cooperativa, nome, " +
-                    "nome_publico, email_institucional, telefone_whatsapp, " +
-                    "cep, endereco, cidade, estado) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        } else {
-            sql = "INSERT INTO cooperativa " +
-                    "(id_cooperativa, nome, cnpj, " +
-                    "nome_publico, email_institucional, telefone_whatsapp, " +
-                    "cep, endereco, cidade, estado) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        }
+        // todo: ver possível geração de link de whatsapp automático pelo numero usando API
+        // Caso afirmativo, adicionar link_whatsapp no comando e statement
 
-        // todo: Descrição como valor opcional
+        sql = (
+                "INSERT INTO cooperativa " +
+                    "(id_cooperativa, nome, cnpj, nome_publico, descricao_institucional, " +
+                    "logo_url, email_institucional, telefone_whatsapp, cep, endereco, cidade, estado) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+        );
 
-        // todo: Logo como valor opcional
 
         try {
 
