@@ -19,10 +19,10 @@ public class CooperativaDAO {
     public CooperativaDAO() {
     }
 
-    // === METODOS DE VALIDACAO E REGEX ================================================================================
+    // === METODOS DE FILTRO PARA NUMERICO =============================================================================
 
-    // Filtrar o CNPJ para retornar apenas valores numéricos
-    private static String validarCnpj(String cnpj) {
+    // Filtrar CNPJ
+    private static String filtrarCnpj(String cnpj) {
 
         // Tratamento inicial
         cnpj.trim();
@@ -35,7 +35,28 @@ public class CooperativaDAO {
         if (cnpj.matches("^\\d{11}$")) {
             return cnpj;
         } else {
-            return "cnpj invalido";
+            return "invalido";
+        }
+
+    }
+
+    // Filtrar Telefone/Whatsapp
+    private static String filtrarTelefoneWhatsapp(String telefoneWhatsapp) {
+
+        // Tratamento inicial
+        telefoneWhatsapp.trim();
+
+        // Retirar "(", ")", e "-", depois, retirar o " " presente entre o DDD e o numero
+        telefoneWhatsapp.replace("(", "");
+        telefoneWhatsapp.replace(")", "");
+        telefoneWhatsapp.replace("-", "");
+        telefoneWhatsapp.replace(" ", "");
+
+        // Formato de telefone comum tem 10 digitos, whatsapp tem 11
+        if (telefoneWhatsapp.matches("^\\d{10,11}$")) {
+            return telefoneWhatsapp;
+        } else {
+            return "invalido";
         }
 
     }
@@ -98,10 +119,6 @@ public class CooperativaDAO {
         // todo: Descrição como valor opcional
 
         // todo: Logo como valor opcional
-
-
-
-        if ()
 
         try {
 
