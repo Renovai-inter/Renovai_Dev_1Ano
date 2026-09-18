@@ -31,8 +31,19 @@ public class Cooperativa {
     public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro) {
         this.idCooperativa = idCooperativa; // pk - obrigatorio
         this.nome = nome; // obrigatorio | CREATE
-        this.cnpj = cnpj; // opcional | CREATE
-        this.nomePublico = nomePublico;  // obrigatorio
+
+        if (this.cnpj.isEmpty()) {
+            this.cnpj = "";
+        } else {
+            this.cnpj = cnpj; // opcional | CREATE
+        }
+
+        if (this.nomePublico.isEmpty()) {
+            this.nomePublico = nome;
+        } else {
+            this.nomePublico = nomePublico; // obrigatorio
+        }
+
         this.descricaoInstitucional = descricaoInstitucional; // opcional | CREATE
         this.logoUrl = logoUrl; // opcional | CREATE
         this.emailInstitucional = emailInstitucional; // obrigatorio | CREATE

@@ -3,10 +3,7 @@ package dao;
 import model.Cooperativa;
 import util.Conexao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class CooperativaDAO {
 
@@ -61,6 +58,9 @@ public class CooperativaDAO {
 
     }
 
+    // todo: Filtrar email
+
+
     // todo: Validar Cidade e UF
 
     // === OUTROS METODOS ==============================================================================================
@@ -80,7 +80,7 @@ public class CooperativaDAO {
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()){
-                return rs.getLong("id_material");
+                return rs.getLong("id_cooperativa");
             }
             else {
                 return -1;
@@ -117,30 +117,41 @@ public class CooperativaDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
+        // todo: EXECUTAR PREPARED STATEMENT E PREENCHER PLACEHOLDERS
 
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-            int ultimoId = getUltimoId();
+            pstmt.setLong(0, getUltimoIdCooperativa());
 
-            // Verifica se o ultimoId foi encontrado (-1) se não
-            if (ultimoId == -1) {
-                return 0;
+            pstmt.setString(1, coop.getNome().toLowerCase());
+
+            String cnpj = filtrarCnpj(coop.getCnpj());
+            if (cnpj.matches("invalido")) {
+                pstmt.setNull(3, Types.VARCHAR);
             } else {
-                pstmt.setInt(1, getUltimoId()+1);
+                pstmt.setString(3, cnpj);
             }
-            pstmt.setString(2, nome);
-            pstmt.setString(3, cnpj);
-            pstmt.setString(4, nome);
-            pstmt.setString(5, emailInstitucional);
-            pstmt.setString(6, telefoneWhatsapp);
-            pstmt.setString(7, cep);
-            pstmt.setString(8, "ENDERECO");
-            pstmt.setString(9, "CIDADE");
-            pstmt.setString(10, "ESTADO");
 
-            return pstmt.executeUpdate();
+            pstmt.setString(4, coop.getNomePublico());
+
+            if (coop.getDescricaoInstitucional().isEmpty()) {
+                pstmt.setNull(5, Types.LONGVARCHAR);
+            } else {
+                pstmt.setString(5, coop.getDescricaoInstitucional());
+            }
+
+            if (coop.getLogoUrl().isEmpty()) {
+                pstmt.setNull(6, Types.VARCHAR);
+            } else {
+                pstmt.setString(6, coop.getLogoUrl());
+            }
+
+            pstmt.setString(7)
+
+
+
 
         } catch (SQLException e) {
             return 0;
