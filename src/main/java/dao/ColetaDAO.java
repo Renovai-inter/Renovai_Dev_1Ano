@@ -22,18 +22,17 @@ public class ColetaDAO {
 
     // === METODOS CREATE ==============================================================================================
 
-    /*Cadastrar local/pessoa na hora – durante o registro de uma entrega, se o local ainda não existir nos endereços, o gestor pode cadastrá-lo ali mesmo.
-    Registrar peso total coletado/recebido – informar o peso total (obrigatório) ao finalizar uma coleta externa ou registrar uma entrega.
-    Registrar quantidade por tipo de material – opcionalmente, distribuir o peso total entre os materiais (papel, papelão, PET, alumínio, vidro etc.).*/
+    /*Nova coleta (Coleta externa) – cadastro de uma nova coleta, selecionando destino (rota cadastrada ou endereço específico), data, cooperado responsável (opcional) e observações (opcional). Ao salvar, entra com status "Agendada".
+*/
 
     public int cadastrarColeta(Coleta coleta) {
 
         Connection conexao = conn.conectar();
 
-        String sql = "INSERT INTO coleta " + "(id_coleta, id_cooperativa," +
+        String sql = "INSERT INTO coleta " + "(id_cooperativa," +
                 "tipo, id_rota, id_endereco_rota, id_cooperado_responsavel,"
-                + "origem_entrega, nome_local_origem, data_agendada, observacoes)" +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "data_agendada, observacoes)" +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try {
 
@@ -73,6 +72,7 @@ public class ColetaDAO {
     /*Nova coleta (Entrega na cooperativa) – registro de uma entrega feita diretamente na cooperativa, informando origem
      (empresa, condomínio, escola, pessoa física, ecoponto, outro), nome do local/pessoa, data (preenchida automaticamente, editável) e
      observações.*/
+
     public int registroNaCooperativa(Coleta coleta) {
         Connection conexao = conn.conectar();
 
@@ -103,6 +103,7 @@ public class ColetaDAO {
     }
 
     /* Cadastrar local/pessoa na hora – durante o registro de uma entrega, se o local ainda não existir nos endereços, o gestor pode cadastrá-lo ali mesmo.*/
+
     public int cadastrarOrigem(Coleta coleta){
         Connection conexao = conn.conectar();
 
@@ -117,6 +118,44 @@ public class ColetaDAO {
 
         } catch (SQLException e) {
             e.getMessage();
+        }
+        return 0;
+    }
+
+        /*Registrar peso total coletado/recebido – informar o peso total (obrigatório) ao finalizar uma coleta externa ou registrar uma entrega.*/
+
+    public double registrarPesoTotal(Coleta coleta){
+        Connection conexao = conn.conectar();
+
+        String sql = "INSERT INTO coleta(peso_total_kg) VALUES (?)";
+
+        try {
+            PreparedStatement pstm = conexao.prepareStatement(sql);
+
+            pstm.setBigDecimal(1, coleta.getPesoTotalKg());
+
+        } catch (SQLException sqle){
+            sqle.getMessage();
+        }
+
+        return 0;
+    }
+
+    /*Registrar quantidade por tipo de material – opcionalmente, distribuir o peso total entre os materiais (papel, papelão, PET, alumínio, vidro etc.).*/
+
+    public int QuantidadeTipoMaterial(Coleta coleta){
+        Connection conexao = conn.conectar();
+
+        String sql = "INSERT INTO coleta(tipo, peso_total_kg) VALUES(?,?)";
+
+        try{
+            PreparedStatement pstm = conexao.prepareStatement(sql);
+
+            pstm.setString(1, coleta.getTipo());
+            pstm.setBigDecimal(2, coleta.getPesoTotalKg());
+
+        } catch (SQLException sqle) {
+            sqle.getMessage();
         }
         return 0;
     }
