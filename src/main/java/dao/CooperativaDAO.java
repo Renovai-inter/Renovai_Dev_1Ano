@@ -58,7 +58,22 @@ public class CooperativaDAO {
 
     }
 
-    // todo: Filtrar email
+    // Filtrar email institucional
+    private static String filtrarEmailInstitucional(String email) {
+
+        // Tratamento inicial
+        email.trim().toLowerCase();
+
+        // todo: Verificação de existência de email
+
+        // Verificação usando regex. ex: joel.gracek@email.com
+        if (email.matches("^[\\w.-]+@[\\w.-]+\\.\\w+$")) {
+            return email;
+        } else {
+            return "invalido";
+        }
+
+    }
 
 
     // todo: Validar Cidade e UF
@@ -162,7 +177,7 @@ public class CooperativaDAO {
     }
 
     // === METODOS READ ================================================================================================
-
+        String sql = "Selet "
 
 
     // === METODOS UPDATE ==============================================================================================
