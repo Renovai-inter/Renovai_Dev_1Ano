@@ -143,7 +143,7 @@ public class CooperativaDAO {
             pstmt.setString(1, coop.getNome().toLowerCase());
 
             String cnpj = filtrarCnpj(coop.getCnpj());
-            if (cnpj.matches("invalido")) {
+            if (cnpj.equals("invalido")) {
                 pstmt.setNull(3, Types.VARCHAR);
             } else {
                 pstmt.setString(3, cnpj);
@@ -163,7 +163,22 @@ public class CooperativaDAO {
                 pstmt.setString(6, coop.getLogoUrl());
             }
 
-            pstmt.setString(7)
+            String emailInstucional = filtrarEmailInstitucional(coop.getEmailInstitucional());
+            if (emailInstucional.equals("invalido")) {
+                pstmt.setNull(7, Types.VARCHAR);
+            } else {
+                pstmt.setString(7, coop.getEmailInstitucional());
+            }
+
+            String telefoneWhatsapp = filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp());
+            if (telefoneWhatsapp.equals("invalido")) {
+                pstmt.setNull(8, Types.VARCHAR);
+            } else {
+                pstmt.setString(8, telefoneWhatsapp);
+            }
+
+
+
 
 
 
