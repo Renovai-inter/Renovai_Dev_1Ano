@@ -90,8 +90,27 @@ public class CooperativaDAO {
 
     }
 
+    // todo: Validar UF
+    private static String validarCidadeUf(String uf) {
 
-    // todo: Validar Cidade e UF
+        // Tratamento inicial
+        uf.trim().toUpperCase();
+
+        // Lista de UFs possíveis
+        String[] listaUfs = {"AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB",
+                "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"};
+
+        // Verificação de formato: CIDADE X / UF
+        for (String ufVer : listaUfs) {
+
+            if (ufVer.equals(uf)) {
+                return uf;
+            }
+
+        }
+        return "invalido";
+
+    }
 
     // === OUTROS METODOS ==============================================================================================
 
