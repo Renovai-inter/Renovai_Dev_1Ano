@@ -1,11 +1,9 @@
 package dao;
-
 import model.Coleta;
+import model.Cooperado;
 import util.Conexao;
-
 import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.sql.Date;
 
@@ -115,6 +113,7 @@ public class ColetaDAO {
             pstm.setString(1, coleta.getNomeLocalOrigem());
             pstm.setString(2, coleta.getOrigemEntrega());
 
+            pstm.executeUpdate();
 
         } catch (SQLException e) {
             e.getMessage();
@@ -133,6 +132,8 @@ public class ColetaDAO {
             PreparedStatement pstm = conexao.prepareStatement(sql);
 
             pstm.setBigDecimal(1, coleta.getPesoTotalKg());
+
+            pstm.executeUpdate();
 
         } catch (SQLException sqle){
             sqle.getMessage();
@@ -154,6 +155,8 @@ public class ColetaDAO {
             pstm.setString(1, coleta.getTipo());
             pstm.setBigDecimal(2, coleta.getPesoTotalKg());
 
+            pstm.executeUpdate();
+
         } catch (SQLException sqle) {
             sqle.getMessage();
         }
@@ -162,11 +165,6 @@ public class ColetaDAO {
 
 
     // === METODOS READ ================================================================================================
-
-    /*Visualizar coletas em andamento – lista na parte superior da tela com código, tipo, local, cooperado responsável, horário de início e status.
-Rastrear coleta – visualizar em tempo real a localização da equipe, rota planejada, percurso já realizado, pontos visitados e restantes, e endereço da próxima parada (disponível apenas para coletas externas em andamento).
-Visualizar histórico de coletas – lista de todas as coletas registradas (código, tipo, responsável, data, status), da mais recente para a mais antiga.
-Conferir peso total vs. soma dos materiais – campo de verificação que compara o peso total informado com a soma dos pesos por material.*/
 
     public ArrayList<Coleta> listarColetas() {
 
@@ -231,6 +229,131 @@ Conferir peso total vs. soma dos materiais – campo de verificação que compar
         }
         return coletas;
     }
+
+    /*Rastrear coleta – visualizar em tempo real a localização da equipe, rota planejada, percurso já realizado, pontos visitados e restantes, e endereço da próxima parada (disponível apenas para coletas externas em andamento).*/
+
+    public ArrayList<Coleta> rastrearColeta(){
+
+        ArrayList<Coleta> coletas = new ArrayList<>();
+
+        String sql;
+        sql = "SELECT id_coleta, tipo, status, id_rota, id_endereco_rota, id_cooperado_responsavel, origem_entrega, nome_local_origem, peso_total_kg, data_fim FROM coleta where id_coleta = ? ";
+
+        Connection conexao = conn.conectar();
+
+        try {
+            PreparedStatement pstm = conexao.prepareStatement(sql);
+
+            ResultSet rst = pstm.executeQuery();
+
+            Coleta coleta = null;
+            while (rst.next()) {
+                coleta = new Coleta();
+
+                coleta.setIdColeta(rst.getLong("id_coleta"));
+                coleta.setTipo(rst.getString("tipo"));
+                coleta.setStatus(rst.getString("status"));
+                coleta.setIdRota(rst.getLong("id_rota"));
+                coleta.setIdEnderecoRota((rst.getLong("id_endereco_rota")));
+                coleta.setIdCooperadoResponsavel((rst.getLong("id_cooperado_responsavel")));
+                coleta.setOrigemEntrega((rst.getString("origem_entrega")));
+                coleta.setNomeLocalOrigem((rst.getString("nome_local_origem")));
+                coleta.setPesoTotalKg((rst.getBigDecimal("peso_total_kg")));
+                coleta.setDataFim((rst.getTimestamp("data_fim")).toLocalDateTime());
+            }
+
+            coletas.add(coleta);
+
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+
+        return coletas;
+    }
+
+    /*Visualizar histórico de coletas – lista de todas as coletas registradas (código, tipo, responsável, data, status), da mais recente para a mais antiga.*/
+
+    public ArrayList<Coleta> historicoColetas(){
+
+        ArrayList<Coleta> coletas = new ArrayList<>();
+
+        String sql;
+        sql = "SELECT id_coleta, tipo, status, id_rota, id_endereco_rota, id_cooperado_responsavel, origem_entrega, nome_local_origem, peso_total_kg, data_fim FROM coleta where id_coleta = ? ";
+
+        Connection conexao = conn.conectar();
+
+        try {
+            PreparedStatement pstm = conexao.prepareStatement(sql);
+
+            ResultSet rst = pstm.executeQuery();
+
+            Coleta coleta = null;
+            while (rst.next()) {
+                coleta = new Coleta();
+
+                coleta.setIdColeta(rst.getLong("id_coleta"));
+                coleta.setTipo(rst.getString("tipo"));
+                coleta.setStatus(rst.getString("status"));
+                coleta.setIdRota(rst.getLong("id_rota"));
+                coleta.setIdEnderecoRota((rst.getLong("id_endereco_rota")));
+                coleta.setIdCooperadoResponsavel((rst.getLong("id_cooperado_responsavel")));
+                coleta.setOrigemEntrega((rst.getString("origem_entrega")));
+                coleta.setNomeLocalOrigem((rst.getString("nome_local_origem")));
+                coleta.setPesoTotalKg((rst.getBigDecimal("peso_total_kg")));
+                coleta.setDataFim((rst.getTimestamp("data_fim")).toLocalDateTime());
+            }
+
+            coletas.add(coleta);
+
+        } catch (SQLException e) {
+            e.getMessage();
+        } finally {
+            conn.desconectar(conexao);
+        }
+
+        return coletas;
+    }
+
+    /*Visualizar coletas em andamento – lista na parte
+     superior da tela com código, tipo, local, cooperado responsável,
+     horário de início e status.*/
+
+    public ArrayList<Coleta> coletasEmAndamento(){
+
+        ArrayList<Coleta> coletas = new ArrayList<>();
+
+        String sql = "SELECT id_coleta, tipo, nome_local_origem, id_cooperado_responsavel, data_inicio, status FROM coleta";
+
+        Connection conexao = conn.conectar();
+
+        try{
+            PreparedStatement pstm = conexao.prepareStatement(sql);
+            ResultSet rst = pstm.executeQuery();
+
+            Coleta coleta = null;
+            while(rst.next()){
+                coleta = new Coleta();
+
+                coleta.setIdColeta(rst.getLong("id_coleta"));
+                coleta.setTipo(rst.getString("tipo"));
+                coleta.setNomeLocalOrigem(rst.getString("nome_local_origem"));
+                coleta.setIdCooperadoResponsavel(rst.getLong("id_cooperado_responsavel"));
+                coleta.setDataInicio(rst.getTimestamp("data_inicio"));
+                coleta.setStatus(rst.getString("status"));
+            }
+            coletas.add(coleta);
+
+
+        } catch (SQLException e) {
+            e.getMessage();
+        } finally {
+            conn.desconectar(conexao);
+        }
+        return coletas;
+    }
+
+    /*Conferir peso total vs. soma dos materiais – campo de verificação que compara o peso total informado com a soma dos pesos por material.*/
+
 
 
     // === METODOS UPDATE ==============================================================================================
