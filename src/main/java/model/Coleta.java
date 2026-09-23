@@ -2,8 +2,8 @@
 package model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 public class Coleta {
 
@@ -18,8 +18,8 @@ public class Coleta {
     private Long idCooperadoResponsavel;
     private String origemEntrega;
     private String nomeLocalOrigem;
-    private LocalDate dataAgendada;
-    private LocalDateTime dataInicio;
+    private Date dataAgendada;
+    private Date dataInicio;
     private LocalDateTime dataFim;
     private BigDecimal pesoTotalKg;
     private String observacoes;
@@ -62,13 +62,13 @@ public class Coleta {
 
     public void setNomeLocalOrigem(String nomeLocalOrigem) { this.nomeLocalOrigem = nomeLocalOrigem; }
 
-    public LocalDate getDataAgendada() { return dataAgendada; }
+    public Date getDataAgendada() { return dataAgendada; }
 
-    public void setDataAgendada(LocalDate dataAgendada) { this.dataAgendada = dataAgendada; }
+    public void setDataAgendada(Date dataAgendada) { this.dataAgendada = dataAgendada; }
 
-    public LocalDateTime getDataInicio() { return dataInicio; }
+    public Date getDataInicio() { return dataInicio; }
 
-    public void setDataInicio(LocalDateTime dataInicio) { this.dataInicio = dataInicio; }
+    public void setDataInicio(Date dataInicio) { this.dataInicio = dataInicio; }
 
     public LocalDateTime getDataFim() { return dataFim; }
 
