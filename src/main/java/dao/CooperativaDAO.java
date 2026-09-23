@@ -52,9 +52,8 @@ public class CooperativaDAO {
         // Formato de telefone comum tem 10 digitos, whatsapp tem 11
         if (telefoneWhatsapp.matches("^\\d{10,11}$")) {
             return telefoneWhatsapp;
-        } else {
-            return "invalido";
         }
+        return "invalido";
 
     }
 
@@ -69,9 +68,8 @@ public class CooperativaDAO {
         // Verificação usando regex. ex: joel.gracek@email.com
         if (email.matches("^[\\w.-]+@[\\w.-]+\\.\\w+$")) {
             return email;
-        } else {
-            return "invalido";
         }
+        return "invalido";
 
     }
 
@@ -84,14 +82,33 @@ public class CooperativaDAO {
         // Validação usando formato 00000-000
         if (cep.matches("^\\d{5}-\\d{3}")) {
             return cep;
-        } else {
-            return "invalido";
         }
+        return "invalido";
 
     }
 
-    // todo: Validar UF
-    private static String validarCidadeUf(String uf) {
+    // Validar Endereço
+    private static String filtrarEndereco(String endereco) {
+
+        // Tratamento inicial
+        String[] valoresEndereco = endereco.trim().toLowerCase().split(",");
+
+        // Formato esperado: Rua, Número, Bairro
+        if (valoresEndereco.length == 3) {
+
+            if (!(valoresEndereco[0].trim().matches("^\\w+$")
+                    && valoresEndereco[1].trim().matches("^\\d+$")
+                    && valoresEndereco[2].trim().matches("^\\w+$"))) {
+                return "invalido";
+            }
+
+        }
+        return endereco;
+
+    }
+
+    // Validar UF
+    private static String validarUf(String uf) {
 
         // Tratamento inicial
         uf.trim().toUpperCase();
@@ -102,11 +119,9 @@ public class CooperativaDAO {
 
         // Verificação de formato: CIDADE X / UF
         for (String ufVer : listaUfs) {
-
             if (ufVer.equals(uf)) {
                 return uf;
             }
-
         }
         return "invalido";
 
@@ -147,12 +162,7 @@ public class CooperativaDAO {
         // DECLARACAO
 
         Connection conexao = conn.conectar();
-
         String sql;
-
-        boolean contemCnpj = coop.getCnpj().isEmpty();
-        boolean contemDescricao;
-        boolean contemLogo;
 
         // COMANDO SQL PADRÃO
 
@@ -166,9 +176,9 @@ public class CooperativaDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         );
 
-        // todo: EXECUTAR PREPARED STATEMENT E PREENCHER PLACEHOLDERS
-
         try {
+
+            // EXECUTAR PREPARED STATEMENT E PREENCHER PLACEHOLDERS
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
@@ -211,11 +221,25 @@ public class CooperativaDAO {
                 pstmt.setString(8, telefoneWhatsapp);
             }
 
+            String cep = filtrarCep(coop.getCep());
+            if (cep.equals("invalido")) {
+                pstmt.setNull(9, Types.VARCHAR);
+            } else {
+                pstmt.setString(9, cep);
+            }
 
+            String endereco = filtrarEndereco(coop.getEndereco());
+            if (endereco.equals("invalido")) {
+                pstmt.setNull(10, Types.VARCHAR);
+            } else {
+                pstmt.setString(10, endereco);
+            }
 
+            pstmt.setString(11, coop.getCidade().trim().toLowerCase());
 
+            pstmt.setString(12, validarUf(coop.getEstado()));
 
-
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             return 0;
@@ -226,7 +250,7 @@ public class CooperativaDAO {
     }
 
     // === METODOS READ ================================================================================================
-        String sql = "Selet "
+
 
 
     // === METODOS UPDATE ==============================================================================================
