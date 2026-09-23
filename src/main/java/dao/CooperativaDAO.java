@@ -75,6 +75,21 @@ public class CooperativaDAO {
 
     }
 
+    // Validar CEP
+    private static String filtrarCep(String cep) {
+
+        // Tratamento inicial
+        cep.trim();
+
+        // Validação usando formato 00000-000
+        if (cep.matches("^\\d{5}-\\d{3}")) {
+            return cep;
+        } else {
+            return "invalido";
+        }
+
+    }
+
 
     // todo: Validar Cidade e UF
 

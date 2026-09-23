@@ -48,7 +48,7 @@ public class Cooperativa {
         this.logoUrl = logoUrl; // opcional | CREATE
         this.emailInstitucional = emailInstitucional; // obrigatorio | CREATE
         this.telefoneWhatsapp = telefoneWhatsapp; // obrigatorio | CREATE
-        this.cep = cep; // obrigatorio | CREATE
+        this.cep = cep; // obrigatorio
         this.endereco = endereco; // obrigatorio | CREATE
         this.cidade = cidade; // obrigatorio | CREATE
         this.estado = estado; // obrigatorio | CREATE
