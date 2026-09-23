@@ -1,6 +1,7 @@
 
 package model;
 
+import java.sql.Date;
 import java.time.LocalDateTime;
 
 public class Cooperado {
@@ -21,7 +22,7 @@ public class Cooperado {
 
     public void setIdCooperado(Long idCooperado) { this.idCooperado = idCooperado; }
 
-    public Long getIdUsuario() { return idUsuario; }
+    public int getIdUsuario() { return idUsuario; }
 
     public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
 
@@ -41,7 +42,7 @@ public class Cooperado {
 
     public void setStatus(String status) { this.status = status; }
 
-    public LocalDateTime getDataCadastro() { return dataCadastro; }
+    public Date getDataCadastro() { return dataCadastro; }
 
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 

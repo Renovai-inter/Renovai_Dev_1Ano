@@ -1,7 +1,9 @@
 package dao;
+import model.Cooperado;
 import util.Conexao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -17,12 +19,6 @@ public class CooperadoDAO {
     }
 
     // === METODOS CREATE ==============================================================================================
-
-    /*CREATE (Criar)
-Adicionar cooperado – abre o formulário para cadastro de um novo cooperado, informando nome completo (obrigatório) e cargo (opcional: Gestor, Tesoureiro, Motorista).
-Selecionar atividades do cooperado – caso não tenha cargo definido, o gestor pode indicar uma ou mais atividades (coleta externa, separação de materiais, organização do galpão, prensagem, pesagem, negociações, administrativo).
-Definir permissões de acesso no cadastro – o gestor define quais funcionalidades (Dashboard, Cooperados, Coletas, Negociações, Vendas, Financeiro, Relatórios, Configurações) estarão disponíveis para o cooperado (por padrão, todas são liberadas).
-Geração automática de conta de acesso – ao cadastrar, o sistema cria automaticamente: código do cooperado, nome de usuário e senha temporária.*/
 
     public int cadastrarCooperado(String nome_completo, String nome_usuario, String senha_hash,
                                   int senha_temporaria, String email, String tipo_usuario, Date data_criacao){
@@ -53,11 +49,108 @@ Geração automática de conta de acesso – ao cadastrar, o sistema cria automa
         return 0;
     }
 
+    /*Selecionar atividades do cooperado – caso não tenha cargo definido, o gestor pode indicar uma
+     ou mais atividades (coleta externa, separação de materiais, organização do galpão, prensagem, pesagem, negociações, administrativo).*/
+
+    public int selecionarAtividades(Cooperado cooperado){
+
+        String sql = "INSERT INTO cooperado(id_usuario, cargo, codigo_cooperado, status) VALUES(?,?,?,?)";
+
+        Connection conexao = conn.conectar();
+
+        try{
+            PreparedStatement pstm = conexao.prepareStatement(sql);
+
+            pstm.setInt(1, cooperado.getIdUsuario());
+            pstm.setString(2, cooperado.getCargo());
+            pstm.setString(3, cooperado.getCodigoCooperado());
+            pstm.setString(4, cooperado.getStatus());
+
+            pstm.executeUpdate();
+
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+        return 0;
+    }
+
+    /*Definir permissões de acesso no cadastro – o gestor define
+     quais funcionalidades (Dashboard, Cooperados, Coletas, Negociações, Vendas, Financeiro, Relatórios, Configurações)
+     estarão disponíveis para o cooperado (por padrão, todas são liberadas).
+Geração automática de conta de acesso – ao cadastrar, o
+sistema cria automaticamente: código do cooperado, nome de usuário e senha temporária.*/
+
+    public int permissoesAcesso(Cooperado cooperado, String nome_completo, String nome_usuario, String senha_hash, Boolean senha_temporaria, String email, String tipo_usario, Date data_criacao){
+
+        String sqlCop = "INSERT INTO cooperado(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo) VALUES(?,?,?,?,?,?)";
+        String sqlUsu = "INSERT INTO usuario(nome_completo, nome_usuario, senha_hash, senha_temporaria, email, tipo_usuario, data_criacao) VALUES(?,?,?,?,?,?,?,?)";
+
+        Connection conexao = conn.conectar();
+
+        try{
+            PreparedStatement pstm = conexao.prepareStatement(sqlCop);
+            PreparedStatement pst = conexao.prepareStatement(sqlUsu);
+
+            //cooperado
+            pstm.setInt(1, cooperado.getIdUsuario());
+            pstm.setString(2, cooperado.getCodigoCooperado());
+            pstm.setString(3, cooperado.getCargo());
+            pstm.setDate(4, cooperado.getDataCadastro());
+            //usuario
+            pst.setString(1, nome_completo);
+            pst.setString(2,nome_usuario);
+            pst.setString(3, senha_hash);
+            pst.setBoolean(4, senha_temporaria);
+            pst.setString(5, email);
+            pst.setString(6, tipo_usario);
+            pst.setDate(7, new java.sql.Date(data_criacao.getTime()));
+        } catch (SQLException e){
+            e.getMessage();
+        }
+
+        return 0;
+    }
+
+
+
 
     // === METODOS READ ================================================================================================
 
     /*Visualizar lista de cooperados – tela principal com código, nome, status e cargo (quando houver) de todos os cooperados cadastrados.
 Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela de edição para ver suas informações completas.*/
+
+    public ArrayList<Cooperado> listaCooperados(){
+
+        ArrayList<Cooperado> cooperados = new ArrayList<>();
+
+        String sql;
+        sql = "SELECT c.codigo_cooperado, u.nome_usuario, c.status, c.cargo FROM cooperado c join usuario u on c.id_usuario = u.id_usuario";
+
+        Connection conexao = conn.conectar();
+
+        try{
+            PreparedStatement pstm = conexao.prepareStatement(sql);
+
+            ResultSet rst = pstm.executeQuery();
+
+            while(rst.next()){
+                Cooperado cooperado = new Cooperado();
+
+                cooperado.setCodigoCooperado(rst.getString("codigo_cooperado"));
+                cooperado.setIdUsuario(rst.getLong("nome_usuario"));
+                cooperado.setIdUsuario(rst.getLong("id_usuario"));
+                cooperado.setStatus(rst.getString("status"));
+                cooperado.setCargo(rst.getString("cargo"));
+
+                cooperados.add(cooperado);
+            }
+
+        } catch (SQLException e) {
+            e.getMessage();
+        }
+
+        return cooperados;
+    }
 
 
 
