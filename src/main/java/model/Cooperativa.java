@@ -26,6 +26,42 @@ public class Cooperativa {
     private String status;
     private LocalDateTime dataCadastro;
 
+    // CONSTRUTOR
+
+    public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro) {
+        this.idCooperativa = idCooperativa; // pk - obrigatorio
+        this.nome = nome; // obrigatorio | CREATE
+
+        if (this.cnpj.isEmpty()) {
+            this.cnpj = "";
+        } else {
+            this.cnpj = cnpj; // opcional | CREATE
+        }
+
+        if (this.nomePublico.isEmpty()) {
+            this.nomePublico = nome;
+        } else {
+            this.nomePublico = nomePublico; // obrigatorio
+        }
+
+        this.descricaoInstitucional = descricaoInstitucional; // opcional | CREATE
+        this.logoUrl = logoUrl; // opcional | CREATE
+        this.emailInstitucional = emailInstitucional; // obrigatorio | CREATE
+        this.telefoneWhatsapp = telefoneWhatsapp; // obrigatorio | CREATE
+        this.cep = cep; // obrigatorio
+        this.endereco = endereco; // obrigatorio | CREATE
+        this.cidade = cidade; // obrigatorio | CREATE
+        this.estado = estado; // obrigatorio | CREATE
+        this.dataFundacao = dataFundacao; // opcional
+        this.canalContatoPreferencial = canalContatoPreferencial; // obrigatorio (c/default)
+        this.linkWhatsapp = linkWhatsapp; // opcional
+        this.status = status; // obrigatorio (c/default)
+        this.dataCadastro = dataCadastro; // obrigatorio (c/default)
+    }
+
+    public Cooperativa() {
+    }
+
     // GETTERS E SETTERS
 
     public Long getIdCooperativa() { return idCooperativa; }
