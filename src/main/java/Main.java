@@ -41,7 +41,7 @@ public class Main {
 
         //System.out.println("Resultado: "+ resultado);
 
-        System.out.println(c.getUltimoId());
+        //System.out.println(c.getUltimoId());
 
 
     }
