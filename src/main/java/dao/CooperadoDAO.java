@@ -1,11 +1,12 @@
 package dao;
+import model.Coleta;
 import model.Cooperado;
 import util.Conexao;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.math.BigDecimal;
+import java.sql.*;
 import java.util.*;
+import java.util.Date;
 
 public class CooperadoDAO {
 
@@ -156,21 +157,259 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
 
     // === METODOS UPDATE ==============================================================================================
 
-    /*Editar cooperado – abre o formulário para edição das informações do cooperado selecionado.
-Alterar cargo do cooperado.
-Alterar atividades desempenhadas (múltipla escolha).
-Alterar status do cooperado (Ativo, Afastado ou Inativo).
-Alterar permissões de acesso ao sistema (somente cooperados com cargo de Gestor podem fazer essa alteração para outros usuários; o gestor sempre mantém acesso total, que não pode ser removido).
-Alterar nome de usuário – pode ser feito posteriormente pelo próprio cooperado, nas configurações da conta.
-Definir nova senha no primeiro acesso – o cooperado deve trocar a senha temporária ao acessar o sistema pela primeira vez.*/
+    // Editar cooperado – abre o formulário para edição das informações do cooperado selecionado.
+
+    public int editarCooperado(Cooperado cooperado) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE cooperado\n" +
+                "SET id_usuario = ?,\n" +
+                "    id_cooperativa = ?,\n" +
+                "    codigo_cooperado = ?,\n" +
+                "    cargo = ?,\n" +
+                "    status = ? WHERE id_cooperado = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setBigDecimal(1, BigDecimal.valueOf(cooperado.getIdUsuario()));
+            pstmt.setBigDecimal(1, BigDecimal.valueOf(cooperado.getIdCooperativa()));
+            pstmt.setString(1, (cooperado.getCodigoCooperado()));
+            pstmt.setString(1, (cooperado.getCargo()));
+            pstmt.setString(1, (cooperado.getStatus()));
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+//Alterar cargo do cooperado.
+
+    public int alterarCargoCooperado(Cooperado cooperado) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE cooperado\n" +
+                "SET cargo = ? WHERE id_cooperado = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, (cooperado.getCargo()));
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+//Alterar atividades desempenhadas (múltipla escolha).
+
+    public int alterarAtividadesDesempenhadas(int idCooperado, String atividade) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE cooperado_atividade\n" +
+                "SET atividade = ? WHERE id_cooperado = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, atividade);
+            pstmt.setInt(2, idCooperado);
 
 
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+
+//Alterar status do cooperado (Ativo, Afastado ou Inativo).
+
+    public int alterarStatusCooperado(Cooperado cooperado) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE cooperado\n" +
+                "SET status = ? WHERE id_cooperado = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, (cooperado.getStatus()));
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+//Alterar permissões de acesso ao sistema (somente cooperados com cargo de Gestor podem fazer essa alteração para outros usuários; o gestor sempre mantém acesso total, que não pode ser removido).
+
+    public int alterarPermissoesAcesso(int idCooperado, int idPermissao) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE cooperado_permissao\n" +
+                "SET id_permissao = ? WHERE id_cooperado = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setInt(1, idCooperado);
+            pstmt.setInt(2, idPermissao);
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+//Alterar nome de usuário – pode ser feito posteriormente pelo próprio cooperado, nas configurações da conta.
+
+    public int alterarNomeUsuario(int idUsuario, String nomeUsuario) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE usuario\n" +
+                "SET nome_usuario = ? WHERE id_usuario = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, nomeUsuario);
+            pstmt.setInt(2, idUsuario);
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+//Definir nova senha no primeiro acesso – o cooperado deve trocar a senha temporária ao acessar o sistema pela primeira vez.
+
+    public int alterarSenha(int idUsuario, String senhaHash, boolean senhaTemporaria) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE usuario\n" +
+                "SET senha_hash = ?,\n" +
+                "    senha_temporaria = ? WHERE id_usuario = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, senhaHash);
+            pstmt.setBoolean(2, false);
+            pstmt.setInt(3, idUsuario);
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
 
     // === METODOS DELETE ==============================================================================================
 
-    /*Remover cooperado – remove o cooperado da cooperativa, com uma tela de confirmação antes para evitar exclusões acidentais. Recomendado apenas quando o cooperado realmente deixa de fazer parte da cooperativa (para afastamentos temporários, o indicado é usar o status "Afastado" em vez de remover).
-Remover acesso a um módulo específico (permissão) – não exclui os dados relacionados à funcionalidade, apenas impede o acesso a ela (é uma "remoção" parcial, não uma exclusão de dados).*/
+    /*Remover cooperado – remove o cooperado da cooperativa, com uma tela de confirmação antes para evitar exclusões acidentais. Recomendado apenas quando o cooperado realmente deixa de fazer parte da cooperativa (para afastamentos temporários, o indicado é usar o status "Afastado" em vez de remover).*/
+
+     public int excluirCooperado(Cooperado cooperado) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "DELETE FROM cooperado\n" +
+                "WHERE id_cooperado = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setLong(1, cooperado.getIdCooperado());
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+//Remover acesso a um módulo específico (permissão) – não exclui os dados relacionados à funcionalidade, apenas impede o acesso a ela (é uma "remoção" parcial, não uma exclusão de dados).*/
+
+    public int removerAcessoModulo(int idCooperado, int idPermissao) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "DELETE FROM cooperado_permissao\n" +
+                "WHERE id_cooperado = ? AND id_permissao = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
 
 
+            pstmt.setLong(1,idCooperado);
+            pstmt.setLong(1,idPermissao);
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
 
 }
