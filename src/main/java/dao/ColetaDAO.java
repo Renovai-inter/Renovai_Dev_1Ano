@@ -358,10 +358,36 @@ public class ColetaDAO {
 
     // === METODOS UPDATE ==============================================================================================
 
-    /*Iniciar coleta – altera o status de "Agendada" para "Em andamento", passando a aparecer na seção de coletas em andamento.
-Finalizar coleta (Coleta externa) – altera o status de "Em andamento" para "Concluída", após o registro do peso total e, opcionalmente, da distribuição por material.
-Finalização automática (Entrega na cooperativa) – ao salvar, o status é definido automaticamente como "Concluída" (não passa por "Agendada" nem "Em andamento").
-Encerramento automático do rastreamento – ao finalizar a coleta, o compartilhamento de localização é interrompido automaticamente.*/
+    /*Iniciar coleta – altera o status de "Agendada" para "Em andamento", passando a aparecer na seção de coletas em andamento.*/
+
+    public int iniciarColeta(Coleta coleta) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE coleta\n" +
+                "SET status = ?, peso_total_kg = ?, data_inicio = ? WHERE id_coleta = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, coleta.getStatus());
+            pstmt.setBigDecimal(2, coleta.getPesoTotalKg());
+            pstmt.setDate(3, Date.valueOf(String.valueOf(coleta.getDataInicio())));
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+    // atualizar coleta
 
     public int atualizarColeta(Coleta coleta) {
 
@@ -377,6 +403,91 @@ Encerramento automático do rastreamento – ao finalizar a coleta, o compartilh
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+    /*Finalizar coleta (Coleta externa) – altera o status de "Em andamento" para "Concluída", após o registro do peso total e, opcionalmente, da distribuição por material.*/
+
+    public int finalizarColeta(Coleta coleta) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE coleta\n" +
+                "SET status = ?, peso_total_kg = ?, data_fim = ? WHERE id_coleta = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, coleta.getStatus());
+            pstmt.setBigDecimal(2, coleta.getPesoTotalKg());
+            pstmt.setTimestamp(3, Timestamp.valueOf(coleta.getDataFim()));
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+    /*Finalização automática (Entrega na cooperativa) – ao salvar, o status é definido automaticamente como "Concluída" (não passa por "Agendada" nem "Em andamento").*/
+
+    public int finalizacaoAutomatica(Coleta coleta) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE coleta\n" +
+                "SET status = ?, data_fim = ? WHERE id_coleta = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, "Concluida");
+            pstmt.setTimestamp(3, Timestamp.valueOf(coleta.getDataFim()));
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+    /*Encerramento automático do rastreamento – ao finalizar a coleta, o compartilhamento de localização é interrompido automaticamente.*/
+
+    public int encerramentoRastreamento(Coleta coleta) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE coleta\n" +
+                "SET status = ?, data_fim = ? WHERE id_coleta = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, "Concluida");
+            pstmt.setTimestamp(3, Timestamp.valueOf(coleta.getDataFim()));
 
 
             return pstmt.executeUpdate();

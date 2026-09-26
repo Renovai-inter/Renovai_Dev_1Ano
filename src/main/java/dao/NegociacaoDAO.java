@@ -1,5 +1,7 @@
 package dao;
 
+import model.Coleta;
+import model.Cooperado;
 import model.Negociacao;
 import util.Conexao;
 
@@ -256,15 +258,145 @@ public class NegociacaoDAO {
 
     // === METODOS UPDATE ==============================================================================================
 
-    /*Aceitar proposta – altera o status da negociação de "nova proposta" (ou "em negociação") para "aceita".
-Enviar nova contraproposta em negociação já em andamento – atualiza a negociação com uma nova condição de valor.
-Aceitar ou recusar oferta dentro de uma negociação em andamento – atualiza o status da negociação existente.*/
+    /*Aceitar proposta – altera o status da negociação de "nova proposta" (ou "em negociação") para "aceita".*/
 
+    public int alterarCargoCooperado(Negociacao negociacao) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE negociacao\n" +
+                "SET status = ? WHERE id_negociacao = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, "aceita");
+            pstmt.setLong(2, negociacao.getIdNegociacao());
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+
+// Enviar nova contraproposta em negociação já em andamento – atualiza a negociação com uma nova condição de valor.
+
+    public int enviarContraProposta(Negociacao negociacao) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE negociacao\n" +
+                "SET valor_kg_atual = ? WHERE id_negociacao = ? AND status = 'em negociação'";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setBigDecimal(1, negociacao.getValorKgAtual());
+            pstmt.setLong(2, negociacao.getIdNegociacao());
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+
+//Aceitar ou recusar oferta dentro de uma negociação em andamento – atualiza o status da negociação existente.
+
+    public int DecisaoDeOferta(Negociacao negociacao) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "UPDATE negociacao\n" +
+                "SET status = ? WHERE id_negociacao = ? AND status = 'em negociação'";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setString(1, negociacao.getStatus());
+            pstmt.setLong(2, negociacao.getIdNegociacao());
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
 
     // === METODOS DELETE ==============================================================================================
 
-    /*Recusar proposta – encerra a negociação (não exclui o registro, mas o move para o histórico como "recusada"), podendo incluir motivo da recusa.
-Cancelar negociação – aparece no histórico como negociação cancelada (é mencionado como resultado possível, mas o documento não detalha a ação específica de cancelamento).*/
+    /*Recusar proposta – encerra a negociação (não exclui o registro, mas o move para o histórico como "recusada"), podendo incluir motivo da recusa.*/
 
+    public int recusarProposta(Negociacao negociacao) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "DELETE FROM negociacao\n" +
+                "WHERE id_negociacao = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+
+            pstmt.setLong(1, negociacao.getIdNegociacao());
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+// Cancelar negociação – aparece no histórico como negociação cancelada (é mencionado como resultado possível, mas o documento não detalha a ação específica de cancelamento).
+
+    public int CancelarNegociacao(Negociacao negociacao) {
+
+        Connection conexao = conn.conectar();
+
+        String sql = "DELETE FROM negociacao\n" +
+                "WHERE id_negociacao = ?";
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+
+            pstmt.setLong(1, negociacao.getIdNegociacao());
+
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            throw new RuntimeException(e);
+
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
 
  }
