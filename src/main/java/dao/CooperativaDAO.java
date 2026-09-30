@@ -4,10 +4,8 @@ import model.Cooperativa;
 import util.Conexao;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 public class CooperativaDAO {
 
@@ -508,9 +506,38 @@ public class CooperativaDAO {
 
     }
 
+    // todo: exibir uma única cooperativa e todos os seus dados
+
     // === METODOS UPDATE ==============================================================================================
 
+    // Atualiza determinado campo do objeto Cooperativa
+    public int atualizarCooperativa(Cooperativa coop, String campo) {
 
+        // DECLARACAO
+
+        Connection conexao = conn.conectar();
+        ArrayList<Cooperativa> cooperativas = new ArrayList<>();
+
+        // COMANDO SQL
+
+        String sql = "UPDATE cooperativa " +
+                "SET " + campo.toLowerCase() + " WHERE id_cooperativa = " + coop.getIdCooperativa();
+
+        try {
+
+            // EXECUTAR PREPARED STATEMENT E PREENCHER PLACEHOLDERS
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            return 0;
+        } finally {
+            conn.desconectar(conexao);
+        }
+
+    }
 
     // === METODOS DELETE ==============================================================================================
 
