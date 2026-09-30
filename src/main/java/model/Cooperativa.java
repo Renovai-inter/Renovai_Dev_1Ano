@@ -26,8 +26,14 @@ public class Cooperativa {
     private String status;
     private LocalDateTime dataCadastro;
 
-    // CONSTRUTOR
+    private int qtdCooperados;
+    private int qtdRotas;
+    private int qtdColetas;
+    private int qtdNegociacoes;
 
+    // CONSTRUTORES
+
+    // Todos os atributos todo: substituir por setters nos construtores
     public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro) {
         this.idCooperativa = idCooperativa; // pk - obrigatorio
         this.nome = nome; // obrigatorio | CREATE
@@ -59,7 +65,65 @@ public class Cooperativa {
         this.dataCadastro = dataCadastro; // obrigatorio (c/default)
     }
 
-    public Cooperativa() {
+    // Exibição do READ Tabela principal
+    public Cooperativa(String nome, String cnpj, String cidade, String estado, String status, int qtdCooperados, LocalDateTime dataCadastro) {
+        this.nome = nome;
+
+        if (this.cnpj.isEmpty()) {
+            this.cnpj = "";
+        } else {
+            this.cnpj = cnpj;
+        }
+
+        this.cidade = cidade;
+        this.estado = estado;
+        this.status = status;
+        this.qtdCooperados = qtdCooperados;
+        this.dataCadastro = dataCadastro;
+    }
+
+    // Exibição READ aprofundada
+    public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro, int qtdCooperados, int qtdRotas, int qtdColetas, int qtdNegociacoes) {
+        this.nome = nome;
+
+        if (this.cnpj.isEmpty()) {
+            this.cnpj = "";
+        } else {
+            this.cnpj = cnpj;
+        }
+
+        if (this.nomePublico.isEmpty()) {
+            this.nomePublico = nome;
+        } else {
+            this.nomePublico = nomePublico;
+        }
+
+        this.descricaoInstitucional = descricaoInstitucional;
+        this.logoUrl = logoUrl;
+        this.emailInstitucional = emailInstitucional;
+        this.telefoneWhatsapp = telefoneWhatsapp;
+        this.cep = cep;
+        this.endereco = endereco;
+        this.cidade = cidade;
+        this.estado = estado;
+        this.dataFundacao = dataFundacao;
+        this.canalContatoPreferencial = canalContatoPreferencial;
+        this.linkWhatsapp = linkWhatsapp;
+        this.status = status;
+        this.dataCadastro = dataCadastro;
+
+        this.qtdCooperados = qtdCooperados;
+        this.qtdRotas = qtdRotas;
+        this.qtdColetas = qtdColetas;
+        this.qtdNegociacoes = qtdNegociacoes;
+    }
+
+    public int getQtdCooperados() {
+        return qtdCooperados;
+    }
+
+    public void setQtdCooperados(int qtdCooperados) {
+        this.qtdCooperados = qtdCooperados;
     }
 
     // GETTERS E SETTERS
@@ -132,4 +196,27 @@ public class Cooperativa {
 
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 
+    public int getQtdRotas() {
+        return qtdRotas;
+    }
+
+    public void setQtdRotas(int qtdRotas) {
+        this.qtdRotas = qtdRotas;
+    }
+
+    public int getQtdColetas() {
+        return qtdColetas;
+    }
+
+    public void setQtdColetas(int qtdColetas) {
+        this.qtdColetas = qtdColetas;
+    }
+
+    public int getQtdNegociacoes() {
+        return qtdNegociacoes;
+    }
+
+    public void setQtdNegociacoes(int qtdNegociacoes) {
+        this.qtdNegociacoes = qtdNegociacoes;
+    }
 }
