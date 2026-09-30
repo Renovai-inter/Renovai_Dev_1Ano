@@ -358,6 +358,106 @@ public class CooperativaDAO {
 
     }
 
+    // Filtrar Cooperativas por Cidade
+    public ArrayList<Cooperativa> filtrarCooperativasPorCidade(String cidadeBusca) {
+
+        // DECLARACAO
+
+        Connection conexao = conn.conectar();
+        ArrayList<Cooperativa> cooperativas = new ArrayList<>();
+
+        // COMANDO SQL
+
+        String sql = "SELECT" +
+                "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
+                "    (select coalesce(count(c.*), 0) from cooperado c where c.id_cooperativa = coop.id_cooperativa) as cooperados, " +
+                "    coop.data_cadastro as cadastro " +
+                "FROM cooperativa coop" +
+                "WHERE coop.nome LIKE '%" + cidadeBusca + "%' OR coop.cnpj LIKE '%" + cidadeBusca + "%';";
+
+        try {
+
+            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            // todo: formatatar saídas: CNPJ
+            while (rs.next()) {
+
+                cooperativas.add(new Cooperativa(
+                        rs.getString("nome"),
+                        rs.getString("cnpj"),
+                        rs.getString("cidade"),
+                        rs.getString("estado"),
+                        rs.getString("status"),
+                        rs.getInt("cooperados"),
+                        LocalDateTime.parse(rs.getString( "cadastro"))
+                ));
+
+            }
+
+            return cooperativas;
+
+        } catch (SQLException e) {
+            return null;
+        } finally {
+            conn.desconectar(conexao);
+        }
+
+    }
+
+    // Filtrar Cooperativas por Estado (UF)
+    public ArrayList<Cooperativa> filtrarCooperativasPorEstado(String estadoBusca) {
+
+        // DECLARACAO
+
+        Connection conexao = conn.conectar();
+        ArrayList<Cooperativa> cooperativas = new ArrayList<>();
+
+        // COMANDO SQL
+
+        String sql = "SELECT" +
+                "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
+                "    (select coalesce(count(c.*), 0) from cooperado c where c.id_cooperativa = coop.id_cooperativa) as cooperados, " +
+                "    coop.data_cadastro as cadastro " +
+                "FROM cooperativa coop" +
+                "WHERE coop.nome LIKE '%" + estadoBusca + "%' OR coop.cnpj LIKE '%" + estadoBusca + "%';";
+
+        try {
+
+            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            // todo: formatatar saídas: CNPJ
+            while (rs.next()) {
+
+                cooperativas.add(new Cooperativa(
+                        rs.getString("nome"),
+                        rs.getString("cnpj"),
+                        rs.getString("cidade"),
+                        rs.getString("estado"),
+                        rs.getString("status"),
+                        rs.getInt("cooperados"),
+                        LocalDateTime.parse(rs.getString( "cadastro"))
+                ));
+
+            }
+
+            return cooperativas;
+
+        } catch (SQLException e) {
+            return null;
+        } finally {
+            conn.desconectar(conexao);
+        }
+
+    }
+
     // === METODOS UPDATE ==============================================================================================
 
 
