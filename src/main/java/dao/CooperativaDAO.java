@@ -330,7 +330,6 @@ public class CooperativaDAO {
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
             ResultSet rs = pstmt.executeQuery();
-
             // todo: formatatar saídas: CNPJ
             while (rs.next()) {
 
@@ -541,6 +540,33 @@ public class CooperativaDAO {
 
     // === METODOS DELETE ==============================================================================================
 
+    // Deleta cooperativa determinada rota por meio do ID
+    public int excluirCooperativa(Cooperativa coop) {
 
+        // DECLARACAO
+
+        Connection conexao = conn.conectar();
+
+        // COMANDO SQL
+
+        String sql = "DELETE FROM COOPERATIVA WHERE id_cooperativa = ?";
+
+        // EXECUTAR PREPARED STATEMENT
+
+        try {
+
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            pstmt.setLong(1, coop.getIdCooperativa());
+
+            return pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+
+            return -1;
+
+        }
+
+    }
 
 }
