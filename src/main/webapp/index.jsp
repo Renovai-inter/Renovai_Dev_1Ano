@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!-- 1. Importe a classe do DAO e o pacote do seu modelo/entidade -->
-<%@ page import="com.exemplo.dao.CooperativaDAO" %>
-<%@ page import="com.exemplo.model.Cooperativa" %>
+<%@ page import="dao.CooperativaDAO" %>
+<%@ page import="model.Cooperativa" %>
 <%@ page import="java.util.List" %>
 <!DOCTYPE html>
 <html>
@@ -9,20 +9,20 @@
 <title>Lista de Usuários</title>
 </head>
 <body>
-<h1>Usuários cadastrados</h1>
+ <h1>Usuários cadastrados</h1>
 
     <ul>
 <%
         try {
-            // 2. Instancia o DAO diretamente na página JSP
+            // 2. Inativostancia o DAO diretamente na página JSP
             CooperativaDAO dao = new CooperativaDAO();
             // 3. Executa a função do DAO
-            List<Cooperativa> lista = dao.getUltimoId();
+            List<Cooperativa> lista = dao.exibirCooperativas();
 
             // 4. Itera sobre os resultados exibindo na tela
             for (Cooperativa u : lista) {
     %>
-<li><%= u.getNome() %> - <%= u.getEmail() %></li>
+<li><%= u.getNome() %> - <%= u.getEmailInstitucional() %></li>
 <%
             }
         } catch (Exception e) {

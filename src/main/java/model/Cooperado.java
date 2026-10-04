@@ -22,7 +22,7 @@ public class Cooperado {
 
     public void setIdCooperado(Long idCooperado) { this.idCooperado = idCooperado; }
 
-    public int getIdUsuario() { return idUsuario; }
+    public long getIdUsuario() { return idUsuario; }
 
     public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
 
@@ -42,7 +42,9 @@ public class Cooperado {
 
     public void setStatus(String status) { this.status = status; }
 
-    public Date getDataCadastro() { return dataCadastro; }
+    public LocalDateTime getDataCadastro() {
+        return dataCadastro;
+    }
 
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 
