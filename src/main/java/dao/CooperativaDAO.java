@@ -2,6 +2,7 @@ package dao;
 
 import model.Cooperativa;
 import util.Conexao;
+import util.Validadora;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -12,6 +13,7 @@ public class CooperativaDAO {
     // ATRIBUTOS
 
     private static Conexao conn = new Conexao();
+    private static Validadora validadora = new Validadora();
 
     // CONSTRUTOR
 
@@ -20,24 +22,7 @@ public class CooperativaDAO {
 
     // === METODOS DE FILTRO PARA NUMERICO =============================================================================
 
-    // Filtrar CNPJ todo: reestruturar filtragem
-    private static String filtrarCnpj(String cnpj) {
-
-        // Tratamento inicial
-        cnpj.trim();
-
-        // Retirar "." e "-"
-        cnpj.replace(".", "");
-        cnpj.replace("-", "");
-
-        // Verificar formato (regex) correto
-        if (cnpj.matches("^\\d{11}$")) {
-            return cnpj;
-        } else {
-            return "invalido";
-        }
-
-    }
+    // todo: reestruturar filtragem
 
     // Filtrar Telefone/Whatsapp
     private static String filtrarTelefoneWhatsapp(String telefoneWhatsapp) {
@@ -190,7 +175,7 @@ public class CooperativaDAO {
 
             pstmt.setString(1, coop.getNome().toLowerCase());
 
-            String cnpj = filtrarCnpj(coop.getCnpj());
+            String cnpj = validadora.filtrarCnpj(coop.getCnpj());
             if (cnpj.equals("invalido")) {
                 pstmt.setNull(3, Types.VARCHAR);
             } else {
