@@ -32,17 +32,14 @@ public class Validadora {
             // Retorno do CNPJ em valores apenas numericos
             return cnpj;
 
-        } else {
-
-            return "invalido";
-
         }
+        return "invalido";
 
     }
 
-    // Filtro de Telefone/Whatsapp - devolvendo somente os valores numéticos de um dos formatos a seguir:
+    // Filtro de Telefone/Whatsapp - devolvendo somente os valores numéricos de um dos formatos a seguir:
     // (00) 0000-0000 ou (00) 00000-0000
-    private static String filtrarTelefoneWhatsapp(String telefoneWhatsapp) {
+    public String filtrarTelefoneWhatsapp(String telefoneWhatsapp) {
 
         // Tratamento inicial
         telefoneWhatsapp.replace(" ", ""); // Retirando todos os espaços em branco
@@ -57,16 +54,13 @@ public class Validadora {
 
             return telefoneWhatsapp;
 
-        } else {
-
-            return "invalido";
-
         }
+        return "invalido";
 
     }
 
     // Filtrar email institucional seguindo o formato seu-nome@email.com
-    private static String filtrarEmailInstitucional(String email) {
+    public String filtrarEmailInstitucional(String email) {
 
         // Tratamento inicial
         email.toLowerCase().replace(" ", ""); // Retirando todos os espaços em branco
@@ -76,6 +70,24 @@ public class Validadora {
             return email;
         }
 
+        return "invalido";
+
+    }
+
+    // Filtrar CEP seguindo o formato 00000-000
+    public String filtrarCep(String cep) {
+
+        // Tratamento inicial
+        cep.replace(" ", "");
+
+        // Validação usando formato 00000-000
+        if (cep.matches("^\\d{5}-\\d{3}$")) {
+
+            // Retirando o "-"
+            cep.replace("-", "");
+
+            return cep;
+        }
         return "invalido";
 
     }
@@ -119,6 +131,15 @@ public class Validadora {
 
     // Um metodo de formatação para email não será necessário, visto que ele já entra no banco seguindo o formato
 
+    // Formatacao de CEP - retornando os valores numericos brutos no formato 00000-0000
+    public String formatarCEP(String cep) {
 
+        // Tratamento inicial
+        cep.replace(" ", "");
+
+        // Retorno no formato correto
+        return cep.substring(0, 6) + "-" + cep.substring(6);
+
+    }
 
 }

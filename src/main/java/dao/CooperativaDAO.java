@@ -24,20 +24,6 @@ public class CooperativaDAO {
 
     // todo: reestruturar filtragem
 
-    // Validar CEP
-    private static String filtrarCep(String cep) {
-
-        // Tratamento inicial
-        cep.trim();
-
-        // Validação usando formato 00000-000
-        if (cep.matches("^\\d{5}-\\d{3}")) {
-            return cep;
-        }
-        return "invalido";
-
-    }
-
     // Validar Endereço
     private static String filtrarEndereco(String endereco) {
 
@@ -160,21 +146,21 @@ public class CooperativaDAO {
                 pstmt.setString(6, coop.getLogoUrl());
             }
 
-            String emailInstucional = filtrarEmailInstitucional(coop.getEmailInstitucional());
+            String emailInstucional = validadora.filtrarEmailInstitucional(coop.getEmailInstitucional());
             if (emailInstucional.equals("invalido")) {
                 pstmt.setNull(7, Types.VARCHAR);
             } else {
                 pstmt.setString(7, coop.getEmailInstitucional());
             }
 
-            String telefoneWhatsapp = filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp());
+            String telefoneWhatsapp = validadora.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp());
             if (telefoneWhatsapp.equals("invalido")) {
                 pstmt.setNull(8, Types.VARCHAR);
             } else {
                 pstmt.setString(8, telefoneWhatsapp);
             }
 
-            String cep = filtrarCep(coop.getCep());
+            String cep = validadora.filtrarCep(coop.getCep());
             if (cep.equals("invalido")) {
                 pstmt.setNull(9, Types.VARCHAR);
             } else {
