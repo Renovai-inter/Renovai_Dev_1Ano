@@ -62,7 +62,7 @@ public class CooperadoDAO {
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
 
-            pstm.setInt(1, cooperado.getIdUsuario());
+            pstm.setLong(1, cooperado.getIdUsuario());
             pstm.setString(2, cooperado.getCargo());
             pstm.setString(3, cooperado.getCodigoCooperado());
             pstm.setString(4, cooperado.getStatus());
@@ -93,10 +93,10 @@ sistema cria automaticamente: código do cooperado, nome de usuário e senha tem
             PreparedStatement pst = conexao.prepareStatement(sqlUsu);
 
             //cooperado
-            pstm.setInt(1, cooperado.getIdUsuario());
+            pstm.setInt(1, Math.toIntExact(cooperado.getIdUsuario()));
             pstm.setString(2, cooperado.getCodigoCooperado());
             pstm.setString(3, cooperado.getCargo());
-            pstm.setDate(4, cooperado.getDataCadastro());
+            pstm.setTimestamp(4, java.sql.Timestamp.valueOf(cooperado.getDataCadastro()));
             //usuario
             pst.setString(1, nome_completo);
             pst.setString(2,nome_usuario);
