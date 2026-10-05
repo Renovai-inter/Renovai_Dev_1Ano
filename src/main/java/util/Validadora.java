@@ -65,6 +65,21 @@ public class Validadora {
 
     }
 
+    // Filtrar email institucional seguindo o formato seu-nome@email.com
+    private static String filtrarEmailInstitucional(String email) {
+
+        // Tratamento inicial
+        email.toLowerCase().replace(" ", ""); // Retirando todos os espaços em branco
+
+        // Verificação usando regex. ex: seu-nome@email.com
+        if (email.matches("^[\\w.-]+@[\\w.-]+\\.\\w+$")) {
+            return email;
+        }
+
+        return "invalido";
+
+    }
+
     // === METODOS DE FORMATACAO DE SAIDA ==============================================================================
 
     /*
@@ -101,5 +116,9 @@ public class Validadora {
         }
 
     }
+
+    // Um metodo de formatação para email não será necessário, visto que ele já entra no banco seguindo o formato
+
+
 
 }

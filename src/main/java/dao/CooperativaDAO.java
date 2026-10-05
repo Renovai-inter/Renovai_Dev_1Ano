@@ -24,42 +24,6 @@ public class CooperativaDAO {
 
     // todo: reestruturar filtragem
 
-    // Filtrar Telefone/Whatsapp
-    private static String filtrarTelefoneWhatsapp(String telefoneWhatsapp) {
-
-        // Tratamento inicial
-        telefoneWhatsapp.trim(); // (00) 00000-0000
-
-        // Retirar "(", ")", e "-", depois, retirar o " " presente entre o DDD e o numero
-        telefoneWhatsapp.replace("(", "");
-        telefoneWhatsapp.replace(")", "");
-        telefoneWhatsapp.replace("-", "");
-        telefoneWhatsapp.replace(" ", "");
-
-        // Formato de telefone comum tem 10 digitos, whatsapp tem 11
-        if (telefoneWhatsapp.matches("^\\d{10,11}$")) {
-            return telefoneWhatsapp;
-        }
-        return "invalido";
-
-    }
-
-    // Filtrar email institucional
-    private static String filtrarEmailInstitucional(String email) {
-
-        // Tratamento inicial
-        email.trim().toLowerCase();
-
-        // todo: Verificação de existência de email
-
-        // Verificação usando regex. ex: joel.gracek@email.com
-        if (email.matches("^[\\w.-]+@[\\w.-]+\\.\\w+$")) {
-            return email;
-        }
-        return "invalido";
-
-    }
-
     // Validar CEP
     private static String filtrarCep(String cep) {
 
