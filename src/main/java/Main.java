@@ -9,7 +9,7 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String PASSWORD = System.getenv("DB_PASSWORD");
+        String PASSWORD = System.getenv("AVNS_boJSmYDug3Qhb3iq6XT");
 
         System.out.println();
 
