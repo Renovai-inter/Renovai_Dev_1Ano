@@ -92,6 +92,20 @@ public class Validadora {
 
     }
 
+    // Filtrar endereço seguindo o formato Rua,Numero,Bairro
+    private static String filtrarEndereco(String endereco) {
+
+        // Tratamento inicial
+        endereco.toUpperCase().replace(" ", "");
+
+        // Formato esperado: Rua, Número, Bairro
+        if (endereco.matches("^[\\p{L}\\d.-]+,\\d+,[\\p{L}\\d.-]+")) {
+            return endereco;
+        }
+        return "invalido";
+
+    }
+
     // === METODOS DE FORMATACAO DE SAIDA ==============================================================================
 
     /*
@@ -139,6 +153,26 @@ public class Validadora {
 
         // Retorno no formato correto
         return cep.substring(0, 6) + "-" + cep.substring(6);
+
+    }
+
+    // Formatação de Endereço - Seguindo o formato Rua, Número, Bairro capitalizados
+    public String formatarEndereco(String endereco) {
+
+        // Tratamento inicial
+        endereco.replace(" ", "");
+
+        // Separando cada elemento por meio da vírgula
+        String[] valoresEndereco = endereco.split(",");
+
+        // Capitalizando os valores de Rua e Bairro
+        valoresEndereco[0] = valoresEndereco[0].toUpperCase().charAt(0) +
+                valoresEndereco[0].toLowerCase().substring(1);
+        valoresEndereco[0] = valoresEndereco[0].toUpperCase().charAt(0) +
+                valoresEndereco[0].toLowerCase().substring(1);
+
+        // Retorno no formato correto
+        return valoresEndereco[0] + ", " + valoresEndereco[1] + ", " + valoresEndereco[2];
 
     }
 

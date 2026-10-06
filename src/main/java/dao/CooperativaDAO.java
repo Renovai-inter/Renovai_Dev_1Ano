@@ -1,8 +1,7 @@
 package dao;
 
 import model.Cooperativa;
-import util.Conexao;
-import util.Validadora;
+import util.*;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -23,26 +22,6 @@ public class CooperativaDAO {
     // === METODOS DE FILTRO PARA NUMERICO =============================================================================
 
     // todo: reestruturar filtragem
-
-    // Validar Endereço
-    private static String filtrarEndereco(String endereco) {
-
-        // Tratamento inicial
-        String[] valoresEndereco = endereco.trim().toLowerCase().split(",");
-
-        // Formato esperado: Rua, Número, Bairro
-        if (valoresEndereco.length == 3) {
-
-            if (!(valoresEndereco[0].trim().matches("^\\w+$")
-                    && valoresEndereco[1].trim().matches("^\\d+$")
-                    && valoresEndereco[2].trim().matches("^\\w+$"))) {
-                return "invalido";
-            }
-
-        }
-        return endereco;
-
-    }
 
     // Validar UF
     private static String validarUf(String uf) {
