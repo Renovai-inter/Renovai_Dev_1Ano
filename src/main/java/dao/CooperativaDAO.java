@@ -23,26 +23,6 @@ public class CooperativaDAO {
 
     // todo: reestruturar filtragem
 
-    // Validar UF
-    private static String validarUf(String uf) {
-
-        // Tratamento inicial
-        uf.trim().toUpperCase();
-
-        // Lista de UFs possíveis
-        String[] listaUfs = {"AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB",
-                "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"};
-
-        // Verificação de formato: CIDADE X / UF
-        for (String ufVer : listaUfs) {
-            if (ufVer.equals(uf)) {
-                return uf;
-            }
-        }
-        return "invalido";
-
-    }
-
     // todo: formatação de datas
 
     // === OUTROS METODOS ==============================================================================================
@@ -146,7 +126,7 @@ public class CooperativaDAO {
                 pstmt.setString(9, cep);
             }
 
-            String endereco = filtrarEndereco(coop.getEndereco());
+            String endereco = validadora.filtrarEndereco(coop.getEndereco());
             if (endereco.equals("invalido")) {
                 pstmt.setNull(10, Types.VARCHAR);
             } else {

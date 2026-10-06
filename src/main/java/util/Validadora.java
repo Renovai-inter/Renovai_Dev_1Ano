@@ -93,7 +93,7 @@ public class Validadora {
     }
 
     // Filtrar endereço seguindo o formato Rua,Numero,Bairro
-    private static String filtrarEndereco(String endereco) {
+    public String filtrarEndereco(String endereco) {
 
         // Tratamento inicial
         endereco.toUpperCase().replace(" ", "");
@@ -101,6 +101,26 @@ public class Validadora {
         // Formato esperado: Rua, Número, Bairro
         if (endereco.matches("^[\\p{L}\\d.-]+,\\d+,[\\p{L}\\d.-]+")) {
             return endereco;
+        }
+        return "invalido";
+
+    }
+
+    // Filtrar UF seguindo um dos valores possíveis
+    private static String validarUf(String uf) {
+
+        // Tratamento inicial
+        uf.replace(" ", "").toUpperCase();
+
+        // Lista de UFs possíveis
+        String[] listaUfs = {"AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB",
+                "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"};
+
+        // Verificação para uf a ver dentro da lista de UF
+        for (String ufVer : listaUfs) {
+            if (ufVer.equals(uf)) {
+                return uf;
+            }
         }
         return "invalido";
 
@@ -175,5 +195,7 @@ public class Validadora {
         return valoresEndereco[0] + ", " + valoresEndereco[1] + ", " + valoresEndereco[2];
 
     }
+
+    // Formatação de UF não será necessária pois valores já estão formatados corretamente no banco
 
 }
