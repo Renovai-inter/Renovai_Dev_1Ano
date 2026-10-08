@@ -10,10 +10,9 @@ public class Conexao {
     // DECLARACAO
 
     // Variaveis estaticas usadas para estabelecer a conexao com o banco
-    private static final String URL = System.getenv("jdbc:postgresql://pg-2a8ff530-renovai-3741.c.aivencloud.com:18259/defaultdb?ssl=require&user=avnadmin&password=AVNS_boJSmYDug3Qhb3iq6XT");
-    private static final String USER = System.getenv("avnadmin");
-    private static final String PASSWORD = System.getenv("AVNS_boJSmYDug3Qhb3iq6XT");
-
+    private static final String URL = System.getenv("DB_URL");
+    private static final String USER = System.getenv("DB_USER");
+    private static final String PASSWORD = System.getenv("DB_PASSWORD");
 
 
     // METODOS
@@ -23,9 +22,11 @@ public class Conexao {
 
         try {
 
+            Class.forName("org.postgresql.Driver");
+
             return DriverManager.getConnection(URL, USER, PASSWORD);
 
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
 
             throw new RuntimeException(e);
 
