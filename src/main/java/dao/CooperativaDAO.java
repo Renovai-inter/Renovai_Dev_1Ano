@@ -21,8 +21,6 @@ public class CooperativaDAO {
 
     // === METODOS DE FILTRO PARA NUMERICO =============================================================================
 
-    // todo: reestruturar filtragem
-
     // todo: formatação de datas
 
     // === OUTROS METODOS ==============================================================================================
@@ -135,7 +133,7 @@ public class CooperativaDAO {
 
             pstmt.setString(11, coop.getCidade().trim().toLowerCase());
 
-            pstmt.setString(12, validarUf(coop.getEstado()));
+            pstmt.setString(12, validadora.validarUf(coop.getEstado()));
 
             return pstmt.executeUpdate();
 

@@ -1,5 +1,7 @@
 package util;
 
+import java.util.Arrays;
+
 public class Validadora {
 
     // === CONSTRUTOR VAZIO ============================================================================================
@@ -107,7 +109,7 @@ public class Validadora {
     }
 
     // Filtrar UF seguindo um dos valores possíveis
-    private static String validarUf(String uf) {
+    public String validarUf(String uf) {
 
         // Tratamento inicial
         uf.replace(" ", "").toUpperCase();
@@ -121,6 +123,26 @@ public class Validadora {
             if (ufVer.equals(uf)) {
                 return uf;
             }
+        }
+        return "invalido";
+
+    }
+
+    // Validação de data seguindo o formato dd/mm/aaaa
+    public String validarData(String data) {
+
+        // Tratamento inicial
+        data.replace(" ", "");
+
+        // Verificando formato de acordo com o padrão dd/mm/aaaa
+        if (data.matches("^\\d{2}/\\d{2}/\\d{4}")) {
+
+            // DateStyle padrão do banco: ISO, MDY | Realizar a conversão para padrão do banco
+            String[] valoresData = data.split("/");
+            data = valoresData[1] + "-" + valoresData[0] + "-" + valoresData[2];
+
+            return data;
+
         }
         return "invalido";
 
@@ -198,4 +220,15 @@ public class Validadora {
 
     // Formatação de UF não será necessária pois valores já estão formatados corretamente no banco
 
+    // Validação de data - convertendo para a visualização pretendida - MDY para dd/mm/aaaa
+    public String formatarData(String data) {
+
+        // Tratamento inicial
+        data.replace(" ", "");
+
+        // Convertendo para o padrão visual por meio de SPLIT
+        String[] valoresData = data.split("-");
+        return valoresData[1] + "/" + valoresData[0] + "/" + valoresData[2];
+
+    }
 }
