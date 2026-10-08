@@ -48,6 +48,7 @@ public class MaterialDAO {
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
+            e.printStackTrace();
             return 0;
         } finally {
             conn.desconectar(conexao);
@@ -92,7 +93,7 @@ public class MaterialDAO {
 
 
     // === METODOS UPDATE ==============================================================================================
-    public int atualizarRota(Material material) {
+    public int atualizarMaterial(Material material) {
 
         Connection conexao = conn.conectar();
 
@@ -122,7 +123,7 @@ public class MaterialDAO {
 
 
     // === METODOS DELETE ==============================================================================================
-    public int excluirRota(Material material) {
+    public int excluirMaterial(Material material) {
 
         Connection conexao = conn.conectar();
 
