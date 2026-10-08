@@ -21,30 +21,7 @@ public class CooperativaDAO {
 
     // === OUTROS METODOS ==============================================================================================
 
-    // Retorna o último índice de ID das cooperativas
-    public long getUltimoIdCooperativa() {
 
-        Connection conexao = conn.conectar();
-
-        String sql = "SELECT id_cooperativa " +
-                "FROM cooperativa " +
-                "ORDER BY 1 DESC LIMIT 1";
-
-        try {
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()){
-                return rs.getLong("id_cooperativa");
-            }
-            else {
-                return -1;
-            }
-        }
-        catch (SQLException e) {
-            return -1;
-        } finally { conn.desconectar(conexao); } }
 
     // === METODOS CREATE ==============================================================================================
 

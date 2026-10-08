@@ -1,5 +1,10 @@
 package util;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 public class Utilitario {
 
     // === CONSTRUTOR VAZIO ============================================================================================
@@ -229,4 +234,37 @@ public class Utilitario {
         return valoresData[1] + "/" + valoresData[0] + "/" + valoresData[2];
 
     }
+
+    // === METODOS DE USO GERAL ========================================================================================
+
+    // Retorna o último índice de ID de qualquer tabela - usado para geração automática de PKs
+    public long selecionarUltimoId(String tabela) {
+
+        // INICIALIZA CONEXÃO COM BD
+
+        Conexao conn = new Conexao();
+        Connection conexao = conn.conectar();
+
+        // SELECIONA PARA COOPERATIVA
+
+        String sql = "SELECT id_" + tabela +
+                " FROM " + tabela +
+                " ORDER BY 1 DESC LIMIT 1";
+
+        try {
+            PreparedStatement pstmt = conexao.prepareStatement(sql);
+
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()){
+                return rs.getLong("id_"+tabela);
+            }
+            else {
+                return -1;
+            }
+        }
+        catch (SQLException e) {
+            return -1;
+        } finally { conn.desconectar(conexao); } }
+
 }
