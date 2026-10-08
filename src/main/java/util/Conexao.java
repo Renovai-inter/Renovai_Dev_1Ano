@@ -18,7 +18,7 @@ public class Conexao {
     // METODOS
 
     // Metodo para estabelecer conexao com o banco de dados
-    public Connection conectar() {
+    public static Connection conectar() {
 
         try {
 
