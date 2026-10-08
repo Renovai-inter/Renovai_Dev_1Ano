@@ -40,6 +40,14 @@ public class MaterialServlet extends HttpServlet {
 
             materialDAO.atualizarMaterial(material);
 
+        } else if ("excluir".equals(acao)) {
+
+            Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
+
+            Material material = new Material();
+            material.setIdMaterial(idMaterial);
+
+            materialDAO.excluirMaterial(material);
         } else {
 
             Material material = new Material();
