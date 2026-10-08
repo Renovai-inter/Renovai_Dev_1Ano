@@ -11,17 +11,13 @@ public class CooperativaDAO {
 
     // ATRIBUTOS
 
-    private static Conexao conn = new Conexao();
-    private static Validadora validadora = new Validadora();
+    private final Conexao conn = new Conexao();
+    private final Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR
 
     public CooperativaDAO() {
     }
-
-    // === METODOS DE FILTRO PARA NUMERICO =============================================================================
-
-    // todo: formatação de datas
 
     // === OUTROS METODOS ==============================================================================================
 
@@ -82,7 +78,7 @@ public class CooperativaDAO {
 
             pstmt.setString(1, coop.getNome().toLowerCase());
 
-            String cnpj = validadora.filtrarCnpj(coop.getCnpj());
+            String cnpj = utilitario.filtrarCnpj(coop.getCnpj());
             if (cnpj.equals("invalido")) {
                 pstmt.setNull(3, Types.VARCHAR);
             } else {
@@ -103,28 +99,28 @@ public class CooperativaDAO {
                 pstmt.setString(6, coop.getLogoUrl());
             }
 
-            String emailInstucional = validadora.filtrarEmailInstitucional(coop.getEmailInstitucional());
+            String emailInstucional = utilitario.filtrarEmailInstitucional(coop.getEmailInstitucional());
             if (emailInstucional.equals("invalido")) {
                 pstmt.setNull(7, Types.VARCHAR);
             } else {
                 pstmt.setString(7, coop.getEmailInstitucional());
             }
 
-            String telefoneWhatsapp = validadora.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp());
+            String telefoneWhatsapp = utilitario.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp());
             if (telefoneWhatsapp.equals("invalido")) {
                 pstmt.setNull(8, Types.VARCHAR);
             } else {
                 pstmt.setString(8, telefoneWhatsapp);
             }
 
-            String cep = validadora.filtrarCep(coop.getCep());
+            String cep = utilitario.filtrarCep(coop.getCep());
             if (cep.equals("invalido")) {
                 pstmt.setNull(9, Types.VARCHAR);
             } else {
                 pstmt.setString(9, cep);
             }
 
-            String endereco = validadora.filtrarEndereco(coop.getEndereco());
+            String endereco = utilitario.filtrarEndereco(coop.getEndereco());
             if (endereco.equals("invalido")) {
                 pstmt.setNull(10, Types.VARCHAR);
             } else {
@@ -133,7 +129,7 @@ public class CooperativaDAO {
 
             pstmt.setString(11, coop.getCidade().trim().toLowerCase());
 
-            pstmt.setString(12, validadora.validarUf(coop.getEstado()));
+            pstmt.setString(12, utilitario.validarUf(coop.getEstado()));
 
             return pstmt.executeUpdate();
 

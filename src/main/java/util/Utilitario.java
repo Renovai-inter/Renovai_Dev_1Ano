@@ -1,14 +1,12 @@
 package util;
 
-import java.util.Arrays;
-
-public class Validadora {
+public class Utilitario {
 
     // === CONSTRUTOR VAZIO ============================================================================================
 
     // Construtor vazio para implementação dos metodos em outras classes
 
-    public Validadora() {
+    public Utilitario() {
     }
 
     // === METODOS DE FILTRO DE ENTRADA ================================================================================
