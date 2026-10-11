@@ -19,7 +19,6 @@ public class MaterialServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.out.println("DOPOST FOI CHAMADO");
 
         String acao = request.getParameter("acao");
 
@@ -40,15 +39,20 @@ public class MaterialServlet extends HttpServlet {
 
             materialDAO.atualizarMaterial(material);
 
+        } else if ("excluir".equals(acao)) {
+
+            Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
+
+            Material material = new Material();
+            material.setIdMaterial(idMaterial);
+
+            materialDAO.excluirMaterial(material);
         } else {
 
             Material material = new Material();
             material.setNome(nome);
             material.setCategoria(categoria);
 
-            int resultado = materialDAO.cadastrarMaterial(material);
-
-            System.out.println("RESULTADO DO CADASTRO: " + resultado);
         }
 
         response.sendRedirect(request.getContextPath() + "/material");
@@ -58,12 +62,12 @@ public class MaterialServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.out.println("DOGET FOI CHAMADO");
+
 
         List<Material> materiais = materialDAO.listarMateriais();
 
         request.setAttribute("materiais", materiais);
 
-        request.getRequestDispatcher("/index.jsp").forward(request, response);
+        request.getRequestDispatcher("/materiais.jsp").forward(request, response);
     }
 }
