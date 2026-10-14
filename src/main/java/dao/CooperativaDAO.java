@@ -1,6 +1,7 @@
 package dao;
 
 import model.Cooperativa;
+import model.Cooperado;
 import util.*;
 
 import java.sql.*;
@@ -13,20 +14,17 @@ public class CooperativaDAO {
 
     private final Conexao conn = new Conexao();
     private final Utilitario utilitario = new Utilitario();
+    private final CooperadoDAO cooperadoDAO = new CooperadoDAO();
 
     // CONSTRUTOR
 
     public CooperativaDAO() {
     }
 
-    // === OUTROS METODOS ==============================================================================================
-
-
-
     // === METODOS CREATE ==============================================================================================
 
-    // Metodo de cadastrar cooperativa | todo: implementar API de buscar endereço por CEP
-    public int cadastrarCooperativa(Cooperativa coop) {
+    // Metodo de cadastrar cooperativa
+    public int cadastrarCooperativa(Cooperativa coop, Cooperado gestor) {
 
         // DECLARACAO
 
@@ -34,9 +32,6 @@ public class CooperativaDAO {
         String sql;
 
         // COMANDO SQL PADRÃO
-
-        // todo: ver possível geração de link de whatsapp automático pelo numero usando API
-        // Caso afirmativo, adicionar link_whatsapp no comando e statement
 
         sql = (
                 "INSERT INTO cooperativa " +
@@ -51,9 +46,9 @@ public class CooperativaDAO {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-            pstmt.setLong(0, getUltimoIdCooperativa());
+            pstmt.setLong(0, utilitario.selecionarUltimoId("cooperativa"));
 
-            pstmt.setString(1, coop.getNome().toLowerCase());
+            pstmt.setString(1, coop.getNome().toUpperCase().trim());
 
             String cnpj = utilitario.filtrarCnpj(coop.getCnpj());
             if (cnpj.equals("invalido")) {
@@ -62,7 +57,7 @@ public class CooperativaDAO {
                 pstmt.setString(3, cnpj);
             }
 
-            pstmt.setString(4, coop.getNomePublico());
+            pstmt.setString(4, coop.getNomePublico().toUpperCase().trim());
 
             if (coop.getDescricaoInstitucional().isEmpty()) {
                 pstmt.setNull(5, Types.LONGVARCHAR);
@@ -73,7 +68,7 @@ public class CooperativaDAO {
             if (coop.getLogoUrl().isEmpty()) {
                 pstmt.setNull(6, Types.VARCHAR);
             } else {
-                pstmt.setString(6, coop.getLogoUrl());
+                pstmt.setString(6, coop.getLogoUrl().trim());
             }
 
             String emailInstucional = utilitario.filtrarEmailInstitucional(coop.getEmailInstitucional());
@@ -104,19 +99,21 @@ public class CooperativaDAO {
                 pstmt.setString(10, endereco);
             }
 
-            pstmt.setString(11, coop.getCidade().trim().toLowerCase());
+            pstmt.setString(11, coop.getCidade().toLowerCase().trim());
 
             pstmt.setString(12, utilitario.validarUf(coop.getEstado()));
 
             return pstmt.executeUpdate();
 
-        } catch (SQLException e) {
+        } catch (SQLException sqle) {
             return 0;
         } finally {
             conn.desconectar(conexao);
         }
 
-        // todo: CADASTRO DE GESTOR EMBUTIDO
+        // CADASTRO DE GESTOR EMBUTIDO
+
+        cooperadoDAO.cadastrarCooperado(gestor.get)
 
     }
 
