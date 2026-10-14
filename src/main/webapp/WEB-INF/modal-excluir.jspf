@@ -1,0 +1,33 @@
+<%-- Precisa das variaveis "c" (Cooperado) e "totalColetas" definidas na pagina que inclui --%>
+<div class="modal-fundo" id="excluir">
+    <form class="modal" method="post" action="cooperado">
+        <input type="hidden" name="id" value="<%= c.getIdCooperado() %>">
+
+        <h3>Excluir cooperado</h3>
+        <p class="sub">Revise o impacto antes de confirmar a ação sobre "<%= esc(c.getNomeCompleto()) %>".</p>
+
+        <p class="mini">Registros relacionados afetados</p>
+        <div class="registros">
+            <div><span>Cooperativa:</span><b><%= esc(c.getNomeCooperativa()) %></b></div>
+            <div><span>Cargo:</span><b><%= c.getCargo() == null ? "-" : esc(c.getCargo()) %></b></div>
+            <div><span>Conta de acesso removida:</span><b><%= esc(c.getNomeUsuario()) %></b></div>
+            <div><span>Coletas sem mais responsável:</span><b><%= totalColetas %></b></div>
+        </div>
+
+        <label class="opcao">
+            <input type="radio" name="acao" value="inativar" checked>
+            <span><b>Alterar status para inativo</b>
+            Recomendado: mantém o histórico e todos os dados.</span>
+        </label>
+        <label class="opcao perigo">
+            <input type="radio" name="acao" value="excluir">
+            <span><b>Excluir permanentemente</b>
+            Esta remoção não pode ser desfeita.</span>
+        </label>
+
+        <div class="rodape">
+            <a href="#" class="botao claro">Cancelar</a>
+            <button type="submit" class="botao vinho">Confirmar</button>
+        </div>
+    </form>
+</div>

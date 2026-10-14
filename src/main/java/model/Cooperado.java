@@ -1,12 +1,11 @@
-
 package model;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class Cooperado {
 
-    // ATRIBUTOS
+    // ATRIBUTOS (tabela cooperado)
 
     private Long idCooperado;
     private Long idUsuario;
@@ -16,13 +15,22 @@ public class Cooperado {
     private String status;
     private LocalDateTime dataCadastro;
 
+    // ATRIBUTOS (vem de outras tabelas, preenchidos pelos JOINs da DAO)
+
+    private String nomeCompleto;
+    private String nomeUsuario;
+    private String email;
+    private String nomeCooperativa;
+    private boolean senhaTemporaria;
+    private ArrayList<String> atividades = new ArrayList<>();
+
     // GETTERS E SETTERS
 
     public Long getIdCooperado() { return idCooperado; }
 
     public void setIdCooperado(Long idCooperado) { this.idCooperado = idCooperado; }
 
-    public long getIdUsuario() { return idUsuario; }
+    public Long getIdUsuario() { return idUsuario; }
 
     public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
 
@@ -42,10 +50,32 @@ public class Cooperado {
 
     public void setStatus(String status) { this.status = status; }
 
-    public LocalDateTime getDataCadastro() {
-        return dataCadastro;
-    }
+    public LocalDateTime getDataCadastro() { return dataCadastro; }
 
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
+
+    public String getNomeCompleto() { return nomeCompleto; }
+
+    public void setNomeCompleto(String nomeCompleto) { this.nomeCompleto = nomeCompleto; }
+
+    public String getNomeUsuario() { return nomeUsuario; }
+
+    public void setNomeUsuario(String nomeUsuario) { this.nomeUsuario = nomeUsuario; }
+
+    public String getEmail() { return email; }
+
+    public void setEmail(String email) { this.email = email; }
+
+    public String getNomeCooperativa() { return nomeCooperativa; }
+
+    public void setNomeCooperativa(String nomeCooperativa) { this.nomeCooperativa = nomeCooperativa; }
+
+    public boolean isSenhaTemporaria() { return senhaTemporaria; }
+
+    public void setSenhaTemporaria(boolean senhaTemporaria) { this.senhaTemporaria = senhaTemporaria; }
+
+    public ArrayList<String> getAtividades() { return atividades; }
+
+    public void setAtividades(ArrayList<String> atividades) { this.atividades = atividades; }
 
 }
