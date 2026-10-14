@@ -1,7 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 
-<%@ page import="model.Material" %>
-<%@ page import="java.util.List" %>
+
 
 <!DOCTYPE html>
 <html>
@@ -26,9 +25,36 @@
 %>
 
             <li>
-                <%= material.getIdMaterial() %> -
-                <%= material.getNome() %> -
-                <%= material.getCategoria() %>
+
+                <form action="${pageContext.request.contextPath}/material" method="post">
+
+                    <input type="hidden" name="acao" value="editar">
+
+                    <input type="hidden"
+                           name="idMaterial"
+                           value="<%= material.getIdMaterial() %>">
+
+                    <input type="text"
+                           name="Nome"
+                           value="<%= material.getNome() %>">
+
+                    <input type="text"
+                           name="Categoria"
+                           value="<%= material.getCategoria() %>">
+
+                    <button type="submit">Editar</button>
+
+                </form>
+
+                <form action="${pageContext.request.contextPath}/material" method="post">
+
+                    <input type="hidden" name="acao" value="excluir">
+
+                    <input type="hidden" name="idMaterial" value="<%= material.getIdMaterial() %>">
+
+                    <button type="submit">Excluir</button>
+
+                </form>
             </li>
 
 <%
