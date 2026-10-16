@@ -113,7 +113,7 @@ public class CooperativaDAO {
 
         // CADASTRO DE GESTOR EMBUTIDO
 
-
+        //cooperadoDAO.cadastrarGestor()
 
     }
 
