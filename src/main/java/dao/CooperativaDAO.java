@@ -24,7 +24,7 @@ public class CooperativaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Metodo de cadastrar cooperativa
-    public int cadastrarCooperativa(Cooperativa coop, Cooperado gestor) {
+    public int[] cadastrarCooperativa(Cooperativa coop, Cooperado gestor, String senhaTemporariaGestor) {
 
         // DECLARACAO
 
@@ -103,19 +103,22 @@ public class CooperativaDAO {
 
             pstmt.setString(12, utilitario.validarUf(coop.getEstado()));
 
-            return pstmt.executeUpdate();
+            // CADASTRO DE GESTOR EMBUTIDO E RETORNO
+
+            int[] retornoGestor = cooperadoDAO.cadastrarGestor(coop, gestor.getNomeCompleto(), gestor.getNomeUsuario(), gestor.getEmail(), senhaTemporariaGestor);
+            int retornoCooperativa = pstmt.executeUpdate();
+
+            return new int[]{retornoCooperativa, retornoGestor[0], retornoGestor[1]};
 
         } catch (SQLException sqle) {
-            return 0;
+            return new int[]{0, 0, 0};
         } finally {
             conn.desconectar(conexao);
         }
 
-        // CADASTRO DE GESTOR EMBUTIDO
-
-        cooperadoDAO.cadastrarCooperado(gestor.get)
-
     }
+
+
 
     // === METODOS READ ================================================================================================
 
