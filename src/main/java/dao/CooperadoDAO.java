@@ -1,7 +1,9 @@
 package dao;
 import model.Coleta;
 import model.Cooperado;
+import model.Cooperativa;
 import util.Conexao;
+import util.Utilitario;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -13,6 +15,7 @@ public class CooperadoDAO {
     // ATRIBUTOS
 
     private Conexao conn = new Conexao();
+    private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR
 
@@ -48,6 +51,49 @@ public class CooperadoDAO {
             conn.desconectar(conexao);
         }
         return 0;
+    }
+
+    // Metodo de cadastro de gestor
+    public int[] cadastrarGestor(Cooperativa cooperativa, String nomeCompleto, String nomeUsuario, String email, String senhaTemporaria) {
+
+        Connection conexao = conn.conectar();
+
+        long idUsuario = utilitario.selecionarUltimoId("usuario");
+        long idCooperado = utilitario.selecionarUltimoId("cooperado");
+
+        String sqlUsuario = "INSERT INTO usuario (id_usuario, nome_completo, nome_usuario, senha_hash, email, tipo_usuario) " +
+                "VALUES (?, ?, ?, ?, ?, 'GESTOR_COOPERATIVA')";
+
+        String sqlCooperado = "INSERT INTO cooperado (id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo) " +
+                "VALUES (?, ?, ?, ?, 'GESTOR')";
+
+        try {
+
+            PreparedStatement pstmtUsuario = conexao.prepareStatement(sqlUsuario);
+            pstmtUsuario.setLong(1, idUsuario);
+            pstmtUsuario.setString(2, nomeCompleto.toUpperCase().strip());
+            if (nomeUsuario.isEmpty()) {
+                pstmtUsuario.setString(3, nomeCompleto.toUpperCase().replace(" ", ""));
+            } else {
+                pstmtUsuario.setString(3, nomeUsuario.toUpperCase().strip());
+            }
+            pstmtUsuario.setString(4, senhaTemporaria);
+            pstmtUsuario.setString(5, utilitario.filtrarEmailInstitucional(email));
+
+            PreparedStatement pstmtCooperado = conexao.prepareStatement(sqlCooperado);
+            pstmtCooperado.setLong(1, idCooperado);
+            pstmtCooperado.setLong(2, idUsuario);
+            pstmtCooperado.setLong(3, cooperativa.getIdCooperativa());
+            pstmtCooperado.setString(4, "CD-"+idCooperado);
+
+            return new int[]{pstmtUsuario.executeUpdate(), pstmtCooperado.executeUpdate()};
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            conn.desconectar(conexao);
+        }
+
     }
 
     /*Selecionar atividades do cooperado – caso não tenha cargo definido, o gestor pode indicar uma

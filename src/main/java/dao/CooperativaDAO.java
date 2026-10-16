@@ -113,9 +113,11 @@ public class CooperativaDAO {
 
         // CADASTRO DE GESTOR EMBUTIDO
 
-        cooperadoDAO.cadastrarCooperado(gestor.get)
+
 
     }
+
+
 
     // === METODOS READ ================================================================================================
 
