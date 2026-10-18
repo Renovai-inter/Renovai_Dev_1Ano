@@ -1,6 +1,9 @@
 
 package model;
 
+import jdk.jshell.Snippet;
+import model.enums.StatusNegociacao;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -8,16 +11,16 @@ public class Negociacao {
 
     // ATRIBUTOS
 
-    private Long idNegociacao;
-    private Long idCooperativa;
-    private Long idEmpresa;
-    private Long idMaterial;
-    private BigDecimal quantidadeKg;
-    private BigDecimal valorKgAtual;
-    private BigDecimal valorTotalAtual;
-    private String status;
-    private LocalDateTime dataCriacao;
-    private LocalDateTime dataConclusao;
+    private Long idNegociacao; // PK
+    private Long idCooperativa; // FK
+    private Long idEmpresa; // FK
+    private Long idMaterial; // FK
+    private BigDecimal quantidadeKg; // NUMERIC(12, 2)
+    private BigDecimal valorKgAtual; // NOT NULL - NUMERIC(10, 2)
+    private BigDecimal valorTotalAtual; // NUMERIC(14, 2)
+    private StatusNegociacao status; // NOT NULL COM CHECK E DEFAULT
+    private LocalDateTime dataCriacao; // NOT NULL - TIMESTAMP COM DEFAULT
+    private LocalDateTime dataConclusao; // TIMESTAMP
 
     // GETTERS E SETTERS
 
@@ -64,13 +67,10 @@ public class Negociacao {
     public void setValorTotalAtual(BigDecimal valorTotalAtual) { this.valorTotalAtual = valorTotalAtual; }
 
     // Retorna o valor de status.
-    public String getStatus() { return status; }
+    public StatusNegociacao getStatus() { return status; }
 
     // Define o valor de status.
-    public void setStatus(String status) {
-        if (status != null && status.codePointCount(0, status.length()) > 20) {
-            throw new IllegalArgumentException("status deve ter no máximo 20 caracteres.");
-        }
+    public void setStatus(StatusNegociacao status) {
         this.status = status;
     }
 

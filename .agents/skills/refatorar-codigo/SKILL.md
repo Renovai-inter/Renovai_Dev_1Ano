@@ -1,24 +1,29 @@
 ---
 name: refatorar-codigo
-description: Revisar models, CRUDs das DAOs e chamadas dos servlets do Renovaí em ordem, com roteiro Markdown e execução somente do escopo escolhido pelo usuário.
+description: Diagnosticar e executar a refatoração do backend Renovaí por etapas, das models aos CRUDs das DAOs e às chamadas dos servlets, com checklist Markdown e escolha explícita do escopo de execução.
 ---
 
 # Refatorar código
 
-Leia `AGENTS.md`, `PADRAO_CODIGO_BACKEND.md` e `CONFERENCIA_DAO_BANCO.md`. Delimite as models, DAOs e chamadas dos servlets afetados; se o pedido for geral, revise por lotes. Consulte `../script-banco.pdf` para as restrições documentadas. Preserve alterações preexistentes. Siga a ordem model → métodos CRUD que recebem a model → servlet que monta e envia a model. Verifique JSPs apenas quando essa integração exigir.
+Leia `AGENTS.md`, `PADRAO_CODIGO_BACKEND.md` e `CONFERENCIA_DAO_BANCO.md` antes da revisão. Use `../script-banco.pdf` como referência do esquema planejado, sem tratá-lo como prova do banco conectado nem pedir novamente o DDL original. Confira o código atual e os relatórios anteriores; um item marcado como concluído só permanece assim se o código ainda o sustentar. Preserve alterações preexistentes.
 
-## Diagnóstico e relatório
+Trabalhe por entidade ou lote pequeno, na ordem **model → CRUD da DAO → servlet**. Examine JSPs apenas se essa integração exigir. Não amplie a revisão para identidade visual, arquitetura nova ou `Main`.
 
-Confira nomes, instanciação, seções, espaçamento, comentários e se cada método realiza o objetivo descrito acima dele. Nos métodos `CREATE`, confira a PK `BIGINT` representada por `long` ou `Long` e como a DAO usa `Utilitario.selecionarUltimoId(String tabela)` para definir e vincular explicitamente um novo ID; o método retorna o último ID, não o novo. Registre lacunas, inclusive tabela vazia, sem alterar o método utilitário nesta revisão. Na model, confira quais setters precisam filtrar e validar entradas, quais getters formatam a saída e se os construtores passam pelos setters pertinentes. A DAO deve receber a model como parâmetro nos CRUDs correspondentes, sem repetir ali os filtros; verifique o valor efetivamente enviado ao banco. Depois confira as chamadas nos servlets. Examine os métodos e regex já existentes na `Utilitario` para identificar reutilização nos setters e getters, sem presumir que estão corretos. Confira `VARCHAR(x)` nos campos sem `CHECK`, os ENUMs já existentes para `CHECK` de lista fechada e os campos textuais preparados em maiúsculas. Encaminhe a implementação ou correção dos filtros e formatações à skill `$atualizar-verificacoes-formatacoes`, para evitar duas etapas alterando o mesmo método.
+## Diagnóstico
 
-Entregue um novo `NN-Refatoracao-Codigo.md` em `../Relatórios/` antes de alterar código; `NN` é o próximo número disponível e o arquivo anterior não deve ser substituído. Para cada achado, indique classe e método, comportamento atual, objetivo, ação concreta e verificação possível. Baseie a comparação de esquema no PDF indicado e não peça o DDL original para concluir essa revisão; apenas não apresente o PDF como prova do banco conectado. Termine com uma checklist **numerada, modular e executável**, separando passos de model, DAO e servlet e mostrando a dependência entre eles. Indique o estado de cada item para que o grupo possa executá-lo sem a IA. Não inclua identidade visual nem DOCX.
+1. **Model:** confira campos e tipos. Centralize filtros e validações de entrada nos setters e formatação de saída nos getters. Ao criar uma model, use instanciação sem parâmetros seguida dos setters; identifique construtores com parâmetros ou atribuições diretas que contornem as regras. Confira `ENUM` para `CHECK` de lista fechada e limite de `VARCHAR(x)` nos setters de campos sem `CHECK`; se o setter já valida os valores do `CHECK`, não acrescente uma segunda checagem de tamanho. Registre separadamente a entrada, o valor guardado na model, o valor persistido e o valor apresentado. Examine a reutilização possível de `Utilitario`. Encaminhe a criação ou correção de filtros, validações e formatações à skill `$atualizar-verificacoes-formatacoes`; esta skill não deve editar a mesma regra em paralelo.
+2. **DAO:** confira cada CRUD que representa a entidade: recebimento da model, SQL e parâmetros, gravação do valor armazenado sem usar getter de apresentação, leitura, tratamento de recursos e exceções. Nos `READ`, confira a montagem da model por instanciação sem parâmetros e setters, inclusive na `CooperativaDAO`; liste os pontos que ainda usam construtor com parâmetros. Em `CREATE`, confira a PK `BIGINT` como `long` ou `Long` e a obtenção e vinculação explícita do próximo ID a partir de `Utilitario.selecionarUltimoId(String tabela)`. O utilitário retorna o último ID; registre o caso de tabela vazia e outros riscos encontrados, sem alterá-lo nesta etapa.
+3. **Servlet:** confira a construção da model via setters, a chamada ao CRUD com a model e o tratamento distinto de erro de validação e erro de persistência. Revise a passagem para JSP somente quando necessária para exibir o resultado ou erro, sem expor detalhes de SQL.
+4. **Organização:** confira nomes, instanciação, seções, espaçamento e comentários curtos que descrevam a intenção real de cada método. Registre divergências entre comentário e comportamento.
 
-## Execução após escolha
+## Relatório e decisão
 
-Apresente o relatório e aguarde a escolha do usuário:
+Antes de editar código, crie `../Relatórios/NN-Refatoracao-Codigo.md`, usando o próximo número livre e preservando os relatórios existentes. Para cada achado, informe classe e método, comportamento observado, objetivo, ação concreta e forma de verificar. Feche com uma checklist **de passo a passo**, numerada, executável e separada em **Models**, **DAOs** e **Servlets**. Cada item deve dizer o arquivo e método, o que fazer, qual item vem antes, como conferir o resultado e se está concluído, pendente ou depende de decisão. Inclua a substituição dos construtores com parâmetros encontrados nos `READ` da `CooperativaDAO` pela instanciação e pelos setters, sem presumir que essa mudança já foi feita. Aponte os itens reservados à skill de validações. Apresente o relatório e aguarde a escolha para executar:
 
-- **Parcial:** ajustar somente comentários de método, títulos de etapa, seções e espaçamento do escopo. O comentário registra o que o método deve fazer; divergências com o código permanecem na checklist. Não mudar lógica, SQL, assinatura, tipos ou ENUMs.
-- **Completa:** executar todos os itens de código da checklist apresentada para o escopo escolhido.
-- **Etapas escolhidas:** executar somente os números indicados pelo usuário.
+- **Parcial:** altere somente comentários de método, títulos de etapa, seções e espaçamento aprovados. Não mude lógica, SQL, assinaturas, tipos ou `ENUM`; mantenha divergências de comportamento na checklist.
+- **Completa:** execute os itens de código aprovados da checklist, respeitando a ordem das dependências e as decisões ainda pendentes.
+- **Etapas escolhidas:** execute apenas os números indicados pelo usuário.
 
-Trabalhe em passos pequenos e atualize o estado da checklist com o que foi feito, não feito ou depende de decisão. Verifique compilação e testes que não dependam de escrita no banco quando fizer sentido. Não declare comportamento validado só porque compilou. Não acrescente arquitetura ou funcionalidades fora dos itens escolhidos.
+Quando esta skill fizer parte de `$revisar-back-renovai`, conclua primeiro as mudanças de model aprovadas em `$atualizar-verificacoes-formatacoes`; depois retome aqui os itens de DAO e servlet. Se a refatoração for chamada isoladamente, explicite essa dependência no relatório antes de alterar DAO ou servlet. Não peça nova autorização para um escopo já escolhido na conversa.
+
+Execute em passos pequenos e atualize a checklist com o que foi concluído, permanece pendente ou exige decisão. Verifique compilação e testes sem escrita no banco quando aplicável; testes com escrita exigem banco isolado e confirmação explícita. Compilação sozinha não comprova o comportamento da aplicação.
