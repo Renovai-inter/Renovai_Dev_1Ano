@@ -1,29 +1,24 @@
 ---
 name: refatorar-codigo
-description: Diagnosticar e executar a refatoração do backend Renovaí por etapas, das models aos CRUDs das DAOs e às chamadas dos servlets, com checklist Markdown e escolha explícita do escopo de execução.
+description: Revisar o backend Renovaí, registrar pendências atuais das Models e planejar a correção das DAOs por severidade antes da integração com servlets.
 ---
 
-# Refatorar código
+# Refatorar código do backend Renovaí
 
-Leia `AGENTS.md`, `PADRAO_CODIGO_BACKEND.md` e `CONFERENCIA_DAO_BANCO.md` antes da revisão. Use `../script-banco.pdf` como referência do esquema planejado, sem tratá-lo como prova do banco conectado nem pedir novamente o DDL original. Confira o código atual e os relatórios anteriores; um item marcado como concluído só permanece assim se o código ainda o sustentar. Preserve alterações preexistentes.
+Leia `AGENTS.md`, `PADRAO_CODIGO_BACKEND.md`, `CONFERENCIA_DAO_BANCO.md` e os relatórios anteriores. Consulte `../script-banco.pdf` como referência do esquema planejado, sem declarar que ele comprova o banco conectado. Confira sempre o código atual: um relatório anterior não comprova que um item continua concluído. Preserve alterações preexistentes.
 
-Trabalhe por entidade ou lote pequeno, na ordem **model → CRUD da DAO → servlet**. Examine JSPs apenas se essa integração exigir. Não amplie a revisão para identidade visual, arquitetura nova ou `Main`.
+## Protocolo de diagnóstico
 
-## Diagnóstico
+1. Delimite as entidades e o estágio pedido pelo usuário. A ordem de dependência é **Model e Utilitario → DAO → Servlet**. Não comece a integração seguinte só porque a etapa anterior foi analisada.
+2. Reexamine as Models do escopo: tipos, `ENUM`, nulidade, limites `VARCHAR`, filtros nos setters, formatação nos getters e chamadas à `Utilitario`. Registre apenas pendências comprovadas e diga se bloqueiam a DAO. A correção de filtros e formatadores pertence a `$atualizar-verificacoes-formatacoes`; não edite a mesma regra nesta skill.
+3. Em cada DAO, compare o contrato da Model com as chamadas, o SQL, a ordem e o tipo de cada parâmetro, as colunas obrigatórias do PDF, o mapeamento de leitura, IDs, transações, recursos e exceções. Nos `READ`, instancie a Model sem parâmetros e preencha pelos setters. Não use um getter de apresentação como valor de gravação sem conferir a forma persistida.
+4. Classifique achados com evidência e impacto: **P0 bloqueante** para incompatibilidade de compilação, SQL que impede a operação, escrita parcial ou acesso indevido; **P1 alta** para dado errado, perda de histórico, leitura incorreta ou violação provável de restrição; **P2 média** para recursos, tratamento de erro e organização que não estejam cobertos por P0 ou P1. Ordene por severidade e, dentro dela, por dependência de execução. Indique decisões externas separadamente; não invente regra de domínio ausente.
+5. Registre os servlets e JSPs afetados como fase posterior. Inspecione a chamada necessária para identificar dependências, sem iniciar a integração se ela não foi autorizada. A `Main` fica na skill de testes.
 
-1. **Model:** confira campos e tipos. Centralize filtros e validações de entrada nos setters e formatação de saída nos getters. Ao criar uma model, use instanciação sem parâmetros seguida dos setters; identifique construtores com parâmetros ou atribuições diretas que contornem as regras. Confira `ENUM` para `CHECK` de lista fechada e limite de `VARCHAR(x)` nos setters de campos sem `CHECK`; se o setter já valida os valores do `CHECK`, não acrescente uma segunda checagem de tamanho. Registre separadamente a entrada, o valor guardado na model, o valor persistido e o valor apresentado. Examine a reutilização possível de `Utilitario`. Encaminhe a criação ou correção de filtros, validações e formatações à skill `$atualizar-verificacoes-formatacoes`; esta skill não deve editar a mesma regra em paralelo.
-2. **DAO:** confira cada CRUD que representa a entidade: recebimento da model, SQL e parâmetros, gravação do valor armazenado sem usar getter de apresentação, leitura, tratamento de recursos e exceções. Nos `READ`, confira a montagem da model por instanciação sem parâmetros e setters, inclusive na `CooperativaDAO`; liste os pontos que ainda usam construtor com parâmetros. Em `CREATE`, confira a PK `BIGINT` como `long` ou `Long` e a obtenção e vinculação explícita do próximo ID a partir de `Utilitario.selecionarUltimoId(String tabela)`. O utilitário retorna o último ID; registre o caso de tabela vazia e outros riscos encontrados, sem alterá-lo nesta etapa.
-3. **Servlet:** confira a construção da model via setters, a chamada ao CRUD com a model e o tratamento distinto de erro de validação e erro de persistência. Revise a passagem para JSP somente quando necessária para exibir o resultado ou erro, sem expor detalhes de SQL.
-4. **Organização:** confira nomes, instanciação, seções, espaçamento e comentários curtos que descrevam a intenção real de cada método. Registre divergências entre comentário e comportamento.
+## Protocolo de entrega e execução
 
-## Relatório e decisão
+Crie um novo `../Relatórios/NN-Refatoracao-Codigo.md` com o próximo número disponível, sem substituir relatórios anteriores. Inclua: escopo e limites da verificação; situação das Models; checklist numerada das DAOs em ordem de severidade; para cada item, arquivo/método, evidência, ação, dependência, forma de conferir e estado. Separe decisões pendentes dos passos executáveis. Não trate compilação como prova de funcionamento nem o PDF como DDL verificado.
 
-Antes de editar código, crie `../Relatórios/NN-Refatoracao-Codigo.md`, usando o próximo número livre e preservando os relatórios existentes. Para cada achado, informe classe e método, comportamento observado, objetivo, ação concreta e forma de verificar. Feche com uma checklist **de passo a passo**, numerada, executável e separada em **Models**, **DAOs** e **Servlets**. Cada item deve dizer o arquivo e método, o que fazer, qual item vem antes, como conferir o resultado e se está concluído, pendente ou depende de decisão. Inclua a substituição dos construtores com parâmetros encontrados nos `READ` da `CooperativaDAO` pela instanciação e pelos setters, sem presumir que essa mudança já foi feita. Aponte os itens reservados à skill de validações. Apresente o relatório e aguarde a escolha para executar:
+Apresente o relatório antes de alterar código e execute somente a modalidade ou os itens escolhidos pelo usuário. **Parcial** altera apenas comentários, seções e espaçamento. **Completa** executa o código aprovado do escopo, respeitando dependências. **Etapas escolhidas** executa apenas os números indicados. Uma escolha para Models não autoriza DAOs; uma escolha para DAOs não autoriza servlets. Se o usuário já escolheu o escopo nesta conversa, não peça nova autorização.
 
-- **Parcial:** altere somente comentários de método, títulos de etapa, seções e espaçamento aprovados. Não mude lógica, SQL, assinaturas, tipos ou `ENUM`; mantenha divergências de comportamento na checklist.
-- **Completa:** execute os itens de código aprovados da checklist, respeitando a ordem das dependências e as decisões ainda pendentes.
-- **Etapas escolhidas:** execute apenas os números indicados pelo usuário.
-
-Quando esta skill fizer parte de `$revisar-back-renovai`, conclua primeiro as mudanças de model aprovadas em `$atualizar-verificacoes-formatacoes`; depois retome aqui os itens de DAO e servlet. Se a refatoração for chamada isoladamente, explicite essa dependência no relatório antes de alterar DAO ou servlet. Não peça nova autorização para um escopo já escolhido na conversa.
-
-Execute em passos pequenos e atualize a checklist com o que foi concluído, permanece pendente ou exige decisão. Verifique compilação e testes sem escrita no banco quando aplicável; testes com escrita exigem banco isolado e confirmação explícita. Compilação sozinha não comprova o comportamento da aplicação.
+Ao executar, trabalhe em lotes pequenos e atualize o estado de cada item com o resultado realmente verificado. Preserve a causa de falhas de persistência e distinga erro de banco de consulta vazia. Verifique a compilação quando fizer parte do escopo autorizado; operações de escrita ou exclusão em teste exigem banco isolado e confirmação explícita. Não execute a `Main` antiga sem inspeção, pois ela contém exclusão ao iniciar.

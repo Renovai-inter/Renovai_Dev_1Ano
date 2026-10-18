@@ -1,6 +1,7 @@
 package util;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
+import java.util.Formatter;
 import java.util.Locale;
 
 public class Utilitario {
@@ -23,11 +25,6 @@ public class Utilitario {
     // Prepara textos livres sem remover os espaços internos.
     public String normalizarTextoLivre(String texto) {
         return texto == null ? null : texto.strip().toUpperCase(Locale.ROOT);
-    }
-
-    // Pendente de implementação pelo grupo: validar NUMERIC(precisao, 2) e retornar double.
-    public double formatarNumeroDecimal(BigDecimal valor, long precisao) {
-        throw new UnsupportedOperationException("Implementar validação de NUMERIC(precisao, 2).");
     }
 
     // === METODOS DE FILTRO DE ENTRADA ================================================================================
@@ -130,6 +127,21 @@ public class Utilitario {
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("data deve seguir o formato dd/mm/aaaa e existir no calendário.", e);
         }
+    }
+
+    // Filtro de informações numericas definidas como DECIMAL(X, Y)
+    public BigDecimal validarNumeroDecimal(String numero, long valor, int decimal) {
+        if (numero == null) {
+            throw new IllegalArgumentException("número é obrigatório");
+        }
+        if (valor < 0 || decimal < 0) {
+            throw new IllegalArgumentException("valores devem ser positivos.");
+        }
+        numero = numero.strip().replace(",", ".");
+        if (numero.matches("^-?[0-9]{1," + valor + "}\\.[0-9]{1," + decimal + "}$")) {
+            return new BigDecimal(numero);
+        }
+        throw new IllegalArgumentException("formato de numero invalido.");
     }
 
     // === METODOS DE FORMATACAO DE SAIDA ==============================================================================

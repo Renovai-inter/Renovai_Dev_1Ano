@@ -130,7 +130,7 @@ public class Coleta {
             if (pesoTotalKg.signum() < 0) {
                 throw new IllegalArgumentException("pesoTotalKg não pode ser negativo.");
             }
-            utilitario.formatarNumeroDecimal(pesoTotalKg, 12L);
+            utilitario.validarNumeroDecimal(pesoTotalKg.toPlainString(), 10L, 2);
         }
         this.pesoTotalKg = pesoTotalKg;
     }
