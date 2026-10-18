@@ -1,6 +1,16 @@
 # Conferência inicial entre DAOs e esquema do Renovaí
 
-Fonte do esquema: `../../script-banco.pdf` (modelo documentado, não DDL conferido). Fonte do código: `src/main/java` deste projeto. Esta é uma conferência estática inicial; o banco em execução não foi consultado. Os casos abaixo precisam de correção ou confirmação na etapa de implementação.
+Fonte do esquema: `../script-banco.pdf` (estrutura planejada pelo grupo, não DDL conferido). Fonte do código: `src/main/java` deste projeto. Esta é uma conferência estática inicial; o banco em execução não foi consultado. Os casos abaixo precisam de correção ou confirmação na etapa de implementação. O PDF permanece a referência escolhida pelo usuário até nova orientação; não é preciso pedir o DDL original para continuar esta revisão.
+
+## Critérios para a próxima revisão
+
+Esta seção registra a metodologia escolhida depois da conferência inicial; não declara que o código atual já foi migrado. Para cada fluxo afetado, conferir nesta ordem:
+
+1. **Model:** o setter filtra e valida a entrada, reutilizando métodos da `Utilitario` quando o contrato corresponder; o getter formata a saída. Registrar o valor recebido, armazenado, enviado ao banco e apresentado. Se o formato do getter for apenas para exibição, definir no roteiro como a DAO obterá o valor de gravação sem misturar os dois formatos.
+2. **DAO:** os métodos CRUD que operam os dados da entidade recebem a model como parâmetro quando ela representa a operação. Conferir SQL, índices dos parâmetros, PK `BIGINT` fornecida pela DAO e valores efetivamente gravados ou lidos.
+3. **Servlet:** atualizar as chamadas afetadas para montar a model por seus setters e passá-la à DAO; conferir como erros de validação e de banco chegam à resposta. Verificar a JSP apenas no ponto necessário para essa integração.
+
+Registrar cada divergência com classe, método, ação e verificação no relatório Markdown correspondente. Alterações de código dependem da modalidade ou dos itens escolhidos pelo usuário.
 
 | Prioridade | Campo/regra documentada | Evidência no código | Consequência provável |
 | --- | --- | --- | --- |

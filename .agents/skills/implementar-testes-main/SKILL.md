@@ -5,7 +5,7 @@ description: Preparar a Main do Renovaí como menu manual para testar métodos d
 
 # Implementar testes pela Main
 
-Leia `AGENTS.md` e `PADRAO_CODIGO_BACKEND.md`. Inspecione a `Main`, os métodos públicos das DAOs e os atributos das models antes de alterar ou executar. A `Main` atual contém uma exclusão ao iniciar: retire chamadas automáticas desse tipo ao construir o menu. Não alterar servlets ou JSPs.
+Leia `AGENTS.md` e `PADRAO_CODIGO_BACKEND.md`. Inspecione a `Main`, os métodos públicos das DAOs e os setters e getters das models antes de alterar ou executar. O menu deve montar a model por seus setters e passá-la ao CRUD conforme a assinatura aprovada; não duplicar na `Main` os filtros da model. A `Main` atual contém uma exclusão ao iniciar: retire chamadas automáticas desse tipo ao construir o menu. Não alterar servlets ou JSPs nesta skill.
 
 ## Plano antes do código
 

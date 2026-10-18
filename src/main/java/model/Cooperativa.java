@@ -1,122 +1,42 @@
 
 package model;
 
+import model.enums.StatusCooperativa;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Cooperativa {
 
-    // ATRIBUTOS
+    // ATRIBUTOS (tabela cooperativa)
 
-    private Long idCooperativa;
-    private String nome;
-    private String cnpj;
-    private String nomePublico;
-    private String descricaoInstitucional;
-    private String logoUrl;
-    private String emailInstitucional;
-    private String telefoneWhatsapp;
-    private String cep;
-    private String endereco;
-    private String cidade;
-    private String estado;
-    private LocalDate dataFundacao;
-    private String canalContatoPreferencial;
-    private String linkWhatsapp;
-    private String status;
-    private LocalDateTime dataCadastro;
+    private Long idCooperativa; // PK
+    private String nome; // NOT NULL - VARCHAR(150)
+    private String cnpj; // NOT NULL - ENTRADA VALIDADA COM METODO
+    private String nomePublico; // NOT NULL - VARCHAR(150)
+    private String descricaoInstitucional; // TEXT
+    private String logoUrl; // VARCHAR(500)
+    private String emailInstitucional; // NOT NULL - ENTRADA VALIDADA COM METODO
+    private String telefoneWhatsapp; // NOT NULL - ENTRADA VALIDADA COM METODO
+    private String cep; // NOT NULL - ENTRADA VALIDADA COM METODO
+    private String endereco; // NOT NULL - ENTRADA VALIDADA COM METODO
+    private String cidade; // NOT NULL - VARCHAR(100)
+    private String estado; // NOT NULL - ENTRADA VALIDADA COM METODO
+    private LocalDate dataFundacao; // DATE
+    private String canalContatoPreferencial; // NOT NULL - VARCHAR(10) COM DEFAULT
+    private String linkWhatsapp; // VARCHAR(255)
+    private StatusCooperativa status; // NOT NULL - CHECK COM DEFAULT
+    private LocalDateTime dataCadastro; // NOT NULL - TIMESTAMP COM DEFAULT
+
+    // ATRIBUTOS (agregações com outras tabelas)
 
     private int qtdCooperados;
     private int qtdRotas;
     private int qtdColetas;
     private int qtdNegociacoes;
 
-    // CONSTRUTORES
 
-    // Constrói a cooperativa com seus dados cadastrais completos.
-    public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro) {
-        this.idCooperativa = idCooperativa; // pk - obrigatorio
-        setNome(nome); // obrigatorio | CREATE
-
-        if (cnpj == null || cnpj.isEmpty()) {
-            setCnpj("");
-        } else {
-            setCnpj(cnpj); // opcional | CREATE
-        }
-
-        if (nomePublico == null || nomePublico.isEmpty()) {
-            setNomePublico(nome);
-        } else {
-            setNomePublico(nomePublico); // obrigatorio
-        }
-
-        this.descricaoInstitucional = descricaoInstitucional; // opcional | CREATE
-        setLogoUrl(logoUrl); // opcional | CREATE
-        setEmailInstitucional(emailInstitucional); // obrigatorio | CREATE
-        setTelefoneWhatsapp(telefoneWhatsapp); // obrigatorio | CREATE
-        setCep(cep); // obrigatorio
-        setEndereco(endereco); // obrigatorio | CREATE
-        setCidade(cidade); // obrigatorio | CREATE
-        this.estado = estado; // obrigatorio | CREATE
-        this.dataFundacao = dataFundacao; // opcional
-        setCanalContatoPreferencial(canalContatoPreferencial); // obrigatorio (c/default)
-        setLinkWhatsapp(linkWhatsapp); // opcional
-        setStatus(status); // obrigatorio (c/default)
-        this.dataCadastro = dataCadastro; // obrigatorio (c/default)
-    }
-
-    // Constrói um resumo da cooperativa para a listagem.
-    public Cooperativa(String nome, String cnpj, String cidade, String estado, String status, int qtdCooperados, LocalDateTime dataCadastro) {
-        setNome(nome);
-
-        if (cnpj == null || cnpj.isEmpty()) {
-            setCnpj("");
-        } else {
-            setCnpj(cnpj);
-        }
-
-        setCidade(cidade);
-        this.estado = estado;
-        setStatus(status);
-        this.qtdCooperados = qtdCooperados;
-        this.dataCadastro = dataCadastro;
-    }
-
-    // Constrói os dados completos e as contagens da cooperativa.
-    public Cooperativa(Long idCooperativa, String nome, String cnpj, String nomePublico, String descricaoInstitucional, String logoUrl, String emailInstitucional, String telefoneWhatsapp, String cep, String endereco, String cidade, String estado, LocalDate dataFundacao, String canalContatoPreferencial, String linkWhatsapp, String status, LocalDateTime dataCadastro, int qtdCooperados, int qtdRotas, int qtdColetas, int qtdNegociacoes) {
-        setNome(nome);
-
-        if (cnpj == null || cnpj.isEmpty()) {
-            setCnpj("");
-        } else {
-            setCnpj(cnpj);
-        }
-
-        if (nomePublico == null || nomePublico.isEmpty()) {
-            setNomePublico(nome);
-        } else {
-            setNomePublico(nomePublico);
-        }
-
-        this.descricaoInstitucional = descricaoInstitucional;
-        setLogoUrl(logoUrl);
-        setEmailInstitucional(emailInstitucional);
-        setTelefoneWhatsapp(telefoneWhatsapp);
-        setCep(cep);
-        setEndereco(endereco);
-        setCidade(cidade);
-        this.estado = estado;
-        this.dataFundacao = dataFundacao;
-        setCanalContatoPreferencial(canalContatoPreferencial);
-        setLinkWhatsapp(linkWhatsapp);
-        setStatus(status);
-        this.dataCadastro = dataCadastro;
-
-        this.qtdCooperados = qtdCooperados;
-        this.qtdRotas = qtdRotas;
-        this.qtdColetas = qtdColetas;
-        this.qtdNegociacoes = qtdNegociacoes;
-    }
+    // GETTERS E SETTERS
 
     // Retorna o valor de qtdCooperados.
     public int getQtdCooperados() {
@@ -127,8 +47,6 @@ public class Cooperativa {
     public void setQtdCooperados(int qtdCooperados) {
         this.qtdCooperados = qtdCooperados;
     }
-
-    // GETTERS E SETTERS
 
     // Retorna o valor de idCooperativa.
     public Long getIdCooperativa() { return idCooperativa; }
@@ -276,13 +194,10 @@ public class Cooperativa {
     }
 
     // Retorna o valor de status.
-    public String getStatus() { return status; }
+    public StatusCooperativa getStatus() { return status; }
 
     // Define o valor de status.
-    public void setStatus(String status) {
-        if (status != null && status.codePointCount(0, status.length()) > 10) {
-            throw new IllegalArgumentException("status deve ter no máximo 10 caracteres.");
-        }
+    public void setStatus(StatusCooperativa status) {
         this.status = status;
     }
 

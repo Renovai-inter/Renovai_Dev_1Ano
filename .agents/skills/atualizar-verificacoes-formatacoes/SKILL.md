@@ -1,17 +1,17 @@
 ---
 name: atualizar-verificacoes-formatacoes
-description: Revisar filtros de entrada e formatações de saída da Utilitario usadas por DAOs e models do Renovaí, com relatório Markdown e execução parcial, completa ou por itens.
+description: Revisar filtros nos setters e formatações nos getters das models do Renovaí, reutilizando a Utilitario e entregando um roteiro Markdown antes de executar mudanças.
 ---
 
 # Atualizar verificações e formatações
 
-Leia `AGENTS.md` e `PADRAO_CODIGO_BACKEND.md`. Revise os métodos de filtro e formatação da `Utilitario` e seus usos nas DAOs e models do escopo. `selecionarUltimoId` fica fora desta revisão. O PDF do banco mostra a estrutura planejada pelo grupo e ajuda a identificar tipos e restrições, sem provar o estado da conexão atual. Não alterar servlets ou JSPs nesta etapa.
+Leia `AGENTS.md`, `PADRAO_CODIGO_BACKEND.md` e `CONFERENCIA_DAO_BANCO.md`. Comece pelas models do escopo: revise filtros e validações nos setters e formatações de saída nos getters. Reutilize métodos existentes da `Utilitario` quando corresponderem ao dado, sem copiar regex. `selecionarUltimoId` fica fora desta revisão. Depois identifique DAOs e servlets afetados pelas mudanças de contrato. O PDF do banco é a referência de estrutura escolhida pelo grupo; não peça DDL original para esta revisão.
 
 ## Diagnóstico e relatório
 
-Para cada dado usado no escopo, mostre o formato recebido, o formato preparado para gravar e, nos métodos `READ`, o formato de apresentação. Confira se os filtros existentes realmente devolvem o valor descrito e se dados inválidos estão sendo enviados como `null` ou `"invalido"`. Esta skill detalha e corrige os filtros, as formatações e seus usos nas DAOs que a refatoração apontou ou que forem encontrados aqui. Identifique validações ausentes e pontos em que a DAO deve distinguir dado inválido de `SQLException`. Não criar nova classe de exceção.
+Para cada atributo usado no escopo, mostre o formato recebido pelo setter, o valor armazenado na model, o valor necessário para o banco e o formato devolvido pelo getter para apresentação. Confira se os métodos existentes da `Utilitario` realmente devolvem o valor descrito e se entradas inválidas viram `null` ou `"invalido"`. Esta skill detalha e corrige os filtros e formatações apontados pela refatoração ou encontrados aqui, centralizando a regra na model. Identifique as chamadas de DAO e servlet que precisam mudar para usar a model. Não permitir que um getter formatado para exibição seja usado sem conferência como valor de gravação. Diferencie erro lançado pelo setter de `SQLException`; não crie classe nova de exceção.
 
-Entregue um novo `NN-Validacao-Dados.md` em `../Relatórios/` antes de mudar código; `NN` é o próximo número disponível e o arquivo anterior não deve ser substituído. Faça uma checklist numerada com classe, método, dado, problema, ação exata e modo de verificar. Para **cada método novo** de filtro ou formatação, peça ao usuário o regex e o formato de retorno; deixe esse item pendente até receber a definição. Não invente um regex. Proponha `throw` com exceção pronta do Java adequada ao dado inválido; preserve o `try/catch (SQLException)` das DAOs para erro de banco.
+Entregue um novo `NN-Validacao-Dados.md` em `../Relatórios/` antes de mudar código; `NN` é o próximo número disponível e o arquivo anterior não deve ser substituído. Faça uma checklist numerada com model, setter ou getter, dado, problema, ação exata, chamadas afetadas e modo de verificar, em ordem model → DAO → servlet. Para **cada método novo** de filtro ou formatação, peça ao usuário o regex e o formato de retorno; deixe esse item pendente até receber a definição. Não invente um regex. Proponha `throw` com exceção pronta do Java adequada ao dado inválido; preserve o `try/catch (SQLException)` das DAOs para erro de banco.
 
 ## Execução após escolha
 
@@ -19,4 +19,4 @@ Entregue um novo `NN-Validacao-Dados.md` em `../Relatórios/` antes de mudar có
 - **Completa:** executar todos os itens de código definidos no relatório, desde que os regex e formatos necessários tenham sido fornecidos.
 - **Etapas escolhidas:** executar somente os números indicados, deixando os demais pendentes.
 
-Em qualquer modalidade, registrar o que foi feito e como foi verificado. Não mudar a forma de apresentar mensagens em servlet/JSP nesta etapa.
+Em qualquer modalidade, registre o que foi feito e como foi verificado. Na execução de código aprovada, atualize as chamadas dos servlets afetadas para construir a model e lidar com a validação dos setters; confira a resposta exibida pela JSP apenas na integração necessária.
