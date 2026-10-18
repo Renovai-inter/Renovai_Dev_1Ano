@@ -245,7 +245,7 @@ public class Utilitario {
         Conexao conn = new Conexao();
         Connection conexao = conn.conectar();
 
-        // SELECIONA PARA COOPERATIVA
+        // SELECIONA PARA TABELA DADA
 
         String sql = "SELECT id_" + tabela +
                 " FROM " + tabela +

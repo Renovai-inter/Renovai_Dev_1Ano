@@ -1,0 +1,9 @@
+# Renovaí Backend
+
+Projeto Java 17, Maven WAR, JDBC/PostgreSQL, servlets e JSPs. Antes de revisar DAOs, models ou a `Utilitario`, leia `PADRAO_CODIGO_BACKEND.md`. Use `../script-banco.pdf` como representação da estrutura planejada pelo grupo, sem tratá-lo como conferência do banco conectado.
+
+Skills do projeto em `.agents/skills/`: `$refatorar-codigo`, `$atualizar-verificacoes-formatacoes`, `$implementar-testes-main` e `$revisar-back-renovai`. A última coordena as três primeiras. O escopo atual de revisão e mudanças é `dao`, `model` e `util`; a `Main` é usada apenas pela skill de testes. Servlets e JSPs ficam para etapa futura, embora dependências encontradas neles possam ser anotadas.
+
+Os entregáveis novos são arquivos Markdown em `../Relatórios/`, fora do repositório. Cada entrega usa o próximo número disponível no nome, como `01-Refatoracao-Codigo.md` e `02-Validacao-Dados.md`; preserve os relatórios anteriores, inclusive os sem número. Antes de mudar código, apresentar um checklist numerado e aguardar a escolha do usuário. Em refatoração e verificações, **parcial** altera só comentários, seções e espaçamento; **completa** significa que Codex executa todos os passos de código da checklist aprovada para aquele escopo; o usuário também pode escolher números específicos. Na skill da `Main`, o usuário escolhe o menu completo ou itens específicos do plano. Evitar soluções além do nível e das necessidades do grupo.
+
+Não executar a `Main` atual sem inspeção: ela contém uma chamada de exclusão ao iniciar. O menu futuro só executa escrita ou exclusão após escolha explícita do usuário e usa a conexão que ele configurar. Preserve mudanças preexistentes, inclusive arquivos em `target/`. Não exponha credenciais.
