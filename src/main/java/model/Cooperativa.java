@@ -2,11 +2,14 @@
 package model;
 
 import model.enums.StatusCooperativa;
+import util.Utilitario;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Cooperativa {
+
+    private final Utilitario utilitario = new Utilitario();
 
     // ATRIBUTOS (tabela cooperativa)
 
@@ -59,6 +62,7 @@ public class Cooperativa {
 
     // Define o valor de nome.
     public void setNome(String nome) {
+        nome = utilitario.normalizarTextoLivre(nome);
         if (nome != null && nome.codePointCount(0, nome.length()) > 150) {
             throw new IllegalArgumentException("nome deve ter no máximo 150 caracteres.");
         }
@@ -66,10 +70,11 @@ public class Cooperativa {
     }
 
     // Retorna o valor de cnpj.
-    public String getCnpj() { return cnpj; }
+    public String getCnpj() { return utilitario.formatarCnpj(cnpj); }
 
     // Define o valor de cnpj.
     public void setCnpj(String cnpj) {
+        cnpj = utilitario.filtrarCnpj(cnpj);
         if (cnpj != null && cnpj.codePointCount(0, cnpj.length()) > 18) {
             throw new IllegalArgumentException("cnpj deve ter no máximo 18 caracteres.");
         }
@@ -81,6 +86,7 @@ public class Cooperativa {
 
     // Define o valor de nomePublico.
     public void setNomePublico(String nomePublico) {
+        nomePublico = utilitario.normalizarTextoLivre(nomePublico);
         if (nomePublico != null && nomePublico.codePointCount(0, nomePublico.length()) > 150) {
             throw new IllegalArgumentException("nomePublico deve ter no máximo 150 caracteres.");
         }
@@ -91,7 +97,9 @@ public class Cooperativa {
     public String getDescricaoInstitucional() { return descricaoInstitucional; }
 
     // Define o valor de descricaoInstitucional.
-    public void setDescricaoInstitucional(String descricaoInstitucional) { this.descricaoInstitucional = descricaoInstitucional; }
+    public void setDescricaoInstitucional(String descricaoInstitucional) {
+        this.descricaoInstitucional = utilitario.normalizarTextoLivre(descricaoInstitucional);
+    }
 
     // Retorna o valor de logoUrl.
     public String getLogoUrl() { return logoUrl; }
@@ -109,6 +117,7 @@ public class Cooperativa {
 
     // Define o valor de emailInstitucional.
     public void setEmailInstitucional(String emailInstitucional) {
+        emailInstitucional = utilitario.filtrarEmailInstitucional(emailInstitucional);
         if (emailInstitucional != null && emailInstitucional.codePointCount(0, emailInstitucional.length()) > 150) {
             throw new IllegalArgumentException("emailInstitucional deve ter no máximo 150 caracteres.");
         }
@@ -116,10 +125,11 @@ public class Cooperativa {
     }
 
     // Retorna o valor de telefoneWhatsapp.
-    public String getTelefoneWhatsapp() { return telefoneWhatsapp; }
+    public String getTelefoneWhatsapp() { return utilitario.formatarTelefoneWhatsapp(telefoneWhatsapp); }
 
     // Define o valor de telefoneWhatsapp.
     public void setTelefoneWhatsapp(String telefoneWhatsapp) {
+        telefoneWhatsapp = utilitario.filtrarTelefoneWhatsapp(telefoneWhatsapp);
         if (telefoneWhatsapp != null && telefoneWhatsapp.codePointCount(0, telefoneWhatsapp.length()) > 20) {
             throw new IllegalArgumentException("telefoneWhatsapp deve ter no máximo 20 caracteres.");
         }
@@ -127,10 +137,11 @@ public class Cooperativa {
     }
 
     // Retorna o valor de cep.
-    public String getCep() { return cep; }
+    public String getCep() { return utilitario.formatarCEP(cep); }
 
     // Define o valor de cep.
     public void setCep(String cep) {
+        cep = utilitario.filtrarCep(cep);
         if (cep != null && cep.codePointCount(0, cep.length()) > 9) {
             throw new IllegalArgumentException("cep deve ter no máximo 9 caracteres.");
         }
@@ -142,6 +153,7 @@ public class Cooperativa {
 
     // Define o valor de endereco.
     public void setEndereco(String endereco) {
+        endereco = utilitario.normalizarTextoLivre(endereco);
         if (endereco != null && endereco.codePointCount(0, endereco.length()) > 255) {
             throw new IllegalArgumentException("endereco deve ter no máximo 255 caracteres.");
         }
@@ -153,6 +165,7 @@ public class Cooperativa {
 
     // Define o valor de cidade.
     public void setCidade(String cidade) {
+        cidade = utilitario.normalizarTextoLivre(cidade);
         if (cidade != null && cidade.codePointCount(0, cidade.length()) > 100) {
             throw new IllegalArgumentException("cidade deve ter no máximo 100 caracteres.");
         }
@@ -163,7 +176,7 @@ public class Cooperativa {
     public String getEstado() { return estado; }
 
     // Define o valor de estado.
-    public void setEstado(String estado) { this.estado = estado; }
+    public void setEstado(String estado) { this.estado = utilitario.validarUf(estado); }
 
     // Retorna o valor de dataFundacao.
     public LocalDate getDataFundacao() { return dataFundacao; }
@@ -176,8 +189,12 @@ public class Cooperativa {
 
     // Define o valor de canalContatoPreferencial.
     public void setCanalContatoPreferencial(String canalContatoPreferencial) {
-        if (canalContatoPreferencial != null && canalContatoPreferencial.codePointCount(0, canalContatoPreferencial.length()) > 10) {
-            throw new IllegalArgumentException("canalContatoPreferencial deve ter no máximo 10 caracteres.");
+        canalContatoPreferencial = utilitario.normalizarTextoLivre(canalContatoPreferencial);
+        if (canalContatoPreferencial != null
+                && !canalContatoPreferencial.equals("WHATSAPP")
+                && !canalContatoPreferencial.equals("TELEFONE")
+                && !canalContatoPreferencial.equals("EMAIL")) {
+            throw new IllegalArgumentException("canalContatoPreferencial inválido.");
         }
         this.canalContatoPreferencial = canalContatoPreferencial;
     }

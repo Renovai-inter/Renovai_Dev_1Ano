@@ -3,12 +3,16 @@ package model;
 
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
+import model.enums.OrigemEntrega;
+import util.Utilitario;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 
 public class Coleta {
+
+    private final Utilitario utilitario = new Utilitario();
 
     // ATRIBUTOS
 
@@ -80,8 +84,9 @@ public class Coleta {
 
     // Define o valor de origemEntrega.
     public void setOrigemEntrega(String origemEntrega) {
-        if (origemEntrega != null && origemEntrega.codePointCount(0, origemEntrega.length()) > 15) {
-            throw new IllegalArgumentException("origemEntrega deve ter no máximo 15 caracteres.");
+        origemEntrega = utilitario.normalizarTextoLivre(origemEntrega);
+        if (origemEntrega != null) {
+            OrigemEntrega.valueOf(origemEntrega);
         }
         this.origemEntrega = origemEntrega;
     }
@@ -91,6 +96,7 @@ public class Coleta {
 
     // Define o valor de nomeLocalOrigem.
     public void setNomeLocalOrigem(String nomeLocalOrigem) {
+        nomeLocalOrigem = utilitario.normalizarTextoLivre(nomeLocalOrigem);
         if (nomeLocalOrigem != null && nomeLocalOrigem.codePointCount(0, nomeLocalOrigem.length()) > 150) {
             throw new IllegalArgumentException("nomeLocalOrigem deve ter no máximo 150 caracteres.");
         }
@@ -119,12 +125,20 @@ public class Coleta {
     public BigDecimal getPesoTotalKg() { return pesoTotalKg; }
 
     // Define o valor de pesoTotalKg.
-    public void setPesoTotalKg(BigDecimal pesoTotalKg) { this.pesoTotalKg = pesoTotalKg; }
+    public void setPesoTotalKg(BigDecimal pesoTotalKg) {
+        if (pesoTotalKg != null) {
+            if (pesoTotalKg.signum() < 0) {
+                throw new IllegalArgumentException("pesoTotalKg não pode ser negativo.");
+            }
+            utilitario.formatarNumeroDecimal(pesoTotalKg, 12L);
+        }
+        this.pesoTotalKg = pesoTotalKg;
+    }
 
     // Retorna o valor de observacoes.
     public String getObservacoes() { return observacoes; }
 
     // Define o valor de observacoes.
-    public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
+    public void setObservacoes(String observacoes) { this.observacoes = utilitario.normalizarTextoLivre(observacoes); }
 
 }

@@ -1,9 +1,15 @@
 package util;
 
+import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
+import java.util.Locale;
 
 public class Utilitario {
 
@@ -14,6 +20,16 @@ public class Utilitario {
     public Utilitario() {
     }
 
+    // Prepara textos livres sem remover os espaços internos.
+    public String normalizarTextoLivre(String texto) {
+        return texto == null ? null : texto.strip().toUpperCase(Locale.ROOT);
+    }
+
+    // Pendente de implementação pelo grupo: validar NUMERIC(precisao, 2) e retornar double.
+    public double formatarNumeroDecimal(BigDecimal valor, long precisao) {
+        throw new UnsupportedOperationException("Implementar validação de NUMERIC(precisao, 2).");
+    }
+
     // === METODOS DE FILTRO DE ENTRADA ================================================================================
 
     /*
@@ -22,100 +38,70 @@ public class Utilitario {
 
     // Filtro de CNPJ - devolvendo somente os valores numéricos do formato 00.000.000/000-00
     public String filtrarCnpj(String cnpj) {
-
-        // Tratamento inicial
-        cnpj.replace(" ", ""); // Retirando todos os espaços em branco
-
-        // Verificação do formato correto (00.000.000/000-00)
-        if (cnpj.matches("^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{3}-\\d{2}$")) {
-
-            // Retirar ".", "-", "/" e espaços
-            cnpj.replace(".", "");
-            cnpj.replace("-", "");
-            cnpj.replace("/", "");
-
-            // Retorno do CNPJ em valores apenas numericos
-            return cnpj;
-
+        if (cnpj == null) {
+            return null;
         }
-        return "invalido";
-
+        cnpj = cnpj.strip();
+        if (cnpj.matches("^\\d{14}$")) {
+            return cnpj;
+        }
+        if (!cnpj.matches("^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$")) {
+            throw new IllegalArgumentException("CNPJ deve seguir o formato 00.000.000/0000-00.");
+        }
+        cnpj = cnpj.replace(".", "").replace("/", "").replace("-", "");
+        return cnpj;
     }
 
     // Filtro de Telefone/Whatsapp - devolvendo somente os valores numéricos de um dos formatos a seguir:
     // (00) 0000-0000 ou (00) 00000-0000
     public String filtrarTelefoneWhatsapp(String telefoneWhatsapp) {
-
-        // Tratamento inicial
-        telefoneWhatsapp.replace(" ", ""); // Retirando todos os espaços em branco
-
-        // Verificação de formato correto - (00) 0000-0000 ou (00) 00000-0000
-        if (telefoneWhatsapp.matches("^\\(\\d{2}\\)\\d{4,5}-\\d{4}$")) {
-
-            // Retirar "(", ")", e "-".
-            telefoneWhatsapp.replace("(", "");
-            telefoneWhatsapp.replace(")", "");
-            telefoneWhatsapp.replace("-", "");
-
-            return telefoneWhatsapp;
-
+        if (telefoneWhatsapp == null) {
+            throw new IllegalArgumentException("telefoneWhatsapp é obrigatório.");
         }
-        return "invalido";
-
+        telefoneWhatsapp = telefoneWhatsapp.strip();
+        if (telefoneWhatsapp.matches("^\\d{10,11}$")) {
+            return telefoneWhatsapp;
+        }
+        if (!telefoneWhatsapp.matches("^\\(\\d{2}\\) ?\\d{4,5}-\\d{4}$")) {
+            throw new IllegalArgumentException("telefoneWhatsapp deve ter 10 ou 11 dígitos.");
+        }
+        return telefoneWhatsapp.replace("(", "").replace(")", "")
+                .replace(" ", "").replace("-", "");
     }
 
     // Filtrar email institucional seguindo o formato seu-nome@email.com
     public String filtrarEmailInstitucional(String email) {
-
-        // Tratamento inicial
-        email.toLowerCase().replace(" ", ""); // Retirando todos os espaços em branco
-
-        // Verificação usando regex. ex: seu-nome@email.com
-        if (email.matches("^[\\w.-]+@[\\w.-]+\\.\\w+$")) {
-            return email;
+        if (email == null) {
+            throw new IllegalArgumentException("email é obrigatório.");
         }
-
-        return "invalido";
-
+        email = email.strip().toLowerCase(Locale.ROOT);
+        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            throw new IllegalArgumentException("email inválido.");
+        }
+        return email;
     }
 
-    // Filtrar CEP seguindo o formato 00000-000
+    // Filtra CEP para guardar somente oito dígitos.
     public String filtrarCep(String cep) {
-
-        // Tratamento inicial
-        cep.replace(" ", "");
-
-        // Validação usando formato 00000-000
-        if (cep.matches("^\\d{5}-\\d{3}$")) {
-
-            // Retirando o "-"
-            cep.replace("-", "");
-
+        if (cep == null) {
+            throw new IllegalArgumentException("CEP é obrigatório.");
+        }
+        cep = cep.strip();
+        if (cep.matches("^\\d{8}$")) {
             return cep;
         }
-        return "invalido";
-
-    }
-
-    // Filtrar endereço seguindo o formato Rua,Numero,Bairro
-    public String filtrarEndereco(String endereco) {
-
-        // Tratamento inicial
-        endereco.toUpperCase().replace(" ", "");
-
-        // Formato esperado: Rua, Número, Bairro
-        if (endereco.matches("^[\\p{L}\\d.-]+,\\d+,[\\p{L}\\d.-]+")) {
-            return endereco;
+        if (!cep.matches("^\\d{5}-\\d{3}$")) {
+            throw new IllegalArgumentException("CEP deve seguir o formato 00000-000.");
         }
-        return "invalido";
-
+        return cep.replace("-", "");
     }
 
     // Filtrar UF seguindo um dos valores possíveis
     public String validarUf(String uf) {
-
-        // Tratamento inicial
-        uf.replace(" ", "").toUpperCase();
+        if (uf == null) {
+            throw new IllegalArgumentException("UF é obrigatória.");
+        }
+        uf = uf.strip().toUpperCase(Locale.ROOT);
 
         // Lista de UFs possíveis
         String[] listaUfs = {"AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB",
@@ -127,28 +113,23 @@ public class Utilitario {
                 return uf;
             }
         }
-        return "invalido";
+        throw new IllegalArgumentException("UF inválida.");
 
     }
 
     // Validação de data seguindo o formato dd/mm/aaaa
     public String validarData(String data) {
-
-        // Tratamento inicial
-        data.replace(" ", "");
-
-        // Verificando formato de acordo com o padrão dd/mm/aaaa
-        if (data.matches("^\\d{2}/\\d{2}/\\d{4}")) {
-
-            // DateStyle padrão do banco: ISO, MDY | Realizar a conversão para padrão do banco
-            String[] valoresData = data.split("/");
-            data = valoresData[1] + "-" + valoresData[0] + "-" + valoresData[2];
-
-            return data;
-
+        if (data == null) {
+            throw new IllegalArgumentException("data é obrigatória.");
         }
-        return "invalido";
-
+        data = data.strip();
+        try {
+            DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/uuuu")
+                    .withResolverStyle(ResolverStyle.STRICT);
+            return LocalDate.parse(data, formato).toString();
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("data deve seguir o formato dd/mm/aaaa e existir no calendário.", e);
+        }
     }
 
     // === METODOS DE FORMATACAO DE SAIDA ==============================================================================
@@ -160,79 +141,62 @@ public class Utilitario {
 
     // Formatação de CNPJ - retornando os valores numéricos brutos do banco no formato 00.000.000/000-00
     public String formatarCnpj(String cnpj) {
-
-        // Tratamento inicial
-        cnpj.replace(" ", ""); // Retirando todos os espaços em branco
-
-        // Retorno no formato apropriado
-        return cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "." + cnpj.substring(9, 12) + "-" +
-                cnpj.substring(12);
+        if (cnpj == null) {
+            return null;
+        }
+        cnpj = cnpj.strip();
+        if (!cnpj.matches("^\\d{14}$")) {
+            throw new IllegalArgumentException("CNPJ armazenado deve ter 14 dígitos.");
+        }
+        return cnpj.substring(0, 2) + "." + cnpj.substring(2, 5) + "."
+                + cnpj.substring(5, 8) + "/" + cnpj.substring(8, 12) + "-" + cnpj.substring(12);
     }
 
     // Formatação de Telefone/Whatsapp - retornando os valores numéricos brutos em um dos formatos
     // (00) 0000-0000 ou (00) 00000-0000
     public String formatarTelefoneWhatsapp(String telefoneWhatsapp) {
-
-        // Tratamento inicial
-        telefoneWhatsapp.replace(" ", ""); // Retirando todos os espaços em branco
-
-        // Retorno no formato apropriado com base nos tipos de telefone
-        // Verifica o tamanho para determinar qual tipo é
+        if (telefoneWhatsapp == null) {
+            return null;
+        }
+        telefoneWhatsapp = telefoneWhatsapp.strip();
+        if (!telefoneWhatsapp.matches("^\\d{10,11}$")) {
+            throw new IllegalArgumentException("telefoneWhatsapp armazenado deve ter 10 ou 11 dígitos.");
+        }
         if (telefoneWhatsapp.length() == 10) {
             return "(" + telefoneWhatsapp.substring(0, 2) + ") " + telefoneWhatsapp.substring(2, 6) + "-" +
                     telefoneWhatsapp.substring(6);
-        } else {
-            return "(" + telefoneWhatsapp.substring(0, 2) + ") " + telefoneWhatsapp.substring(2, 7) + "-" +
-                    telefoneWhatsapp.substring(7);
         }
-
+        return "(" + telefoneWhatsapp.substring(0, 2) + ") " + telefoneWhatsapp.substring(2, 7) + "-" +
+                telefoneWhatsapp.substring(7);
     }
 
     // Um metodo de formatação para email não será necessário, visto que ele já entra no banco seguindo o formato
 
-    // Formatacao de CEP - retornando os valores numericos brutos no formato 00000-0000
+    // Formata oito dígitos de CEP como 00000-000.
     public String formatarCEP(String cep) {
-
-        // Tratamento inicial
-        cep.replace(" ", "");
-
-        // Retorno no formato correto
-        return cep.substring(0, 6) + "-" + cep.substring(6);
-
-    }
-
-    // Formatação de Endereço - Seguindo o formato Rua, Número, Bairro capitalizados
-    public String formatarEndereco(String endereco) {
-
-        // Tratamento inicial
-        endereco.replace(" ", "");
-
-        // Separando cada elemento por meio da vírgula
-        String[] valoresEndereco = endereco.split(",");
-
-        // Capitalizando os valores de Rua e Bairro
-        valoresEndereco[0] = valoresEndereco[0].toUpperCase().charAt(0) +
-                valoresEndereco[0].toLowerCase().substring(1);
-        valoresEndereco[0] = valoresEndereco[0].toUpperCase().charAt(0) +
-                valoresEndereco[0].toLowerCase().substring(1);
-
-        // Retorno no formato correto
-        return valoresEndereco[0] + ", " + valoresEndereco[1] + ", " + valoresEndereco[2];
-
+        if (cep == null) {
+            return null;
+        }
+        cep = cep.strip();
+        if (!cep.matches("^\\d{8}$")) {
+            throw new IllegalArgumentException("CEP armazenado deve ter oito dígitos.");
+        }
+        return cep.substring(0, 5) + "-" + cep.substring(5);
     }
 
     // Formatação de UF não será necessária pois valores já estão formatados corretamente no banco
 
     // Validação de data - convertendo para a visualização pretendida - MDY para dd/mm/aaaa
     public String formatarData(String data) {
-
-        // Tratamento inicial
-        data.replace(" ", "");
-
-        // Convertendo para o padrão visual por meio de SPLIT
-        String[] valoresData = data.split("-");
-        return valoresData[1] + "/" + valoresData[0] + "/" + valoresData[2];
-
+        if (data == null) {
+            return null;
+        }
+        try {
+            LocalDate valor = LocalDate.parse(data.strip());
+            return valor.format(DateTimeFormatter.ofPattern("dd/MM/uuuu"));
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("data armazenada deve seguir o formato aaaa-mm-dd.", e);
+        }
     }
 
     // === METODOS DE USO GERAL ========================================================================================

@@ -2,8 +2,11 @@
 package model;
 
 import model.enums.CategoriaMaterial;
+import util.Utilitario;
 
 public class Material {
+
+    private final Utilitario utilitario = new Utilitario();
 
     // ATRIBUTOS
 
@@ -24,6 +27,7 @@ public class Material {
 
     // Define o valor de nome.
     public void setNome(String nome) {
+        nome = utilitario.normalizarTextoLivre(nome);
         if (nome != null && nome.codePointCount(0, nome.length()) > 100) {
             throw new IllegalArgumentException("nome deve ter no máximo 100 caracteres.");
         }
@@ -35,10 +39,7 @@ public class Material {
 
     // Define o valor de categoria.
     public void setCategoria(String categoria) {
-        if (categoria != null && categoria.codePointCount(0, categoria.length()) > 20) {
-            throw new IllegalArgumentException("categoria deve ter no máximo 20 caracteres.");
-        }
-        this.categoria = categoria == null ? null : CategoriaMaterial.valueOf(categoria);
+        this.categoria = categoria == null ? null : CategoriaMaterial.valueOf(utilitario.normalizarTextoLivre(categoria));
     }
 
 }

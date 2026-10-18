@@ -3,11 +3,14 @@ package model;
 import model.enums.CargoCooperado;
 import model.enums.StatusCooperado;
 import model.enums.TipoUsuario;
+import util.Utilitario;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Cooperado {
+
+    private final Utilitario utilitario = new Utilitario();
 
     // ATRIBUTOS (tabela cooperado)
 
@@ -87,6 +90,7 @@ public class Cooperado {
 
     // Define o valor de nomeCompleto.
     public void setNomeCompleto(String nomeCompleto) {
+        nomeCompleto = utilitario.normalizarTextoLivre(nomeCompleto);
         if (nomeCompleto != null && nomeCompleto.codePointCount(0, nomeCompleto.length()) > 150) {
             throw new IllegalArgumentException("nomeCompleto deve ter no máximo 150 caracteres.");
         }
@@ -98,6 +102,7 @@ public class Cooperado {
 
     // Define o valor de nomeUsuario.
     public void setNomeUsuario(String nomeUsuario) {
+        nomeUsuario = utilitario.normalizarTextoLivre(nomeUsuario);
         if (nomeUsuario != null && nomeUsuario.codePointCount(0, nomeUsuario.length()) > 50) {
             throw new IllegalArgumentException("nomeUsuario deve ter no máximo 50 caracteres.");
         }
@@ -109,10 +114,7 @@ public class Cooperado {
 
     // Define o valor de email.
     public void setEmail(String email) {
-        if (email != null && email.codePointCount(0, email.length()) > 150) {
-            throw new IllegalArgumentException("email deve ter no máximo 150 caracteres.");
-        }
-        this.email = email;
+        this.email = utilitario.filtrarEmailInstitucional(email);
     }
 
     // Retorna o valor de nomeCooperativa.
@@ -120,6 +122,7 @@ public class Cooperado {
 
     // Define o valor de nomeCooperativa.
     public void setNomeCooperativa(String nomeCooperativa) {
+        nomeCooperativa = utilitario.normalizarTextoLivre(nomeCooperativa);
         if (nomeCooperativa != null && nomeCooperativa.codePointCount(0, nomeCooperativa.length()) > 150) {
             throw new IllegalArgumentException("nomeCooperativa deve ter no máximo 150 caracteres.");
         }

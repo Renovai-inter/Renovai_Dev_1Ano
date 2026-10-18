@@ -3,11 +3,14 @@ package model;
 
 import jdk.jshell.Snippet;
 import model.enums.StatusNegociacao;
+import util.Utilitario;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Negociacao {
+
+    private final Utilitario utilitario = new Utilitario();
 
     // ATRIBUTOS
 
@@ -52,19 +55,38 @@ public class Negociacao {
     public BigDecimal getQuantidadeKg() { return quantidadeKg; }
 
     // Define o valor de quantidadeKg.
-    public void setQuantidadeKg(BigDecimal quantidadeKg) { this.quantidadeKg = quantidadeKg; }
+    public void setQuantidadeKg(BigDecimal quantidadeKg) {
+        if (quantidadeKg != null) {
+            if (quantidadeKg.signum() <= 0) {
+                throw new IllegalArgumentException("quantidadeKg deve ser positiva.");
+            }
+            utilitario.formatarNumeroDecimal(quantidadeKg, 12L);
+        }
+        this.quantidadeKg = quantidadeKg;
+    }
 
     // Retorna o valor de valorKgAtual.
     public BigDecimal getValorKgAtual() { return valorKgAtual; }
 
     // Define o valor de valorKgAtual.
-    public void setValorKgAtual(BigDecimal valorKgAtual) { this.valorKgAtual = valorKgAtual; }
+    public void setValorKgAtual(BigDecimal valorKgAtual) {
+        if (valorKgAtual == null || valorKgAtual.signum() <= 0) {
+            throw new IllegalArgumentException("valorKgAtual deve ser positivo.");
+        }
+        utilitario.formatarNumeroDecimal(valorKgAtual, 10L);
+        this.valorKgAtual = valorKgAtual;
+    }
 
     // Retorna o valor de valorTotalAtual.
     public BigDecimal getValorTotalAtual() { return valorTotalAtual; }
 
     // Define o valor de valorTotalAtual.
-    public void setValorTotalAtual(BigDecimal valorTotalAtual) { this.valorTotalAtual = valorTotalAtual; }
+    public void setValorTotalAtual(BigDecimal valorTotalAtual) {
+        if (valorTotalAtual != null) {
+            utilitario.formatarNumeroDecimal(valorTotalAtual, 14L);
+        }
+        this.valorTotalAtual = valorTotalAtual;
+    }
 
     // Retorna o valor de status.
     public StatusNegociacao getStatus() { return status; }

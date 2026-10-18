@@ -1,7 +1,11 @@
 
 package model;
 
+import util.Utilitario;
+
 public class Rota {
+
+    private final Utilitario utilitario = new Utilitario();
 
     // ATRIBUTOS
 
@@ -28,6 +32,7 @@ public class Rota {
 
     // Define o valor de nomeRota.
     public void setNomeRota(String nomeRota) {
+        nomeRota = utilitario.normalizarTextoLivre(nomeRota);
         if (nomeRota != null && nomeRota.codePointCount(0, nomeRota.length()) > 100) {
             throw new IllegalArgumentException("nomeRota deve ter no máximo 100 caracteres.");
         }
