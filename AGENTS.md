@@ -1,6 +1,6 @@
 # Renovaí Backend
 
-Projeto Java 17, Maven WAR, JDBC/PostgreSQL, servlets e JSPs. Antes de revisar DAOs, models ou a `Utilitario`, leia `PADRAO_CODIGO_BACKEND.md`. Use `../script-banco.pdf` como representação da estrutura planejada pelo grupo, sem tratá-lo como conferência do banco conectado.
+Projeto Java 17, Maven WAR, JDBC/PostgreSQL, servlets e JSPs. Antes de revisar DAOs, models ou a `Utilitario`, leia `PADRAO_CODIGO_BACKEND.md`. Use `../script-banco.pdf` como referência de esquema escolhida pelo usuário até nova orientação. Não peça o DDL original para iniciar ou repetir a revisão. O PDF descreve a estrutura planejada pelo grupo; não é uma conferência do banco conectado.
 
 Skills do projeto em `.agents/skills/`: `$refatorar-codigo`, `$atualizar-verificacoes-formatacoes`, `$implementar-testes-main` e `$revisar-back-renovai`. A última coordena as três primeiras. O escopo atual de revisão e mudanças é `dao`, `model` e `util`; a `Main` é usada apenas pela skill de testes. Servlets e JSPs ficam para etapa futura, embora dependências encontradas neles possam ser anotadas.
 

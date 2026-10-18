@@ -15,22 +15,27 @@ public class ColetaDAO {
 
     // CONSTRUTOR
 
+    // Inicializa o acesso aos dados de coleta.
     public ColetaDAO() {
     }
 
     // === METODOS CREATE ==============================================================================================
 
-    /*Nova coleta (Coleta externa) – cadastro de uma nova coleta, selecionando destino (rota cadastrada ou endereço específico), data, cooperado responsável (opcional) e observações (opcional). Ao salvar, entra com status "Agendada".
-*/
-
+    // Cadastra uma coleta externa agendada com seus dados obrigatórios.
     public int cadastrarColeta(Coleta coleta) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "INSERT INTO coleta " + "(id_cooperativa," +
                 "tipo, id_rota, id_endereco_rota, id_cooperado_responsavel,"
                 + "data_agendada, observacoes)" +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -67,14 +72,18 @@ public class ColetaDAO {
         }
     }
 
-    /*Nova coleta (Entrega na cooperativa) – registro de uma entrega feita diretamente na cooperativa, informando origem
-     (empresa, condomínio, escola, pessoa física, ecoponto, outro), nome do local/pessoa, data (preenchida automaticamente, editável) e
-     observações.*/
-
+    // Registra uma entrega recebida diretamente na cooperativa.
     public int registroNaCooperativa(Coleta coleta) {
+
+        // Declaração
+
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "INSERT INTO coleta(id_coleta, origem_entrega, nome_local_origem, data_fim, observacoes) VALUES (?,?,?,?,?,?)";
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -100,12 +109,18 @@ public class ColetaDAO {
         return 0;
     }
 
-    /* Cadastrar local/pessoa na hora – durante o registro de uma entrega, se o local ainda não existir nos endereços, o gestor pode cadastrá-lo ali mesmo.*/
-
+    // Registra a origem informada para uma entrega.
     public int cadastrarOrigem(Coleta coleta){
+
+        // Declaração
+
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "INSERT INTO coleta(nome_local_origem, origem_entrega) VALUES(?,?)";
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -121,12 +136,18 @@ public class ColetaDAO {
         return 0;
     }
 
-        /*Registrar peso total coletado/recebido – informar o peso total (obrigatório) ao finalizar uma coleta externa ou registrar uma entrega.*/
-
+    // Registra o peso total de uma coleta existente.
     public double registrarPesoTotal(Coleta coleta){
+
+        // Declaração
+
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "INSERT INTO coleta(peso_total_kg) VALUES (?)";
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -142,12 +163,18 @@ public class ColetaDAO {
         return 0;
     }
 
-    /*Registrar quantidade por tipo de material – opcionalmente, distribuir o peso total entre os materiais (papel, papelão, PET, alumínio, vidro etc.).*/
-
+    // Registra a quantidade recebida por tipo de material.
     public int QuantidadeTipoMaterial(Coleta coleta){
+
+        // Declaração
+
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "INSERT INTO coleta(tipo, peso_total_kg) VALUES(?,?)";
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -163,14 +190,18 @@ public class ColetaDAO {
         return 0;
     }
 
-
     // === METODOS READ ================================================================================================
 
+    // Lista as coletas cadastradas com seus dados principais.
     public ArrayList<Coleta> listarColetas() {
+
+        // Declaração
 
         ArrayList<Coleta> coletas = new ArrayList<>();
 
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "SELECT " +
                 "id_coleta, id_cooperativa," +
@@ -178,6 +209,8 @@ public class ColetaDAO {
                 "origem_entrega,nome_local_origem,data_agendada,data_inicio,data_fim" +
                 ",peso_total_kg,observacoes " +
                 "FROM coleta";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -201,7 +234,6 @@ public class ColetaDAO {
                 BigDecimal peso_total_kg = rs.getBigDecimal("peso_total_kg");
                 String observacoes = rs.getString("observacoes");
 
-
                 coleta.setIdColeta(id_coleta);
                 coleta.setIdCooperativa(id_cooperativa);
                 coleta.setTipo(tipo);
@@ -216,7 +248,6 @@ public class ColetaDAO {
                 coleta.setPesoTotalKg(peso_total_kg);
                 coleta.setObservacoes(observacoes);
 
-
                 coletas.add(coleta);
             }
 
@@ -230,16 +261,21 @@ public class ColetaDAO {
         return coletas;
     }
 
-    /*Rastrear coleta – visualizar em tempo real a localização da equipe, rota planejada, percurso já realizado, pontos visitados e restantes, e endereço da próxima parada (disponível apenas para coletas externas em andamento).*/
-
+    // Consulta os dados disponíveis para acompanhar uma coleta externa.
     public ArrayList<Coleta> rastrearColeta(){
 
+        // Declaração
+
         ArrayList<Coleta> coletas = new ArrayList<>();
+
+        // Comando SQL
 
         String sql;
         sql = "SELECT id_coleta, tipo, status, id_rota, id_endereco_rota, id_cooperado_responsavel, origem_entrega, nome_local_origem, peso_total_kg, data_fim FROM coleta where id_coleta = ? ";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -271,16 +307,21 @@ public class ColetaDAO {
         return coletas;
     }
 
-    /*Visualizar histórico de coletas – lista de todas as coletas registradas (código, tipo, responsável, data, status), da mais recente para a mais antiga.*/
-
+    // Lista as coletas registradas para consulta do histórico.
     public ArrayList<Coleta> historicoColetas(){
 
+        // Declaração
+
         ArrayList<Coleta> coletas = new ArrayList<>();
+
+        // Comando SQL
 
         String sql;
         sql = "SELECT id_coleta, tipo, status, id_rota, id_endereco_rota, id_cooperado_responsavel, origem_entrega, nome_local_origem, peso_total_kg, data_fim FROM coleta where id_coleta = ? ";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -314,17 +355,20 @@ public class ColetaDAO {
         return coletas;
     }
 
-    /*Visualizar coletas em andamento – lista na parte
-     superior da tela com código, tipo, local, cooperado responsável,
-     horário de início e status.*/
-
+    // Lista apenas as coletas que estão em andamento.
     public ArrayList<Coleta> coletasEmAndamento(){
 
+        // Declaração
+
         ArrayList<Coleta> coletas = new ArrayList<>();
+
+        // Comando SQL
 
         String sql = "SELECT id_coleta, tipo, nome_local_origem, id_cooperado_responsavel, data_inicio, status FROM coleta";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -343,7 +387,6 @@ public class ColetaDAO {
             }
             coletas.add(coleta);
 
-
         } catch (SQLException e) {
             e.getMessage();
         } finally {
@@ -354,18 +397,21 @@ public class ColetaDAO {
 
     /*Conferir peso total vs. soma dos materiais – campo de verificação que compara o peso total informado com a soma dos pesos por material.*/
 
-
-
     // === METODOS UPDATE ==============================================================================================
 
-    /*Iniciar coleta – altera o status de "Agendada" para "Em andamento", passando a aparecer na seção de coletas em andamento.*/
-
+    // Inicia uma coleta agendada e registra o horário de início.
     public int iniciarColeta(Coleta coleta) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE coleta\n" +
                 "SET status = ?, peso_total_kg = ?, data_inicio = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -375,7 +421,6 @@ public class ColetaDAO {
             pstmt.setBigDecimal(2, coleta.getPesoTotalKg());
             pstmt.setDate(3, Date.valueOf(String.valueOf(coleta.getDataInicio())));
 
-
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -387,11 +432,14 @@ public class ColetaDAO {
         }
     }
 
-    // atualizar coleta
-
+    // Atualiza os dados de uma coleta identificada pelo ID.
     public int atualizarColeta(Coleta coleta) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "UPDATE coleta\n" +
                 "SET tipo = ?, status = ?," +
@@ -400,10 +448,11 @@ public class ColetaDAO {
                 "peso_total_kg = ?, observacoes = ? " +
                 "WHERE id_coleta = ?";
 
+        // Executar PreparedStatement
+
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
-
 
             return pstmt.executeUpdate();
 
@@ -416,14 +465,19 @@ public class ColetaDAO {
         }
     }
 
-    /*Finalizar coleta (Coleta externa) – altera o status de "Em andamento" para "Concluída", após o registro do peso total e, opcionalmente, da distribuição por material.*/
-
+    // Finaliza uma coleta externa com peso e horário de término.
     public int finalizarColeta(Coleta coleta) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE coleta\n" +
                 "SET status = ?, peso_total_kg = ?, data_fim = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -433,7 +487,6 @@ public class ColetaDAO {
             pstmt.setBigDecimal(2, coleta.getPesoTotalKg());
             pstmt.setTimestamp(3, Timestamp.valueOf(coleta.getDataFim()));
 
-
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
@@ -445,14 +498,19 @@ public class ColetaDAO {
         }
     }
 
-    /*Finalização automática (Entrega na cooperativa) – ao salvar, o status é definido automaticamente como "Concluída" (não passa por "Agendada" nem "Em andamento").*/
-
+    // Finaliza uma entrega registrada na cooperativa.
     public int finalizacaoAutomatica(Coleta coleta) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "UPDATE coleta\n" +
                 "SET status = ?, data_fim = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -460,7 +518,6 @@ public class ColetaDAO {
 
             pstmt.setString(1, "Concluida");
             pstmt.setTimestamp(3, Timestamp.valueOf(coleta.getDataFim()));
-
 
             return pstmt.executeUpdate();
 
@@ -473,14 +530,19 @@ public class ColetaDAO {
         }
     }
 
-    /*Encerramento automático do rastreamento – ao finalizar a coleta, o compartilhamento de localização é interrompido automaticamente.*/
-
+    // Encerra o acompanhamento após a finalização da coleta.
     public int encerramentoRastreamento(Coleta coleta) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "UPDATE coleta\n" +
                 "SET status = ?, data_fim = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -488,7 +550,6 @@ public class ColetaDAO {
 
             pstmt.setString(1, "Concluida");
             pstmt.setTimestamp(3, Timestamp.valueOf(coleta.getDataFim()));
-
 
             return pstmt.executeUpdate();
 
@@ -500,25 +561,28 @@ public class ColetaDAO {
             conn.desconectar(conexao);
         }
     }
-
 
     // === METODOS DELETE ==============================================================================================
 
-    /*Cancelar coleta – o documento cita o status "Cancelada" (coleta cancelada antes da conclusão), mas não detalha a ação/fluxo específico de cancelamento.*/
+    // Cancela uma coleta preservando seu registro para o histórico.
     public int excluirColeta(Coleta coleta) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "DELETE FROM coleta\n" +
                 "WHERE id_coleta = ?";
 
+        // Executar PreparedStatement
+
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-
             pstmt.setLong(1,coleta.getIdColeta());
-
 
             return pstmt.executeUpdate();
 
@@ -530,14 +594,21 @@ public class ColetaDAO {
             conn.desconectar(conexao);
         }
     }
-    // Retorna o último índice de ID das coletas
+
+    // Consulta o último ID cadastrado na tabela de coletas.
     public long getUltimoIdColeta () {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "SELECT id_coleta " +
                 "FROM coleta " +
                 "ORDER BY coleta.id_coleta DESC LIMIT 1";
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstmt = conexao.prepareStatement(sql);

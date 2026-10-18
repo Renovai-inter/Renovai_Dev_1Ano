@@ -18,20 +18,21 @@ public class CooperativaDAO {
 
     // CONSTRUTOR
 
+    // Inicializa o acesso aos dados de cooperativa.
     public CooperativaDAO() {
     }
 
     // === METODOS CREATE ==============================================================================================
 
-    // Metodo de cadastrar cooperativa
+    // Cadastra uma cooperativa e seu gestor inicial.
     public int[] cadastrarCooperativa(Cooperativa coop, Cooperado gestor, String senhaTemporariaGestor) {
 
-        // DECLARACAO
+        // Declaração
 
         Connection conexao = conn.conectar();
         String sql;
 
-        // COMANDO SQL PADRÃO
+        // Comando SQL
 
         sql = (
                 "INSERT INTO cooperativa " +
@@ -42,7 +43,7 @@ public class CooperativaDAO {
 
         try {
 
-            // EXECUTAR PREPARED STATEMENT E PREENCHER PLACEHOLDERS
+            // Executar PreparedStatement
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
@@ -103,7 +104,7 @@ public class CooperativaDAO {
 
             pstmt.setString(12, utilitario.validarUf(coop.getEstado()));
 
-            // CADASTRO DE GESTOR EMBUTIDO E RETORNO
+            // Execução e retorno
 
             int[] retornoGestor = cooperadoDAO.cadastrarGestor(coop, gestor.getNomeCompleto(), gestor.getNomeUsuario(), gestor.getEmail(), senhaTemporariaGestor);
             int retornoCooperativa = pstmt.executeUpdate();
@@ -118,19 +119,17 @@ public class CooperativaDAO {
 
     }
 
-
-
     // === METODOS READ ================================================================================================
 
-    // Exibe todas as cooperativas no banco - sem filtros ou buscas
+    // Lista as cooperativas cadastradas com dados resumidos.
     public ArrayList<Cooperativa> exibirCooperativas() {
 
-        // DECLARACAO
+        // Declaração
 
         Connection conexao = conn.conectar();
         ArrayList<Cooperativa> cooperativas = new ArrayList<>();
 
-        // COMANDO SQL
+        // Comando SQL
 
         String sql = "SELECT" +
                 "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
@@ -140,7 +139,7 @@ public class CooperativaDAO {
 
         try {
 
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
+            // Executar PreparedStatement
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
@@ -171,15 +170,15 @@ public class CooperativaDAO {
 
     }
 
-    // Exibe as cooperativas filtradas por nome ou código
+    // Busca cooperativas pelo nome ou código informado.
     public ArrayList<Cooperativa> buscarCooperativasPorNomeOuCodigo(String busca) {
 
-        // DECLARACAO
+        // Declaração
 
         Connection conexao = conn.conectar();
         ArrayList<Cooperativa> cooperativas = new ArrayList<>();
 
-        // COMANDO SQL
+        // Comando SQL
 
         String sql = "SELECT" +
                 "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
@@ -190,7 +189,7 @@ public class CooperativaDAO {
 
         try {
 
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
+            // Executar PreparedStatement
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
@@ -220,15 +219,15 @@ public class CooperativaDAO {
 
     }
 
-    // Filtrar Cooperativas por Cidade
+    // Lista as cooperativas da cidade informada.
     public ArrayList<Cooperativa> filtrarCooperativasPorCidade(String cidadeBusca) {
 
-        // DECLARACAO
+        // Declaração
 
         Connection conexao = conn.conectar();
         ArrayList<Cooperativa> cooperativas = new ArrayList<>();
 
-        // COMANDO SQL
+        // Comando SQL
 
         String sql = "SELECT" +
                 "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
@@ -239,7 +238,7 @@ public class CooperativaDAO {
 
         try {
 
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
+            // Executar PreparedStatement
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
@@ -270,15 +269,15 @@ public class CooperativaDAO {
 
     }
 
-    // Filtrar Cooperativas por Estado (UF)
+    // Lista as cooperativas do estado informado.
     public ArrayList<Cooperativa> filtrarCooperativasPorEstado(String estadoBusca) {
 
-        // DECLARACAO
+        // Declaração
 
         Connection conexao = conn.conectar();
         ArrayList<Cooperativa> cooperativas = new ArrayList<>();
 
-        // COMANDO SQL
+        // Comando SQL
 
         String sql = "SELECT" +
                 "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
@@ -289,7 +288,7 @@ public class CooperativaDAO {
 
         try {
 
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
+            // Executar PreparedStatement
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
@@ -320,15 +319,15 @@ public class CooperativaDAO {
 
     }
 
-    // Filtrar Cooperativas por Status
+    // Lista as cooperativas com o status informado.
     public ArrayList<Cooperativa> filtrarCooperativasPorStatus(String statusBusca) {
 
-        // DECLARACAO
+        // Declaração
 
         Connection conexao = conn.conectar();
         ArrayList<Cooperativa> cooperativas = new ArrayList<>();
 
-        // COMANDO SQL
+        // Comando SQL
 
         String sql = "SELECT" +
                 "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
@@ -339,7 +338,7 @@ public class CooperativaDAO {
 
         try {
 
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
+            // Executar PreparedStatement
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
@@ -374,22 +373,22 @@ public class CooperativaDAO {
 
     // === METODOS UPDATE ==============================================================================================
 
-    // Atualiza determinado campo do objeto Cooperativa
+    // Atualiza um campo permitido da cooperativa identificada.
     public int atualizarCooperativa(Cooperativa coop, String campo) {
 
-        // DECLARACAO
+        // Declaração
 
         Connection conexao = conn.conectar();
         ArrayList<Cooperativa> cooperativas = new ArrayList<>();
 
-        // COMANDO SQL
+        // Comando SQL
 
         String sql = "UPDATE cooperativa " +
                 "SET " + campo.toLowerCase() + " WHERE id_cooperativa = " + coop.getIdCooperativa();
 
         try {
 
-            // EXECUTAR PREPARED STATEMENT E PREENCHER PLACEHOLDERS
+            // Executar PreparedStatement
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
@@ -405,18 +404,18 @@ public class CooperativaDAO {
 
     // === METODOS DELETE ==============================================================================================
 
-    // Deleta cooperativa determinada rota por meio do ID
+    // Exclui a cooperativa identificada pelo ID.
     public int excluirCooperativa(Cooperativa coop) {
 
-        // DECLARACAO
+        // Declaração
 
         Connection conexao = conn.conectar();
 
-        // COMANDO SQL
+        // Comando SQL
 
         String sql = "DELETE FROM COOPERATIVA WHERE id_cooperativa = ?";
 
-        // EXECUTAR PREPARED STATEMENT
+        // Executar PreparedStatement
 
         try {
 

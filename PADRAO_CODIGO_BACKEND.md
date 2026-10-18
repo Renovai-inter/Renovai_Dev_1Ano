@@ -4,7 +4,7 @@ Este documento orienta a revisão didática das classes `dao`, `model` e `util` 
 
 ## Referência do banco
 
-`../script-banco.pdf` representa a estrutura planejada pelo grupo: tabelas, colunas, tipos e restrições como `NOT NULL` e `CHECK`. Ele orienta a revisão, mas não comprova o estado do banco conectado. Ao encontrar diferença entre código e PDF, registrar a diferença no relatório para decisão do grupo. Não inventar valores ou regras ausentes do documento.
+`../script-banco.pdf` é a referência de esquema definida pelo usuário até segunda ordem. Ele representa a estrutura planejada pelo grupo: tabelas, colunas, tipos e restrições como `NOT NULL` e `CHECK`. Use-o para revisar o código sem pedir repetidamente o DDL original. O PDF não comprova o estado do banco conectado; se uma tarefa futura exigir essa conferência específica, trate-a separadamente. Ao encontrar diferença entre código e PDF, registre a diferença no relatório para decisão do grupo. Não invente valores ou regras ausentes do documento.
 
 ## Nomes e instanciação
 
@@ -23,6 +23,7 @@ Este documento orienta a revisão didática das classes `dao`, `model` e `util` 
 
 ## Dados, validação e formatação
 
+- Para cada coluna `VARCHAR(x)` representada por `String` em uma model, o setter deve conferir que o valor tem no máximo `x` caracteres antes de atribuí-lo. Um valor maior lança `IllegalArgumentException` com o campo e o limite na mensagem; não cortar o texto silenciosamente. Contar caracteres Unicode com `codePointCount`, para não rejeitar um caractere suplementar como se fossem dois. A regra de tamanho não define sozinha se `null` é permitido: preservar essa decisão conforme a nulidade documentada para cada campo. Construtores que recebem esses campos devem passar pelos setters correspondentes, para não contornar a verificação.
 - As PKs documentadas como `BIGINT` são representadas em Java por `long` (ou `Long` onde a model já usa esse tipo). O projeto não pressupõe geração automática dessas PKs pelo banco: nas operações `CREATE`, a DAO deve fornecer o ID no `INSERT`. O método existente `Utilitario.selecionarUltimoId(String tabela)` consulta o último ID da tabela informada e retorna um `long`; ele não devolve por si só uma nova PK. Na revisão, conferir como cada DAO calcula e vincula o novo ID a partir desse resultado, inclusive o caso de tabela vazia. Esta regra não autoriza mudar o método utilitário sem escolha posterior do usuário.
 - Revisar quais campos ainda precisam de validação e quais restrições `CHECK` do PDF correspondem a valores fechados. Para listas fechadas usadas pelas DAOs e models, conferir os ENUMs já existentes antes de propor ou criar outro. Usar o ENUM nas models e DAOs do escopo aprovado; outros tipos de `CHECK`, como limites numéricos, são casos de validação, não de ENUM.
 - Nos métodos da `Utilitario`, filtrar dados de entrada para gravação e formatar dados lidos para apresentação. Para cada filtro ou formatação **novo**, pedir ao usuário o regex e o formato de retorno antes de implementar. Conferir os filtros existentes; não presumir que funcionam só porque já estão escritos. `selecionarUltimoId` é uma exceção existente e fica fora desta revisão.

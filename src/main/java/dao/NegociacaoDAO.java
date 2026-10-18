@@ -19,18 +19,24 @@ public class NegociacaoDAO {
 
     // CONSTRUTOR
 
+    // Inicializa o acesso aos dados de negociacao.
     public NegociacaoDAO() {
     }
 
     // === METODOS CREATE ==============================================================================================
 
-    /*Fazer contraproposta – a cooperativa cria uma nova condição (novo valor) para enviar à recicladora, podendo incluir uma observação explicando a alteração.*/
-
+    // Registra uma contraproposta vinculada à negociação.
     public int fazerContraproposta(Negociacao negociacao) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "INSERT INTO negociacao(id_cooperativa, id_empresa, quantidade_kg, valor_kg_atual, valor_total_atual, status) VALUES(?,?,?,?,?,?)";
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -51,15 +57,20 @@ public class NegociacaoDAO {
 
     // === METODOS READ ================================================================================================
 
-    /*Visualizar novas propostas – listagem das propostas recebidas que ainda aguardam resposta (empresa recicladora, material, quantidade, valor por kg, valor total, data de recebimento).*/
-
+    // Lista as propostas que aguardam resposta.
     public ArrayList<Negociacao> novasPropostas() {
 
+        // Declaração
+
         ArrayList<Negociacao> negociacoes = new ArrayList<>();
+
+        // Comando SQL
 
         String sql = "SELECT id_cooperativa, id_empresa, id_material, quantidade_kg, valor_kg_atual, valor_total_atual, data_conclusao FROM negociacao";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -79,7 +90,6 @@ public class NegociacaoDAO {
 
             negociacoes.add(negociacao);
 
-
         } catch (SQLException e) {
             e.getMessage();
         } finally {
@@ -89,16 +99,21 @@ public class NegociacaoDAO {
         }
     }
 
-    /*Visualizar detalhes da proposta – abrir uma proposta para ver informações da empresa (nome, responsável, forma de contato) e informações da proposta (material, quantidade, valor por kg , valor total, data, observações).*/
-
+    // Consulta os detalhes de uma proposta e da empresa envolvida.
     public ArrayList<Negociacao> analisarDetalhesProposta() {
 
+        // Declaração
+
         ArrayList<Negociacao> negociacoes = new ArrayList<>();
+
+        // Comando SQL
 
         String sql = "SELECT e.id_empresa, e.nome, e.email_institucional, e.telefone_whatsapp, n.id_material, n.quantidade_kg, n.valor_kg_atual, n.valor_total_atual" +
                 " FROM negociacao n join empresa_recicladora e on n.id_negociacao = e.id_empresa";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -119,7 +134,6 @@ public class NegociacaoDAO {
 
             negociacoes.add(negociacao);
 
-
         } catch (SQLException e) {
             e.getMessage();
         } finally {
@@ -128,15 +142,20 @@ public class NegociacaoDAO {
         return negociacoes;
     }
 
-    /*Visualizar negociações em andamento – propostas que já tiveram interação mas ainda não foram finalizadas (empresa, material, quantidade, última atualização, status).*/
-
+    // Lista as negociações com interação ainda não finalizadas.
     public ArrayList<Negociacao> negociacaoEmAndamento() {
 
+        // Declaração
+
         ArrayList<Negociacao> negociacoes = new ArrayList<>();
+
+        // Comando SQL
 
         String sql = "SELECT id_empresa, id_material, quantidade_kg, status FROM negociacao";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -154,8 +173,6 @@ public class NegociacaoDAO {
 
             negociacoes.add(negociacao);
 
-
-
         } catch (SQLException e) {
             e.getMessage();
         } finally {
@@ -164,15 +181,20 @@ public class NegociacaoDAO {
         return negociacoes;
     }
 
-    /*Visualizar histórico de negociação – dentro de uma negociação em andamento, ver o histórico de interações.*/
-
+    // Consulta o histórico de uma negociação identificada.
     public ArrayList<Negociacao> historicoNegociacao() {
 
+        // Declaração
+
         ArrayList<Negociacao> negociacoes = new ArrayList<>();
+
+        // Comando SQL
 
         String sql = "SELECT * FROM negociacao where id_negociacao = ? order by data_criacao";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -192,15 +214,20 @@ public class NegociacaoDAO {
         return negociacoes;
     }
 
-    /*Visualizar propostas aceitas – registro de negociações aprovadas por ambas as partes (empresa, material, quantidade, valor acordado, data da aprovação).*/
-
+    // Lista as propostas aceitas pelas partes.
     public ArrayList<Negociacao> propostasAceitas() {
 
+        // Declaração
+
         ArrayList<Negociacao> negociacoes = new ArrayList<>();
+
+        // Comando SQL
 
         String sql = "SELECT id_empresa, id_material, quantidade_kg, valor_total_atual, data_conclusao FROM negociacao";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -224,15 +251,20 @@ public class NegociacaoDAO {
         return negociacoes;
     }
 
-    /*Visualizar histórico geral – negociações finalizadas ou encerradas (vendas concluídas, propostas recusadas, negociações canceladas).*/
-
+    // Lista as negociações finalizadas ou encerradas.
     public ArrayList<Negociacao> historicoGeral() {
 
+        // Declaração
+
         ArrayList<Negociacao> negociacoes = new ArrayList<>();
+
+        // Comando SQL
 
         String sql = "SELECT * FROM negociacao where id_negociacao = ? order by data_criacao";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -252,20 +284,23 @@ public class NegociacaoDAO {
         return negociacoes;
     }
 
-
     /*Filtrar negociações – por status: todas, novas propostas, em negociação, aceitas, recusadas, concluídas.*/
-
 
     // === METODOS UPDATE ==============================================================================================
 
-    /*Aceitar proposta – altera o status da negociação de "nova proposta" (ou "em negociação") para "aceita".*/
-
+    // Aceita uma proposta e registra a conclusão da negociação.
     public int alterarCargoCooperado(Negociacao negociacao) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE negociacao\n" +
                 "SET status = ? WHERE id_negociacao = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -285,15 +320,19 @@ public class NegociacaoDAO {
         }
     }
 
-
-// Enviar nova contraproposta em negociação já em andamento – atualiza a negociação com uma nova condição de valor.
-
+    // Atualiza a condição de valor de uma negociação em andamento.
     public int enviarContraProposta(Negociacao negociacao) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE negociacao\n" +
                 "SET valor_kg_atual = ? WHERE id_negociacao = ? AND status = 'em negociação'";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -313,15 +352,19 @@ public class NegociacaoDAO {
         }
     }
 
-
-//Aceitar ou recusar oferta dentro de uma negociação em andamento – atualiza o status da negociação existente.
-
+    // Registra a decisão de aceitar ou recusar uma oferta.
     public int DecisaoDeOferta(Negociacao negociacao) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE negociacao\n" +
                 "SET status = ? WHERE id_negociacao = ? AND status = 'em negociação'";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -343,22 +386,25 @@ public class NegociacaoDAO {
 
     // === METODOS DELETE ==============================================================================================
 
-    /*Recusar proposta – encerra a negociação (não exclui o registro, mas o move para o histórico como "recusada"), podendo incluir motivo da recusa.*/
-
+    // Recusa uma proposta e conserva a negociação no histórico.
     public int recusarProposta(Negociacao negociacao) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "DELETE FROM negociacao\n" +
                 "WHERE id_negociacao = ?";
+
+        // Executar PreparedStatement
 
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-
             pstmt.setLong(1, negociacao.getIdNegociacao());
-
 
             return pstmt.executeUpdate();
 
@@ -371,22 +417,25 @@ public class NegociacaoDAO {
         }
     }
 
-// Cancelar negociação – aparece no histórico como negociação cancelada (é mencionado como resultado possível, mas o documento não detalha a ação específica de cancelamento).
-
+    // Cancela uma negociação e conserva seu registro no histórico.
     public int CancelarNegociacao(Negociacao negociacao) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "DELETE FROM negociacao\n" +
                 "WHERE id_negociacao = ?";
+
+        // Executar PreparedStatement
 
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-
             pstmt.setLong(1, negociacao.getIdNegociacao());
-
 
             return pstmt.executeUpdate();
 

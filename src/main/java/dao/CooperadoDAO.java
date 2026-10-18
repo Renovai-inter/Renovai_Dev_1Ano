@@ -19,18 +19,27 @@ public class CooperadoDAO {
 
     // CONSTRUTOR
 
+    // Inicializa o acesso aos dados de cooperado.
     public CooperadoDAO() {
     }
 
     // === METODOS CREATE ==============================================================================================
 
+    // Cadastra o cooperado e os dados de usuário necessários.
     public int cadastrarCooperado(String nome_completo, String nome_usuario, String senha_hash,
+
+        // Declaração
+
                                   int senha_temporaria, String email, String tipo_usuario, Date data_criacao){
+
+        // Comando SQL
 
         String sql = "INSERT INTO cooperado(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo, status, " +
                 "data_cadastro) VALUES (?,?,?,?,?,?,?)";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -53,19 +62,25 @@ public class CooperadoDAO {
         return 0;
     }
 
-    // Metodo de cadastro de gestor
+    // Cadastra um usuário gestor vinculado a uma cooperativa.
     public int[] cadastrarGestor(Cooperativa cooperativa, String nomeCompleto, String nomeUsuario, String email, String senhaTemporaria) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
         long idUsuario = utilitario.selecionarUltimoId("usuario");
         long idCooperado = utilitario.selecionarUltimoId("cooperado");
 
+        // Comando SQL
+
         String sqlUsuario = "INSERT INTO usuario (id_usuario, nome_completo, nome_usuario, senha_hash, email, tipo_usuario) " +
                 "VALUES (?, ?, ?, ?, ?, 'GESTOR_COOPERATIVA')";
 
         String sqlCooperado = "INSERT INTO cooperado (id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo) " +
                 "VALUES (?, ?, ?, ?, 'GESTOR')";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -96,14 +111,18 @@ public class CooperadoDAO {
 
     }
 
-    /*Selecionar atividades do cooperado – caso não tenha cargo definido, o gestor pode indicar uma
-     ou mais atividades (coleta externa, separação de materiais, organização do galpão, prensagem, pesagem, negociações, administrativo).*/
-
+    // Registra as atividades atribuídas a um cooperado.
     public int selecionarAtividades(Cooperado cooperado){
+
+        // Declaração
+
+        // Comando SQL
 
         String sql = "INSERT INTO cooperado(id_usuario, cargo, codigo_cooperado, status) VALUES(?,?,?,?)";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -121,18 +140,19 @@ public class CooperadoDAO {
         return 0;
     }
 
-    /*Definir permissões de acesso no cadastro – o gestor define
-     quais funcionalidades (Dashboard, Cooperados, Coletas, Negociações, Vendas, Financeiro, Relatórios, Configurações)
-     estarão disponíveis para o cooperado (por padrão, todas são liberadas).
-Geração automática de conta de acesso – ao cadastrar, o
-sistema cria automaticamente: código do cooperado, nome de usuário e senha temporária.*/
-
+    // Registra a conta e as permissões de acesso do cooperado.
     public int permissoesAcesso(Cooperado cooperado, String nome_completo, String nome_usuario, String senha_hash, Boolean senha_temporaria, String email, String tipo_usario, Date data_criacao){
+
+        // Declaração
+
+        // Comando SQL
 
         String sqlCop = "INSERT INTO cooperado(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo) VALUES(?,?,?,?,?,?)";
         String sqlUsu = "INSERT INTO usuario(nome_completo, nome_usuario, senha_hash, senha_temporaria, email, tipo_usuario, data_criacao) VALUES(?,?,?,?,?,?,?,?)";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sqlCop);
@@ -158,22 +178,23 @@ sistema cria automaticamente: código do cooperado, nome de usuário e senha tem
         return 0;
     }
 
-
-
-
     // === METODOS READ ================================================================================================
 
-    /*Visualizar lista de cooperados – tela principal com código, nome, status e cargo (quando houver) de todos os cooperados cadastrados.
-Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela de edição para ver suas informações completas.*/
-
+    // Lista os cooperados com identificação, status e cargo.
     public ArrayList<Cooperado> listaCooperados(){
 
+        // Declaração
+
         ArrayList<Cooperado> cooperados = new ArrayList<>();
+
+        // Comando SQL
 
         String sql;
         sql = "SELECT c.codigo_cooperado, u.nome_usuario, c.status, c.cargo FROM cooperado c join usuario u on c.id_usuario = u.id_usuario";
 
         Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
 
         try{
             PreparedStatement pstm = conexao.prepareStatement(sql);
@@ -199,15 +220,16 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
         return cooperados;
     }
 
-
-
     // === METODOS UPDATE ==============================================================================================
 
-    // Editar cooperado – abre o formulário para edição das informações do cooperado selecionado.
-
+    // Atualiza os dados do cooperado identificado pelo ID.
     public int editarCooperado(Cooperado cooperado) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "UPDATE cooperado\n" +
                 "SET id_usuario = ?,\n" +
@@ -215,6 +237,8 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
                 "    codigo_cooperado = ?,\n" +
                 "    cargo = ?,\n" +
                 "    status = ? WHERE id_cooperado = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -237,14 +261,19 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
         }
     }
 
-//Alterar cargo do cooperado.
-
+    // Altera o cargo de um cooperado existente.
     public int alterarCargoCooperado(Cooperado cooperado) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE cooperado\n" +
                 "SET cargo = ? WHERE id_cooperado = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -263,14 +292,19 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
         }
     }
 
-//Alterar atividades desempenhadas (múltipla escolha).
-
+    // Altera uma atividade atribuída ao cooperado.
     public int alterarAtividadesDesempenhadas(int idCooperado, String atividade) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE cooperado_atividade\n" +
                 "SET atividade = ? WHERE id_cooperado = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -278,7 +312,6 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
 
             pstmt.setString(1, atividade);
             pstmt.setInt(2, idCooperado);
-
 
             return pstmt.executeUpdate();
 
@@ -291,15 +324,19 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
         }
     }
 
-
-//Alterar status do cooperado (Ativo, Afastado ou Inativo).
-
+    // Altera o status de um cooperado existente.
     public int alterarStatusCooperado(Cooperado cooperado) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE cooperado\n" +
                 "SET status = ? WHERE id_cooperado = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -318,14 +355,19 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
         }
     }
 
-//Alterar permissões de acesso ao sistema (somente cooperados com cargo de Gestor podem fazer essa alteração para outros usuários; o gestor sempre mantém acesso total, que não pode ser removido).
-
+    // Altera uma permissão de acesso atribuída ao cooperado.
     public int alterarPermissoesAcesso(int idCooperado, int idPermissao) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE cooperado_permissao\n" +
                 "SET id_permissao = ? WHERE id_cooperado = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -345,14 +387,19 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
         }
     }
 
-//Alterar nome de usuário – pode ser feito posteriormente pelo próprio cooperado, nas configurações da conta.
-
+    // Altera o nome de usuário de uma conta existente.
     public int alterarNomeUsuario(int idUsuario, String nomeUsuario) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "UPDATE usuario\n" +
                 "SET nome_usuario = ? WHERE id_usuario = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -372,15 +419,20 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
         }
     }
 
-//Definir nova senha no primeiro acesso – o cooperado deve trocar a senha temporária ao acessar o sistema pela primeira vez.
-
+    // Atualiza a senha e o indicador de senha temporária.
     public int alterarSenha(int idUsuario, String senhaHash, boolean senhaTemporaria) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "UPDATE usuario\n" +
                 "SET senha_hash = ?,\n" +
                 "    senha_temporaria = ? WHERE id_usuario = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -403,14 +455,19 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
 
     // === METODOS DELETE ==============================================================================================
 
-    /*Remover cooperado – remove o cooperado da cooperativa, com uma tela de confirmação antes para evitar exclusões acidentais. Recomendado apenas quando o cooperado realmente deixa de fazer parte da cooperativa (para afastamentos temporários, o indicado é usar o status "Afastado" em vez de remover).*/
-
+    // Exclui o vínculo do cooperado identificado pelo ID.
      public int excluirCooperado(Cooperado cooperado) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "DELETE FROM cooperado\n" +
                 "WHERE id_cooperado = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -429,23 +486,26 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
         }
     }
 
-//Remover acesso a um módulo específico (permissão) – não exclui os dados relacionados à funcionalidade, apenas impede o acesso a ela (é uma "remoção" parcial, não uma exclusão de dados).*/
-
+    // Remove uma permissão específica de um cooperado.
     public int removerAcessoModulo(int idCooperado, int idPermissao) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "DELETE FROM cooperado_permissao\n" +
                 "WHERE id_cooperado = ? AND id_permissao = ?";
+
+        // Executar PreparedStatement
 
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-
             pstmt.setLong(1,idCooperado);
             pstmt.setLong(1,idPermissao);
-
 
             return pstmt.executeUpdate();
 

@@ -17,18 +17,28 @@ public class RotaDAO {
 
     // CONSTRUTOR
 
+    // Inicializa o acesso aos dados de rota.
     public RotaDAO() {
     }
 
     // === METODOS CREATE ==============================================================================================
+
+    // Cadastra uma rota vinculada à cooperativa.
     public int cadastrarRota(Rota rota) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "INSERT INTO rota " +
                 "(id_rota," +
                 "id_cooperativa,nome_rota)" +
                 "VALUES (?, ?, ?)";
+
+        // Executar PreparedStatement
+
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
@@ -62,17 +72,24 @@ public class RotaDAO {
         }
     }
 
-
     // === METODOS READ ================================================================================================
+
+    // Lista as rotas cadastradas.
     public ArrayList<Rota> listarRotas() {
+
+        // Declaração
 
         ArrayList<Rota> rotas = new ArrayList<>();
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "SELECT " +
                 "id_rota," +
                 "id_cooperativa,nome_rota FROM rota";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -99,13 +116,21 @@ public class RotaDAO {
     }
 
     // === METODOS UPDATE ==============================================================================================
+
+    // Atualiza os dados da rota identificada pelo ID.
     public int atualizarRota(Rota rota) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "UPDATE rota\n" +
                 "SET id_cooperativa = ?, nome_rota = ?\n" +
                 "WHERE id_rota = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -127,20 +152,26 @@ public class RotaDAO {
     }
 
     // === METODOS DELETE ==============================================================================================
+
+    // Exclui a rota identificada pelo ID.
     public int excluirRota(Rota rota) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "DELETE FROM rota\n" +
                 "WHERE id_rota = ?";
+
+        // Executar PreparedStatement
 
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-
             pstmt.setLong(1,rota.getIdRota());
-
 
             return pstmt.executeUpdate();
 
@@ -153,15 +184,21 @@ public class RotaDAO {
         }
     }
 
-    // Retorna o último índice de ID das rotas
+    // Consulta o último ID cadastrado na tabela de rotas.
         public long getUltimoIdRota () {
 
+        // Declaração
+
             Connection conexao = conn.conectar();
+
+        // Comando SQL
 
             String sql =
                     "SELECT id_rota " +
                             "FROM rota " +
                             "ORDER BY rota.id_rota DESC LIMIT 1";
+
+        // Executar PreparedStatement
 
             try {
 
@@ -175,7 +212,6 @@ public class RotaDAO {
                 else {
                     return -1;
                 }
-
 
             } catch (SQLException e) {
 

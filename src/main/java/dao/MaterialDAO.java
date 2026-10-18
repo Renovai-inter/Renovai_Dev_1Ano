@@ -17,17 +17,26 @@ public class MaterialDAO {
 
     // CONSTRUTOR
 
+    // Inicializa o acesso aos dados de material.
     public MaterialDAO() {
     }
 
     // === METODOS CREATE ==============================================================================================
+
+    // Cadastra um material com os campos exigidos pelo esquema.
     public int cadastrarMaterial(Material material) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "INSERT INTO material " + "(id_material,"
                 + "nome,categoria)" +
                 "VALUES (?, ?, ?)";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -55,17 +64,24 @@ public class MaterialDAO {
         }
     }
 
-
     // === METODOS READ ================================================================================================
+
+    // Lista os materiais cadastrados.
     public ArrayList<Material> listarMateriais() {
+
+        // Declaração
 
         ArrayList<Material> materiais = new ArrayList<>();
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "SELECT " +
                 "id_material," +
                 "nome,categoria FROM material";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -91,15 +107,22 @@ public class MaterialDAO {
         }
     }
 
-
     // === METODOS UPDATE ==============================================================================================
+
+    // Atualiza os dados do material identificado pelo ID.
     public int atualizarMaterial(Material material) {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "UPDATE material\n" +
                 "SET nome = ?, categoria = ?\n" +
                 "WHERE id_material = ?";
+
+        // Executar PreparedStatement
 
         try {
 
@@ -120,23 +143,27 @@ public class MaterialDAO {
         }
     }
 
-
-
     // === METODOS DELETE ==============================================================================================
+
+    // Exclui o material identificado pelo ID.
     public int excluirMaterial(Material material) {
+
+        // Declaração
 
         Connection conexao = conn.conectar();
 
+        // Comando SQL
+
         String sql = "DELETE FROM material\n" +
                 "WHERE id_material = ?";
+
+        // Executar PreparedStatement
 
         try {
 
             PreparedStatement pstmt = conexao.prepareStatement(sql);
 
-
             pstmt.setLong(1,material.getIdMaterial());
-
 
             return pstmt.executeUpdate();
 
@@ -149,14 +176,20 @@ public class MaterialDAO {
         }
     }
 
-    // Retorna o último índice de ID dos materiais
+    // Consulta o último ID cadastrado na tabela de materiais.
     public long getUltimoIdMaterial () {
 
+        // Declaração
+
         Connection conexao = conn.conectar();
+
+        // Comando SQL
 
         String sql = "SELECT id_material " +
                 "FROM material " +
                 "ORDER BY material.id_material DESC LIMIT 1";
+
+        // Executar PreparedStatement
 
         try {
             PreparedStatement pstmt = conexao.prepareStatement(sql);
