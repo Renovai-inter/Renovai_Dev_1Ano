@@ -1,5 +1,9 @@
 package model;
 
+import model.enums.CargoCooperado;
+import model.enums.StatusCooperado;
+import model.enums.TipoUsuario;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -7,21 +11,22 @@ public class Cooperado {
 
     // ATRIBUTOS (tabela cooperado)
 
-    private Long idCooperado;
-    private Long idUsuario;
-    private Long idCooperativa;
-    private String codigoCooperado;
-    private String cargo;
-    private String status;
-    private LocalDateTime dataCadastro;
+    private Long idCooperado; // PK
+    private Long idUsuario; // FK
+    private Long idCooperativa; // FK
+    private String codigoCooperado; // NOT NULL - VARCHAR(20)
+    private CargoCooperado cargo; // NOT NULL - CHECK
+    private StatusCooperado status; // NOT NULL - CHECK COM DEFAULT
+    private LocalDateTime dataCadastro; // NOT NULL COM DEFAULT
 
     // ATRIBUTOS (vem de outras tabelas, preenchidos pelos JOINs da DAO)
 
-    private String nomeCompleto;
-    private String nomeUsuario;
-    private String email;
-    private String nomeCooperativa;
-    private boolean senhaTemporaria;
+    private String nomeCompleto; // NOT NULL - VARCHAR(150)
+    private String nomeUsuario; // NOT NULL - VARCHAR(50)
+    private TipoUsuario tipoUsuario; // NOT NULL - CHECK
+    private String email; // NOT NULL - VARCHAR(150)
+    private String nomeCooperativa; // NOT NULL - VARCHAR(150)
+    private boolean senhaTemporaria; // BOOLEAN COM DEFAULT
     private ArrayList<String> atividades = new ArrayList<>();
 
     // GETTERS E SETTERS
@@ -56,24 +61,18 @@ public class Cooperado {
     }
 
     // Retorna o valor de cargo.
-    public String getCargo() { return cargo; }
+    public CargoCooperado getCargo() { return cargo; }
 
     // Define o valor de cargo.
-    public void setCargo(String cargo) {
-        if (cargo != null && cargo.codePointCount(0, cargo.length()) > 15) {
-            throw new IllegalArgumentException("cargo deve ter no máximo 15 caracteres.");
-        }
+    public void setCargo(CargoCooperado cargo) {
         this.cargo = cargo;
     }
 
     // Retorna o valor de status.
-    public String getStatus() { return status; }
+    public StatusCooperado getStatus() { return status; }
 
     // Define o valor de status.
-    public void setStatus(String status) {
-        if (status != null && status.codePointCount(0, status.length()) > 10) {
-            throw new IllegalArgumentException("status deve ter no máximo 10 caracteres.");
-        }
+    public void setStatus(StatusCooperado status) {
         this.status = status;
     }
 
@@ -139,4 +138,11 @@ public class Cooperado {
     // Define o valor de atividades.
     public void setAtividades(ArrayList<String> atividades) { this.atividades = atividades; }
 
+    public TipoUsuario getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(TipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
+    }
 }
