@@ -14,7 +14,7 @@ Crie um novo `NN-Testes-Main.md` em `../Relatórios/`, usando o próximo número
 ## Menu
 
 - Um `while` principal mostra as DAOs numeradas; `0` encerra. Ao escolher uma DAO, outro menu mostra seus métodos; `0` volta.
-- O teste pergunta ao usuário os dados necessários para o método escolhido, monta a model quando couber, executa a DAO e mostra entrada resumida, retorno e possível erro. Ao terminar, volta ao menu.
+- O teste pergunta ao usuário os dados necessários para o método escolhido, monta a model quando couber, executa a DAO e mostra entrada resumida, retorno e possível erro. Para métodos `CREATE`, conferir se a DAO obtém e vincula a PK `BIGINT` por meio do fluxo que usa `selecionarUltimoId(String tabela)`; não presumir geração automática pelo banco nem pedir ao usuário o ID quando a DAO deve defini-lo. Ao terminar, volta ao menu.
 - Cubra os métodos existentes em passos pequenos. Não criar laços ou classes extras só para demonstrar sintaxe. Trate entrada não numérica no menu sem encerrar o programa.
 - Identifique no menu os métodos que gravam ou excluem. A escolha do teste pelo usuário inicia a operação na conexão que ele configurou; nenhuma escrita ou exclusão ocorre ao iniciar a `Main`. Não imprimir credenciais.
 - Em cadastros que envolvem mais de uma tabela, como cooperativa, usuário e cooperado, mostrar separadamente os retornos disponíveis. Não chamar o teste de concluído apenas porque um retorno não é nulo.
