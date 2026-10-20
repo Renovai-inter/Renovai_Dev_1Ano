@@ -1,384 +1,184 @@
 package dao;
 
-import model.Coleta;
-import model.Cooperado;
 import model.Negociacao;
+import model.enums.StatusNegociacao;
 import util.Conexao;
+import util.Utilitario;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class NegociacaoDAO {
+    private final Conexao conn = new Conexao();
+    private final Utilitario utilitario = new Utilitario();
 
-    // ATRIBUTOS
-
-    private Conexao conn = new Conexao();
-
-    // CONSTRUTOR
-
-    // Inicializa o acesso aos dados de negociacao.
+    // Inicializa o acesso aos dados de negociação.
     public NegociacaoDAO() {
     }
 
     // === METODOS CREATE ==============================================================================================
 
-    // Registra uma contraproposta vinculada à negociação.
-    public int fazerContraproposta(Negociacao negociacao) {
-
-        // Declaração
-
-        Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "INSERT INTO negociacao(id_cooperativa, id_empresa, quantidade_kg, valor_kg_atual, valor_total_atual, status) VALUES(?,?,?,?,?,?)";
-
-        // Executar PreparedStatement
-
-        try {
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-
-            pstm.setLong(1, negociacao.getIdCooperativa());
-            pstm.setLong(2, negociacao.getIdEmpresa());
-            pstm.setBigDecimal(3, negociacao.getQuantidadeKg());
-            pstm.setBigDecimal(4, negociacao.getValorKgAtual());
-            pstm.setBigDecimal(5, negociacao.getValorTotalAtual());
-            pstm.setString(6, negociacao.getStatus());
-
-            pstm.executeUpdate();
-        } catch (SQLException sqle) {
-            sqle.getMessage();
+    // Registra uma proposta da cooperativa para a negociação informada.
+    public Negociacao fazerContraproposta(Long idNegociacao, BigDecimal valorKgAtual,
+                                         BigDecimal quantidadeKg) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setValorKgAtual(valorKgAtual);
+        negociacao.setQuantidadeKg(quantidadeKg);
+        if (negociacao.getIdNegociacao() == null) {
+            throw new IllegalArgumentException("ID da negociação e valor por quilo são obrigatórios.");
         }
-        return 0;
+        long ultimoId = utilitario.selecionarUltimoId("proposta");
+        long idProposta = ultimoId == -1 ? 1 : ultimoId + 1;
+        String sql = "INSERT INTO proposta (id_proposta, id_negociacao, autor, valor_kg, " +
+                "quantidade_kg) VALUES (?, ?, 'COOPERATIVA', ?, ?)";
+        Connection conexao = conn.conectar();
+        try {
+            try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+                pstmt.setLong(1, idProposta);
+                pstmt.setLong(2, negociacao.getIdNegociacao());
+                pstmt.setBigDecimal(3, negociacao.getValorKgAtual());
+                pstmt.setBigDecimal(4, negociacao.getQuantidadeKg());
+                return pstmt.executeUpdate() == 0 ? null : negociacao;
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Falha ao registrar contraproposta da cooperativa.", e);
+        } finally {
+            conn.desconectar(conexao);
+        }
     }
 
     // === METODOS READ ================================================================================================
 
-    // Lista as propostas que aguardam resposta.
+    // Lista propostas que aguardam resposta.
     public ArrayList<Negociacao> novasPropostas() {
-
-        // Declaração
-
-        ArrayList<Negociacao> negociacoes = new ArrayList<>();
-
-        // Comando SQL
-
-        String sql = "SELECT id_cooperativa, id_empresa, id_material, quantidade_kg, valor_kg_atual, valor_total_atual, data_conclusao FROM negociacao";
-
-        Connection conexao = conn.conectar();
-
-        // Executar PreparedStatement
-
-        try {
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-            ResultSet rst = pstm.executeQuery();
-
-            Negociacao negociacao = null;
-            while (rst.next()) {
-                negociacao = new Negociacao();
-
-                negociacao.setIdCooperativa(rst.getLong("id_cooperativa"));
-                negociacao.setIdEmpresa(rst.getLong("id_empresa"));
-                negociacao.setIdMaterial(rst.getLong("id_material"));
-                negociacao.setQuantidadeKg(rst.getBigDecimal("quantidade_kg"));
-                negociacao.setValorTotalAtual(rst.getBigDecimal("valor_total_atual"));
-                negociacao.setDataConclusao(rst.getTimestamp("data_conclusao").toLocalDateTime());
-            }
-
-            negociacoes.add(negociacao);
-
-        } catch (SQLException e) {
-            e.getMessage();
-        } finally {
-            conn.desconectar(conexao);
-
-            return negociacoes;
-        }
+        return consultarNegociacoes(" WHERE status = 'AGUARDANDO_RESPOSTA'");
     }
 
-    // Consulta os detalhes de uma proposta e da empresa envolvida.
+    // Lista os dados da negociação vinculada a uma empresa.
     public ArrayList<Negociacao> analisarDetalhesProposta() {
-
-        // Declaração
-
-        ArrayList<Negociacao> negociacoes = new ArrayList<>();
-
-        // Comando SQL
-
-        String sql = "SELECT e.id_empresa, e.nome, e.email_institucional, e.telefone_whatsapp, n.id_material, n.quantidade_kg, n.valor_kg_atual, n.valor_total_atual" +
-                " FROM negociacao n join empresa_recicladora e on n.id_negociacao = e.id_empresa";
-
-        Connection conexao = conn.conectar();
-
-        // Executar PreparedStatement
-
-        try{
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-            ResultSet rst = pstm.executeQuery();
-
-            Negociacao negociacao = null;
-            while (rst.next()) {
-                negociacao = new Negociacao();
-
-                negociacao.setIdEmpresa(rst.getLong("id_empresa"));
-                negociacao.setIdEmpresa(rst.getLong("nome"));
-                negociacao.setIdEmpresa(rst.getLong("email_institucional"));
-                negociacao.setIdEmpresa(rst.getLong("telefone_whatsapp"));
-                negociacao.setIdMaterial(rst.getLong("id_material"));
-                negociacao.setQuantidadeKg(rst.getBigDecimal("quantidade_kg"));
-                negociacao.setValorTotalAtual(rst.getBigDecimal("valor_total_atual"));
-            }
-
-            negociacoes.add(negociacao);
-
-        } catch (SQLException e) {
-            e.getMessage();
-        } finally {
-            conn.desconectar(conexao);
-        }
-        return negociacoes;
+        return consultarNegociacoes(" WHERE id_empresa IS NOT NULL");
     }
 
-    // Lista as negociações com interação ainda não finalizadas.
+    // Lista negociações em andamento.
     public ArrayList<Negociacao> negociacaoEmAndamento() {
-
-        // Declaração
-
-        ArrayList<Negociacao> negociacoes = new ArrayList<>();
-
-        // Comando SQL
-
-        String sql = "SELECT id_empresa, id_material, quantidade_kg, status FROM negociacao";
-
-        Connection conexao = conn.conectar();
-
-        // Executar PreparedStatement
-
-        try{
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-            ResultSet rst = pstm.executeQuery();
-
-            Negociacao negociacao = null;
-            while(rst.next()){
-                negociacao = new Negociacao();
-
-                negociacao.setIdEmpresa(rst.getLong("id_empresa"));
-                negociacao.setIdMaterial(rst.getLong("id_material"));
-                negociacao.setQuantidadeKg(rst.getBigDecimal("quantidade_kg"));
-                negociacao.setStatus(rst.getString("status"));
-            }
-
-            negociacoes.add(negociacao);
-
-        } catch (SQLException e) {
-            e.getMessage();
-        } finally {
-            conn.desconectar(conexao);
-        }
-        return negociacoes;
+        return consultarNegociacoes(" WHERE status = 'EM_NEGOCIACAO'");
     }
 
-    // Consulta o histórico de uma negociação identificada.
+    // Lista negociações encerradas para consulta do histórico.
     public ArrayList<Negociacao> historicoNegociacao() {
-
-        // Declaração
-
-        ArrayList<Negociacao> negociacoes = new ArrayList<>();
-
-        // Comando SQL
-
-        String sql = "SELECT * FROM negociacao where id_negociacao = ? order by data_criacao";
-
-        Connection conexao = conn.conectar();
-
-        // Executar PreparedStatement
-
-        try {
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-            ResultSet rst = pstm.executeQuery();
-
-            Negociacao negociacao = null;
-            while(rst.next()){
-              negociacao = new Negociacao();
-
-              negociacao.setIdNegociacao(rst.getLong("id_negociacao"));
-            }
-        } catch (SQLException e) {
-            e.getMessage();
-        } finally {
-            conn.desconectar(conexao);
-        }
-        return negociacoes;
+        return consultarNegociacoes(" WHERE status IN ('ACEITA', 'RECUSADA', 'CANCELADA', 'CONCLUIDA')");
     }
 
-    // Lista as propostas aceitas pelas partes.
+    // Lista as propostas aceitas.
     public ArrayList<Negociacao> propostasAceitas() {
-
-        // Declaração
-
-        ArrayList<Negociacao> negociacoes = new ArrayList<>();
-
-        // Comando SQL
-
-        String sql = "SELECT id_empresa, id_material, quantidade_kg, valor_total_atual, data_conclusao FROM negociacao";
-
-        Connection conexao = conn.conectar();
-
-        // Executar PreparedStatement
-
-        try {
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-            ResultSet rst = pstm.executeQuery();
-
-            Negociacao negociacao = null;
-            while(rst.next()){
-                negociacao = new Negociacao();
-
-                negociacao.setIdEmpresa(rst.getLong("id_empresa"));
-                negociacao.setIdMaterial(rst.getLong("id_material"));
-                negociacao.setQuantidadeKg(rst.getBigDecimal("quantidade_kg"));
-                negociacao.setValorTotalAtual(rst.getBigDecimal("valor_total_atual"));
-                negociacao.setDataConclusao(rst.getTimestamp("data_conclusao").toLocalDateTime());
-            }
-        } catch (SQLException e) {
-            e.getMessage();
-        } finally {
-            conn.desconectar(conexao);
-        }
-        return negociacoes;
+        return consultarNegociacoes(" WHERE status = 'ACEITA'");
     }
 
-    // Lista as negociações finalizadas ou encerradas.
+    // Lista todas as negociações, inclusive as finalizadas.
     public ArrayList<Negociacao> historicoGeral() {
+        return consultarNegociacoes("");
+    }
 
-        // Declaração
-
-        ArrayList<Negociacao> negociacoes = new ArrayList<>();
-
-        // Comando SQL
-
-        String sql = "SELECT * FROM negociacao where id_negociacao = ? order by data_criacao";
-
+    // Executa uma consulta e monta uma Model para cada linha.
+    private ArrayList<Negociacao> consultarNegociacoes(String filtro) {
+        String sql = "SELECT id_negociacao, id_cooperativa, id_empresa, id_material, " +
+                "quantidade_kg, valor_kg_atual, valor_total_atual, status, data_criacao, " +
+                "data_conclusao FROM negociacao" + filtro;
         Connection conexao = conn.conectar();
-
-        // Executar PreparedStatement
-
-        try {
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-            ResultSet rst = pstm.executeQuery();
-
-            Negociacao negociacao = null;
-            while(rst.next()){
-                negociacao = new Negociacao();
-
-                negociacao.setIdNegociacao(rst.getLong("id_negociacao"));
+        ArrayList<Negociacao> negociacoes = new ArrayList<>();
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                Negociacao negociacao = new Negociacao();
+                negociacao.setIdNegociacao(rs.getLong("id_negociacao"));
+                negociacao.setIdCooperativa(rs.getLong("id_cooperativa"));
+                negociacao.setIdEmpresa(rs.getLong("id_empresa"));
+                negociacao.setIdMaterial(rs.getLong("id_material"));
+                negociacao.setQuantidadeKg(rs.getBigDecimal("quantidade_kg"));
+                negociacao.setValorKgAtual(rs.getBigDecimal("valor_kg_atual"));
+                negociacao.setValorTotalAtual(rs.getBigDecimal("valor_total_atual"));
+                negociacao.setStatus(StatusNegociacao.valueOf(rs.getString("status")));
+                Timestamp criacao = rs.getTimestamp("data_criacao");
+                Timestamp conclusao = rs.getTimestamp("data_conclusao");
+                negociacao.setDataCriacao(criacao == null ? null : criacao.toLocalDateTime());
+                negociacao.setDataConclusao(conclusao == null ? null : conclusao.toLocalDateTime());
+                negociacoes.add(negociacao);
             }
+            return negociacoes;
         } catch (SQLException e) {
-            e.getMessage();
+            throw new RuntimeException("Falha ao consultar negociações.", e);
         } finally {
             conn.desconectar(conexao);
         }
-        return negociacoes;
     }
-
-    /*Filtrar negociações – por status: todas, novas propostas, em negociação, aceitas, recusadas, concluídas.*/
 
     // === METODOS UPDATE ==============================================================================================
 
-    // Aceita uma proposta e registra a conclusão da negociação.
-    public int alterarCargoCooperado(Negociacao negociacao) {
-
-        // Declaração
-
-        Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "UPDATE negociacao\n" +
-                "SET status = ? WHERE id_negociacao = ?";
-
-        // Executar PreparedStatement
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setString(1, "aceita");
-            pstmt.setLong(2, negociacao.getIdNegociacao());
-
-            return pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
-        } finally {
-            conn.desconectar(conexao);
-        }
+    // Aceita a proposta identificada e registra sua conclusão.
+    public Negociacao aceitarProposta(Long idNegociacao, LocalDateTime dataConclusao) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setDataConclusao(dataConclusao);
+        return atualizarStatusFinal(negociacao, StatusNegociacao.ACEITA) == 0 ? null : negociacao;
     }
 
-    // Atualiza a condição de valor de uma negociação em andamento.
-    public int enviarContraProposta(Negociacao negociacao) {
-
-        // Declaração
-
+    // Atualiza o valor de uma negociação em andamento.
+    public Negociacao enviarContraProposta(Long idNegociacao, BigDecimal valorKgAtual) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setValorKgAtual(valorKgAtual);
+        if (negociacao.getIdNegociacao() == null || negociacao.getValorKgAtual() == null) {
+            throw new IllegalArgumentException("ID e valor por quilo são obrigatórios.");
+        }
+        String sql = "UPDATE negociacao SET valor_kg_atual = ? " +
+                "WHERE id_negociacao = ? AND status = 'EM_NEGOCIACAO'";
         Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "UPDATE negociacao\n" +
-                "SET valor_kg_atual = ? WHERE id_negociacao = ? AND status = 'em negociação'";
-
-        // Executar PreparedStatement
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setBigDecimal(1, negociacao.getValorKgAtual());
             pstmt.setLong(2, negociacao.getIdNegociacao());
-
-            return pstmt.executeUpdate();
-
+            return pstmt.executeUpdate() == 0 ? null : negociacao;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao atualizar contraproposta.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-    // Registra a decisão de aceitar ou recusar uma oferta.
-    public int DecisaoDeOferta(Negociacao negociacao) {
-
-        // Declaração
-
+    // Registra a decisão sobre uma oferta em negociação.
+    public Negociacao decisaoDeOferta(Long idNegociacao, StatusNegociacao status,
+                                     LocalDateTime dataConclusao) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setStatus(status);
+        negociacao.setDataConclusao(dataConclusao);
+        if (negociacao.getStatus() == null) {
+            throw new IllegalArgumentException("Status é obrigatório.");
+        }
+        if (negociacao.getStatus() == StatusNegociacao.ACEITA ||
+                negociacao.getStatus() == StatusNegociacao.RECUSADA ||
+                negociacao.getStatus() == StatusNegociacao.CANCELADA ||
+                negociacao.getStatus() == StatusNegociacao.CONCLUIDA) {
+            return atualizarStatusFinal(negociacao, negociacao.getStatus()) == 0 ? null : negociacao;
+        }
+        if (negociacao.getIdNegociacao() == null) {
+            throw new IllegalArgumentException("idNegociacao é obrigatório.");
+        }
+        String sql = "UPDATE negociacao SET status = ? WHERE id_negociacao = ? " +
+                "AND status = 'EM_NEGOCIACAO'";
         Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "UPDATE negociacao\n" +
-                "SET status = ? WHERE id_negociacao = ? AND status = 'em negociação'";
-
-        // Executar PreparedStatement
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setString(1, negociacao.getStatus());
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setString(1, negociacao.getStatus().name());
             pstmt.setLong(2, negociacao.getIdNegociacao());
-
-            return pstmt.executeUpdate();
-
+            return pstmt.executeUpdate() == 0 ? null : negociacao;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao registrar decisão da oferta.", e);
         } finally {
             conn.desconectar(conexao);
         }
@@ -386,66 +186,42 @@ public class NegociacaoDAO {
 
     // === METODOS DELETE ==============================================================================================
 
-    // Recusa uma proposta e conserva a negociação no histórico.
-    public int recusarProposta(Negociacao negociacao) {
+    // Recusa a proposta preservando seu histórico.
+    public Negociacao recusarProposta(Long idNegociacao, LocalDateTime dataConclusao) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setDataConclusao(dataConclusao);
+        return atualizarStatusFinal(negociacao, StatusNegociacao.RECUSADA) == 0 ? null : negociacao;
+    }
 
-        // Declaração
+    // Cancela a negociação preservando seu histórico.
+    public Negociacao cancelarNegociacao(Long idNegociacao, LocalDateTime dataConclusao) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setDataConclusao(dataConclusao);
+        return atualizarStatusFinal(negociacao, StatusNegociacao.CANCELADA) == 0 ? null : negociacao;
+    }
 
+    // Atualiza um status final e sua data obrigatória de conclusão.
+    private int atualizarStatusFinal(Negociacao negociacao, StatusNegociacao status) {
+        if (negociacao.getIdNegociacao() == null || negociacao.getDataConclusao() == null) {
+            throw new IllegalArgumentException("ID e data de conclusão são obrigatórios.");
+        }
+        String sql = "UPDATE negociacao SET status = ?, data_conclusao = ? WHERE id_negociacao = ?";
         Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "DELETE FROM negociacao\n" +
-                "WHERE id_negociacao = ?";
-
-        // Executar PreparedStatement
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setLong(1, negociacao.getIdNegociacao());
-
-            return pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setString(1, status.name());
+            pstmt.setTimestamp(2, Timestamp.valueOf(negociacao.getDataConclusao()));
+            pstmt.setLong(3, negociacao.getIdNegociacao());
+            int linhas = pstmt.executeUpdate();
+            if (linhas > 0) {
+                negociacao.setStatus(status);
+            }
+            return linhas;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao atualizar o status da negociação.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
-
-    // Cancela uma negociação e conserva seu registro no histórico.
-    public int CancelarNegociacao(Negociacao negociacao) {
-
-        // Declaração
-
-        Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "DELETE FROM negociacao\n" +
-                "WHERE id_negociacao = ?";
-
-        // Executar PreparedStatement
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setLong(1, negociacao.getIdNegociacao());
-
-            return pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
-        } finally {
-            conn.desconectar(conexao);
-        }
-    }
-
- }
+}

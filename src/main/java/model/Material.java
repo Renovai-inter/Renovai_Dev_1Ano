@@ -13,6 +13,7 @@ public class Material {
     private Long idMaterial; // PK
     private String nome; // NOT NULL - VARCHAR(100)
     private CategoriaMaterial categoria; // NOT NULL - VARCHAR(20) - CHECK
+    private String origem; // NOT NULL - VARCHAR(10)
 
     // GETTERS E SETTERS
 
