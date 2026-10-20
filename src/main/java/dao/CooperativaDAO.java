@@ -6,7 +6,7 @@ import model.enums.StatusCooperativa;
 import util.*;
 
 import java.sql.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class CooperativaDAO {
@@ -26,15 +26,36 @@ public class CooperativaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma cooperativa e seu gestor inicial.
-    public int[] cadastrarCooperativa(Cooperativa coop, Cooperado gestor, String senhaTemporariaGestor) {
+    public Cooperativa cadastrarCooperativa(String nome, String cnpj, String nomePublico,
+                                            String descricaoInstitucional, String logoUrl,
+                                            String emailInstitucional, String telefoneWhatsapp,
+                                            String cep, String endereco, String cidade, String estado,
+                                            String nomeGestor, String usuarioGestor,
+                                            String emailGestor, String senhaTemporariaGestor) {
+        Cooperativa coop = new Cooperativa();
+        coop.setNome(nome);
+        coop.setCnpj(cnpj);
+        coop.setNomePublico(nomePublico);
+        coop.setDescricaoInstitucional(descricaoInstitucional);
+        coop.setLogoUrl(logoUrl);
+        coop.setEmailInstitucional(emailInstitucional);
+        coop.setTelefoneWhatsapp(telefoneWhatsapp);
+        coop.setCep(cep);
+        coop.setEndereco(endereco);
+        coop.setCidade(cidade);
+        coop.setEstado(estado);
+        Cooperado gestor = new Cooperado();
+        gestor.setNomeCompleto(nomeGestor);
+        gestor.setNomeUsuario(usuarioGestor);
+        gestor.setEmail(emailGestor);
         Connection conexao = conn.conectar();
         String sql = "INSERT INTO cooperativa (id_cooperativa, nome, cnpj, nome_publico, " +
                 "descricao_institucional, logo_url, email_institucional, telefone_whatsapp, " +
                 "cep, endereco, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             conexao.setAutoCommit(false);
-            long idCooperativa = coop.getIdCooperativa() == null
-                    ? proximoId(conexao, "cooperativa", "id_cooperativa") : coop.getIdCooperativa();
+            long ultimoId = utilitario.selecionarUltimoId("cooperativa");
+            long idCooperativa = ultimoId == -1 ? 1 : ultimoId + 1;
             coop.setIdCooperativa(idCooperativa);
             int retornoCooperativa;
             try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
@@ -55,7 +76,8 @@ public class CooperativaDAO {
             int[] retornoGestor = cooperadoDAO.cadastrarGestor(conexao, coop, gestor,
                     senhaTemporariaGestor);
             conexao.commit();
-            return new int[]{retornoCooperativa, retornoGestor[0], retornoGestor[1]};
+            return retornoCooperativa == 0 || retornoGestor[0] == 0 || retornoGestor[1] == 0
+                    ? null : coop;
         } catch (SQLException e) {
             try {
                 conexao.rollback();
@@ -72,16 +94,6 @@ public class CooperativaDAO {
             throw e;
         } finally {
             conn.desconectar(conexao);
-        }
-    }
-
-    // Consulta o próximo ID da tabela informada na conexão do cadastro.
-    private long proximoId(Connection conexao, String tabela, String coluna) throws SQLException {
-        String sql = "SELECT COALESCE(MAX(" + coluna + "), 0) + 1 FROM " + tabela;
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
-            rs.next();
-            return rs.getLong(1);
         }
     }
 
@@ -161,27 +173,29 @@ public class CooperativaDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza um campo permitido da cooperativa identificada.
-    public int atualizarCooperativa(Cooperativa coop, String campo) {
+    public Cooperativa atualizarCooperativa(Long idCooperativa, String campo, String valorInformado) {
+        Cooperativa coop = new Cooperativa();
+        coop.setIdCooperativa(idCooperativa);
         if (coop.getIdCooperativa() == null) {
             throw new IllegalArgumentException("idCooperativa é obrigatório.");
         }
         String coluna = campo.strip().toLowerCase(java.util.Locale.ROOT);
         Object valor = switch (coluna) {
-            case "nome" -> coop.getNome();
-            case "cnpj" -> utilitario.filtrarCnpj(coop.getCnpj());
-            case "nome_publico" -> coop.getNomePublico();
-            case "descricao_institucional" -> coop.getDescricaoInstitucional();
-            case "logo_url" -> coop.getLogoUrl();
-            case "email_institucional" -> coop.getEmailInstitucional();
-            case "telefone_whatsapp" -> utilitario.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp());
-            case "cep" -> utilitario.filtrarCep(coop.getCep());
-            case "endereco" -> coop.getEndereco();
-            case "cidade" -> coop.getCidade();
-            case "estado" -> coop.getEstado();
-            case "data_fundacao" -> coop.getDataFundacao() == null ? null : Date.valueOf(coop.getDataFundacao());
-            case "canal_contato_preferencial" -> coop.getCanalContatoPreferencial();
-            case "link_whatsapp" -> coop.getLinkWhatsapp();
-            case "status" -> coop.getStatus() == null ? null : coop.getStatus().name();
+            case "nome" -> { coop.setNome(valorInformado); yield coop.getNome(); }
+            case "cnpj" -> { coop.setCnpj(valorInformado); yield utilitario.filtrarCnpj(coop.getCnpj()); }
+            case "nome_publico" -> { coop.setNomePublico(valorInformado); yield coop.getNomePublico(); }
+            case "descricao_institucional" -> { coop.setDescricaoInstitucional(valorInformado); yield coop.getDescricaoInstitucional(); }
+            case "logo_url" -> { coop.setLogoUrl(valorInformado); yield coop.getLogoUrl(); }
+            case "email_institucional" -> { coop.setEmailInstitucional(valorInformado); yield coop.getEmailInstitucional(); }
+            case "telefone_whatsapp" -> { coop.setTelefoneWhatsapp(valorInformado); yield utilitario.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp()); }
+            case "cep" -> { coop.setCep(valorInformado); yield utilitario.filtrarCep(coop.getCep()); }
+            case "endereco" -> { coop.setEndereco(valorInformado); yield coop.getEndereco(); }
+            case "cidade" -> { coop.setCidade(valorInformado); yield coop.getCidade(); }
+            case "estado" -> { coop.setEstado(valorInformado); yield coop.getEstado(); }
+            case "data_fundacao" -> { coop.setDataFundacao(valorInformado == null ? null : LocalDate.parse(valorInformado)); yield coop.getDataFundacao() == null ? null : Date.valueOf(coop.getDataFundacao()); }
+            case "canal_contato_preferencial" -> { coop.setCanalContatoPreferencial(valorInformado); yield coop.getCanalContatoPreferencial(); }
+            case "link_whatsapp" -> { coop.setLinkWhatsapp(valorInformado); yield coop.getLinkWhatsapp(); }
+            case "status" -> { coop.setStatus(valorInformado == null ? null : StatusCooperativa.valueOf(valorInformado)); yield coop.getStatus() == null ? null : coop.getStatus().name(); }
             default -> throw new IllegalArgumentException("Campo da cooperativa não permitido: " + campo);
         };
         String sql = "UPDATE cooperativa SET " + coluna + " = ? WHERE id_cooperativa = ?";
@@ -189,7 +203,7 @@ public class CooperativaDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setObject(1, valor);
             pstmt.setLong(2, coop.getIdCooperativa());
-            return pstmt.executeUpdate();
+            return pstmt.executeUpdate() == 0 ? null : coop;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar cooperativa.", e);
         } finally {
@@ -200,7 +214,9 @@ public class CooperativaDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui a cooperativa identificada pelo ID.
-    public int excluirCooperativa(Cooperativa coop) {
+    public Cooperativa excluirCooperativa(Long idCooperativa) {
+        Cooperativa coop = new Cooperativa();
+        coop.setIdCooperativa(idCooperativa);
         if (coop.getIdCooperativa() == null) {
             throw new IllegalArgumentException("idCooperativa é obrigatório.");
         }
@@ -208,7 +224,7 @@ public class CooperativaDAO {
         Connection conexao = conn.conectar();
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, coop.getIdCooperativa());
-            return pstmt.executeUpdate();
+            return pstmt.executeUpdate() == 0 ? null : coop;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir cooperativa.", e);
         } finally {

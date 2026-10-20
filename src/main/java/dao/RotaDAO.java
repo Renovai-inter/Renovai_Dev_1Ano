@@ -2,6 +2,7 @@ package dao;
 
 import model.Rota;
 import util.Conexao;
+import util.Utilitario;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,6 +15,7 @@ public class RotaDAO {
     // ATRIBUTOS
 
     private Conexao conn = new Conexao();
+    private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR
 
@@ -24,7 +26,13 @@ public class RotaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma rota vinculada à cooperativa.
-    public int cadastrarRota(Rota rota) {
+    public Rota cadastrarRota(Long idCooperativa, String nomeRota) {
+
+        Rota rota = new Rota();
+        rota.setIdCooperativa(idCooperativa);
+        rota.setNomeRota(nomeRota);
+        long ultimoIdRota = utilitario.selecionarUltimoId("rota");
+        long novoIdRota = ultimoIdRota == -1 ? 1 : ultimoIdRota + 1;
 
         // Declaração
 
@@ -40,14 +48,7 @@ public class RotaDAO {
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            long ultimoIdRota = getUltimoIdRota();
-
-            // Verifica se o ultimoId foi encontrado (-1) se não
-            if (ultimoIdRota == -1) {
-                pstmt.setLong(1,1);
-            } else {
-                pstmt.setLong(1, ultimoIdRota + 1);
-            }
+            pstmt.setLong(1, novoIdRota);
 
             Long IdCooperativa = rota.getIdCooperativa();
 
@@ -61,7 +62,12 @@ public class RotaDAO {
 
             pstmt.setString(3, rota.getNomeRota());
 
-            return pstmt.executeUpdate();
+            int linhas = pstmt.executeUpdate();
+            if (linhas == 0) {
+                return null;
+            }
+            rota.setIdRota(novoIdRota);
+            return rota;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar rota.", e);
         } finally {
@@ -111,7 +117,12 @@ public class RotaDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza os dados da rota identificada pelo ID.
-    public int atualizarRota(Rota rota) {
+    public Rota atualizarRota(Long idRota, Long idCooperativa, String nomeRota) {
+
+        Rota rota = new Rota();
+        rota.setIdRota(idRota);
+        rota.setIdCooperativa(idCooperativa);
+        rota.setNomeRota(nomeRota);
 
         // Declaração
 
@@ -130,7 +141,7 @@ public class RotaDAO {
             pstmt.setString(2,rota.getNomeRota());
             pstmt.setLong(3,rota.getIdRota());
 
-            return pstmt.executeUpdate();
+            return pstmt.executeUpdate() == 0 ? null : rota;
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar rota.", e);
@@ -143,7 +154,10 @@ public class RotaDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui a rota identificada pelo ID.
-    public int excluirRota(Rota rota) {
+    public Rota excluirRota(Long idRota) {
+
+        Rota rota = new Rota();
+        rota.setIdRota(idRota);
 
         // Declaração
 
@@ -159,7 +173,7 @@ public class RotaDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1,rota.getIdRota());
 
-            return pstmt.executeUpdate();
+            return pstmt.executeUpdate() == 0 ? null : rota;
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir rota.", e);
@@ -169,36 +183,4 @@ public class RotaDAO {
         }
     }
 
-    // Consulta o último ID cadastrado na tabela de rotas.
-        public long getUltimoIdRota () {
-
-        // Declaração
-
-            Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-            String sql =
-                    "SELECT id_rota " +
-                            "FROM rota " +
-                            "ORDER BY rota.id_rota DESC LIMIT 1";
-
-        // Executar PreparedStatement
-
-            try (PreparedStatement pstmt = conexao.prepareStatement(sql);
-                 ResultSet rs = pstmt.executeQuery()) {
-                if  (rs.next()){
-                    return rs.getLong("id_rota");
-                }
-                else {
-                    return -1;
-                }
-
-            } catch (SQLException e) {
-                throw new RuntimeException("Falha ao consultar o último ID de rota.", e);
-
-            } finally {
-                conn.desconectar(conexao);
-            }
-        }
     }

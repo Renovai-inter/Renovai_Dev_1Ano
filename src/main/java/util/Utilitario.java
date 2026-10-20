@@ -129,7 +129,7 @@ public class Utilitario {
         }
     }
 
-    // Filtro de informações numericas definidas como DECIMAL(X, Y)
+    // Filtro de informações numericas definidas como NUMERIC(X, Y)
     public BigDecimal validarNumeroDecimal(String numero, long valor, int decimal) {
         if (numero == null) {
             throw new IllegalArgumentException("número é obrigatório");
@@ -138,7 +138,7 @@ public class Utilitario {
             throw new IllegalArgumentException("valores devem ser positivos.");
         }
         numero = numero.strip().replace(",", ".");
-        if (numero.matches("^-?[0-9]{1," + valor + "}\\.[0-9]{1," + decimal + "}$")) {
+        if (numero.matches("^-?[0-9]{1," + valor + "}(\\.[0-9]{1," + decimal + "})?$")) {
             return new BigDecimal(numero);
         }
         throw new IllegalArgumentException("formato de numero invalido.");

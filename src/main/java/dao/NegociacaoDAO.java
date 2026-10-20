@@ -3,16 +3,20 @@ package dao;
 import model.Negociacao;
 import model.enums.StatusNegociacao;
 import util.Conexao;
+import util.Utilitario;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class NegociacaoDAO {
     private final Conexao conn = new Conexao();
+    private final Utilitario utilitario = new Utilitario();
 
     // Inicializa o acesso aos dados de negociação.
     public NegociacaoDAO() {
@@ -21,27 +25,27 @@ public class NegociacaoDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Registra uma proposta da cooperativa para a negociação informada.
-    public int fazerContraproposta(Negociacao negociacao) {
-        if (negociacao.getIdNegociacao() == null || negociacao.getValorKgAtual() == null) {
+    public Negociacao fazerContraproposta(Long idNegociacao, BigDecimal valorKgAtual,
+                                         BigDecimal quantidadeKg) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setValorKgAtual(valorKgAtual);
+        negociacao.setQuantidadeKg(quantidadeKg);
+        if (negociacao.getIdNegociacao() == null) {
             throw new IllegalArgumentException("ID da negociação e valor por quilo são obrigatórios.");
         }
-        String sqlId = "SELECT COALESCE(MAX(id_proposta), 0) + 1 FROM proposta";
+        long ultimoId = utilitario.selecionarUltimoId("proposta");
+        long idProposta = ultimoId == -1 ? 1 : ultimoId + 1;
         String sql = "INSERT INTO proposta (id_proposta, id_negociacao, autor, valor_kg, " +
                 "quantidade_kg) VALUES (?, ?, 'COOPERATIVA', ?, ?)";
         Connection conexao = conn.conectar();
         try {
-            long idProposta;
-            try (PreparedStatement pstmt = conexao.prepareStatement(sqlId);
-                 ResultSet rs = pstmt.executeQuery()) {
-                rs.next();
-                idProposta = rs.getLong(1);
-            }
             try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
                 pstmt.setLong(1, idProposta);
                 pstmt.setLong(2, negociacao.getIdNegociacao());
                 pstmt.setBigDecimal(3, negociacao.getValorKgAtual());
                 pstmt.setBigDecimal(4, negociacao.getQuantidadeKg());
-                return pstmt.executeUpdate();
+                return pstmt.executeUpdate() == 0 ? null : negociacao;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar contraproposta da cooperativa.", e);
@@ -118,12 +122,18 @@ public class NegociacaoDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Aceita a proposta identificada e registra sua conclusão.
-    public int alterarCargoCooperado(Negociacao negociacao) {
-        return atualizarStatusFinal(negociacao, StatusNegociacao.ACEITA);
+    public Negociacao aceitarProposta(Long idNegociacao, LocalDateTime dataConclusao) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setDataConclusao(dataConclusao);
+        return atualizarStatusFinal(negociacao, StatusNegociacao.ACEITA) == 0 ? null : negociacao;
     }
 
     // Atualiza o valor de uma negociação em andamento.
-    public int enviarContraProposta(Negociacao negociacao) {
+    public Negociacao enviarContraProposta(Long idNegociacao, BigDecimal valorKgAtual) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setValorKgAtual(valorKgAtual);
         if (negociacao.getIdNegociacao() == null || negociacao.getValorKgAtual() == null) {
             throw new IllegalArgumentException("ID e valor por quilo são obrigatórios.");
         }
@@ -133,7 +143,7 @@ public class NegociacaoDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setBigDecimal(1, negociacao.getValorKgAtual());
             pstmt.setLong(2, negociacao.getIdNegociacao());
-            return pstmt.executeUpdate();
+            return pstmt.executeUpdate() == 0 ? null : negociacao;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar contraproposta.", e);
         } finally {
@@ -142,7 +152,12 @@ public class NegociacaoDAO {
     }
 
     // Registra a decisão sobre uma oferta em negociação.
-    public int DecisaoDeOferta(Negociacao negociacao) {
+    public Negociacao decisaoDeOferta(Long idNegociacao, StatusNegociacao status,
+                                     LocalDateTime dataConclusao) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setStatus(status);
+        negociacao.setDataConclusao(dataConclusao);
         if (negociacao.getStatus() == null) {
             throw new IllegalArgumentException("Status é obrigatório.");
         }
@@ -150,7 +165,7 @@ public class NegociacaoDAO {
                 negociacao.getStatus() == StatusNegociacao.RECUSADA ||
                 negociacao.getStatus() == StatusNegociacao.CANCELADA ||
                 negociacao.getStatus() == StatusNegociacao.CONCLUIDA) {
-            return atualizarStatusFinal(negociacao, negociacao.getStatus());
+            return atualizarStatusFinal(negociacao, negociacao.getStatus()) == 0 ? null : negociacao;
         }
         if (negociacao.getIdNegociacao() == null) {
             throw new IllegalArgumentException("idNegociacao é obrigatório.");
@@ -161,7 +176,7 @@ public class NegociacaoDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, negociacao.getStatus().name());
             pstmt.setLong(2, negociacao.getIdNegociacao());
-            return pstmt.executeUpdate();
+            return pstmt.executeUpdate() == 0 ? null : negociacao;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar decisão da oferta.", e);
         } finally {
@@ -172,13 +187,19 @@ public class NegociacaoDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Recusa a proposta preservando seu histórico.
-    public int recusarProposta(Negociacao negociacao) {
-        return atualizarStatusFinal(negociacao, StatusNegociacao.RECUSADA);
+    public Negociacao recusarProposta(Long idNegociacao, LocalDateTime dataConclusao) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setDataConclusao(dataConclusao);
+        return atualizarStatusFinal(negociacao, StatusNegociacao.RECUSADA) == 0 ? null : negociacao;
     }
 
     // Cancela a negociação preservando seu histórico.
-    public int CancelarNegociacao(Negociacao negociacao) {
-        return atualizarStatusFinal(negociacao, StatusNegociacao.CANCELADA);
+    public Negociacao cancelarNegociacao(Long idNegociacao, LocalDateTime dataConclusao) {
+        Negociacao negociacao = new Negociacao();
+        negociacao.setIdNegociacao(idNegociacao);
+        negociacao.setDataConclusao(dataConclusao);
+        return atualizarStatusFinal(negociacao, StatusNegociacao.CANCELADA) == 0 ? null : negociacao;
     }
 
     // Atualiza um status final e sua data obrigatória de conclusão.
