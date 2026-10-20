@@ -38,10 +38,7 @@ public class MaterialDAO {
 
         // Executar PreparedStatement
 
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             long ultimoId = getUltimoIdMaterial();
 
             if (ultimoId == -1) {
@@ -57,8 +54,7 @@ public class MaterialDAO {
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            return 0;
+            throw new RuntimeException("Falha ao cadastrar material.", e);
         } finally {
             conn.desconectar(conexao);
         }
@@ -83,12 +79,8 @@ public class MaterialDAO {
 
         // Executar PreparedStatement
 
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()){
                 Material material = new Material();
                 Long idMaterial = rs.getLong("id_material");
@@ -101,7 +93,7 @@ public class MaterialDAO {
             }
             return materiais;
         }catch (SQLException e) {
-            return new ArrayList<>();
+            throw new RuntimeException("Falha ao listar materiais.", e);
         } finally {
             conn.desconectar(conexao);
         }
@@ -124,10 +116,7 @@ public class MaterialDAO {
 
         // Executar PreparedStatement
 
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1,material.getNome());
             pstmt.setString(2,material.getCategoria());
             pstmt.setLong(3,material.getIdMaterial());
@@ -135,8 +124,7 @@ public class MaterialDAO {
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-
-            return -1;
+            throw new RuntimeException("Falha ao atualizar material.", e);
 
         } finally {
             conn.desconectar(conexao);
@@ -159,17 +147,13 @@ public class MaterialDAO {
 
         // Executar PreparedStatement
 
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1,material.getIdMaterial());
 
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-
-            return -1;
+            throw new RuntimeException("Falha ao excluir material.", e);
 
         } finally {
             conn.desconectar(conexao);
@@ -191,11 +175,8 @@ public class MaterialDAO {
 
         // Executar PreparedStatement
 
-        try {
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             if (rs.next()){
                 return rs.getLong("id_material");
             }
@@ -204,7 +185,7 @@ public class MaterialDAO {
             }
         }
         catch (SQLException e) {
-            return -1;
+            throw new RuntimeException("Falha ao consultar o último ID de material.", e);
         } finally { conn.desconectar(conexao); } }
 
 }

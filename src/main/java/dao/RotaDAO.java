@@ -39,10 +39,7 @@ public class RotaDAO {
 
         // Executar PreparedStatement
 
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             long ultimoIdRota = getUltimoIdRota();
 
             // Verifica se o ultimoId foi encontrado (-1) se não
@@ -59,14 +56,14 @@ public class RotaDAO {
             if (IdCooperativa != null && IdCooperativa>0){
                 pstmt.setLong(2, IdCooperativa);
             }else {
-                return 0;
+                throw new IllegalArgumentException("idCooperativa deve ser positivo.");
             }
 
             pstmt.setString(3, rota.getNomeRota());
 
             return pstmt.executeUpdate();
         } catch (SQLException e) {
-            return 0;
+            throw new RuntimeException("Falha ao cadastrar rota.", e);
         } finally {
             conn.desconectar(conexao);
         }
@@ -91,12 +88,8 @@ public class RotaDAO {
 
         // Executar PreparedStatement
 
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()){
                 Rota rota = new Rota();
                 Long idRota = rs.getLong("id_rota");
@@ -109,7 +102,7 @@ public class RotaDAO {
             }
             return rotas;
         }catch (SQLException e) {
-            return new ArrayList<>();
+            throw new RuntimeException("Falha ao listar rotas.", e);
         } finally {
             conn.desconectar(conexao);
         }
@@ -132,10 +125,7 @@ public class RotaDAO {
 
         // Executar PreparedStatement
 
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1,rota.getIdCooperativa());
             pstmt.setString(2,rota.getNomeRota());
             pstmt.setLong(3,rota.getIdRota());
@@ -143,8 +133,7 @@ public class RotaDAO {
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-
-            return -1;
+            throw new RuntimeException("Falha ao atualizar rota.", e);
 
         } finally {
             conn.desconectar(conexao);
@@ -167,17 +156,13 @@ public class RotaDAO {
 
         // Executar PreparedStatement
 
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1,rota.getIdRota());
 
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-
-            return -1;
+            throw new RuntimeException("Falha ao excluir rota.", e);
 
         } finally {
             conn.desconectar(conexao);
@@ -200,12 +185,8 @@ public class RotaDAO {
 
         // Executar PreparedStatement
 
-            try {
-
-                PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-                ResultSet rs = pstmt.executeQuery();
-
+            try (PreparedStatement pstmt = conexao.prepareStatement(sql);
+                 ResultSet rs = pstmt.executeQuery()) {
                 if  (rs.next()){
                     return rs.getLong("id_rota");
                 }
@@ -214,8 +195,7 @@ public class RotaDAO {
                 }
 
             } catch (SQLException e) {
-
-                return -1;
+                throw new RuntimeException("Falha ao consultar o último ID de rota.", e);
 
             } finally {
                 conn.desconectar(conexao);
