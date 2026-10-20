@@ -3,6 +3,10 @@ package controller;
 
 import dao.ColetaDAO;
 import model.Coleta;
+import dao.MaterialDAO;
+import model.Material;
+import java.util.Objects;
+import java.util.function.Supplier;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -19,6 +23,7 @@ import java.util.Map;
 public class ColetaServlet extends HttpServlet {
 
     private final ColetaDAO coletaDAO = new ColetaDAO();
+    private final MaterialDAO materialDAO = new MaterialDAO();
 
     @Override
     protected void doGet(HttpServletRequest request,
@@ -38,25 +43,92 @@ public class ColetaServlet extends HttpServlet {
                     return;
                 }
 
+                Map<Long, BigDecimal> materiais =
+                        coletaDAO.listarMateriaisDaColeta(id);
+
+                BigDecimal soma = materiais.values().stream()
+                        .filter(Objects::nonNull)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+                BigDecimal informado = coleta.getPesoTotalKg() != null
+                        ? coleta.getPesoTotalKg() : BigDecimal.ZERO;
+
+                Map<Long, String> cooperativas =
+                        opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas");
+                Map<Long, String> cooperados =
+                        opcoesOuVazio(coletaDAO::listarCooperados, "cooperados");
+                Map<Long, String> rotas =
+                        opcoesOuVazio(coletaDAO::listarRotas, "rotas");
+
                 request.setAttribute("coleta", coleta);
-                request.setAttribute("materiais",
-                        coletaDAO.listarMateriaisDaColeta(id));
+                request.setAttribute("materiais", materiais);
+                request.setAttribute("nomesMateriais", nomesDosMateriais());
+                request.setAttribute("somaMateriais", soma);
+                request.setAttribute("pesoConfere", informado.compareTo(soma) == 0);
+                request.setAttribute("nomeCooperativa",
+                        nomeDe(cooperativas, coleta.getIdCooperativa(), "Cooperativa"));
+                request.setAttribute("nomeRota",
+                        nomeDe(rotas, coleta.getIdRota(), "Rota"));
+                request.setAttribute("nomeCooperado",
+                        nomeDe(cooperados, coleta.getIdCooperadoResponsavel(), "Cooperado"));
 
                 request.getRequestDispatcher("/detalhes-coleta.jsp")
                         .forward(request, response);
 
+            } else if ("nova".equals(acao)) {
+                request.setAttribute("cooperativas",
+                        opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas"));
+                request.setAttribute("cooperados",
+                        opcoesOuVazio(coletaDAO::listarCooperados, "cooperados"));
+                request.setAttribute("rotas",
+                        opcoesOuVazio(coletaDAO::listarRotas, "rotas"));
+                request.setAttribute("materiaisCatalogo",
+                        materialDAO.listarMateriais());
+
+                request.getRequestDispatcher("/nova-coleta.jsp")
+                        .forward(request, response);
+
             } else {
                 request.setAttribute("coletas", coletaDAO.listarColetas());
+                request.setAttribute("cooperativas",
+                        opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas"));
+                request.setAttribute("cooperados",
+                        opcoesOuVazio(coletaDAO::listarCooperados, "cooperados"));
+
                 request.getRequestDispatcher("/coletas.jsp")
                         .forward(request, response);
             }
 
         } catch (IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "ID inválido.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido.");
         } catch (RuntimeException e) {
             throw new ServletException("Erro ao consultar coletas.", e);
         }
+    }
+
+    // Se a consulta falhar, devolve mapa vazio e a tela usa campos de ID no lugar dos selects
+    private Map<Long, String> opcoesOuVazio(Supplier<Map<Long, String>> fonte,
+                                            String descricao) {
+        try {
+            return fonte.get();
+        } catch (RuntimeException e) {
+            getServletContext().log("Não foi possível carregar " + descricao, e);
+            return new LinkedHashMap<>();
+        }
+    }
+
+    private Map<Long, String> nomesDosMateriais() {
+        Map<Long, String> nomes = new LinkedHashMap<>();
+        for (Material m : materialDAO.listarMateriais()) {
+            nomes.put(m.getIdMaterial(), m.getNome());
+        }
+        return nomes;
+    }
+
+    private String nomeDe(Map<Long, String> mapa, Long id, String rotulo) {
+        if (id == null) return null;
+        String nome = mapa.get(id);
+        return nome != null ? nome : rotulo + " #" + id;
     }
 
     @Override

@@ -48,7 +48,6 @@ public class MaterialDAO {
             return pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
             return 0;
         } finally {
             conn.desconectar(conexao);
@@ -85,6 +84,7 @@ public class MaterialDAO {
             }
             return materiais;
         }catch (SQLException e) {
+            e.printStackTrace();
             return new ArrayList<>();
         } finally {
             conn.desconectar(conexao);

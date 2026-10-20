@@ -307,4 +307,34 @@ public class ColetaDAO {
         long valor = rs.getLong(coluna);
         return rs.wasNull() ? null : valor;
     }
+
+    public Map<Long, String> listarCooperativas() {
+        return listarOpcoes("SELECT id_cooperativa, nome FROM cooperativa ORDER BY nome");
+    }
+
+    public Map<Long, String> listarCooperados() {
+        return listarOpcoes("SELECT id_cooperado, nome FROM cooperado ORDER BY nome");
+    }
+
+    public Map<Long, String> listarRotas() {
+        return listarOpcoes("SELECT id_rota, nome FROM rota ORDER BY nome");
+    }
+
+    private Map<Long, String> listarOpcoes(String sql) {
+        Map<Long, String> opcoes = new LinkedHashMap<>();
+
+        try (Connection conn = Conexao.conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                opcoes.put(rs.getLong(1), rs.getString(2));
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao listar opções.", e);
+        }
+
+        return opcoes;
+    }
 }
