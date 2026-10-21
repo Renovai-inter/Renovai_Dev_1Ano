@@ -126,6 +126,7 @@ button {
     font-family: 'Poppins', sans-serif;
     font-weight: bold;
     margin-left: 15px;
+    text-decoration: none;
 }
 
 
@@ -319,6 +320,59 @@ button {
   z-index: 1;
 }
 
+
+.beneficios-conteudo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 6%;
+}
+
+.icone-trilha {
+  position: relative;
+  width: 240px;
+  height: 500px;
+  flex-shrink: 0;
+}
+
+.wheel-svg {
+  position: absolute;
+  top: 0;
+  left: -240px;
+  width: 480px;
+  height: 500px;
+  overflow: visible;
+}
+
+
+.leque-fundo path {
+  fill: #DCEACB;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.icone-segmento {
+  fill: #DCEACB;
+  stroke: #F8F6F2;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill 0.18s ease;
+}
+
+.icone-segmento.active {
+  fill: #882B4E;
+}
+
+.icone-segmento:hover:not(.active) {
+  fill: #C9DFB2;
+}
+
+
 .beneficios-conteudo {
   position: relative;
   z-index: 2;
@@ -326,98 +380,278 @@ button {
   gap: 48px;
   align-items: flex-start;
   max-width: 1100px;
-  margin: 0 auto 0;
+  margin: 0 auto;
   padding: 0 6%;
 }
 
+
+.beneficios-conteudo {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    gap: 48px;
+    align-items: flex-start;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 6%;
+}
+
 .icone-trilha {
-  position: relative;
-  width: 320px;
-  height: 320px;
-  flex-shrink: 0;
+    position: relative;
+    width: 240px;
+    height: 500px;
+    flex: 0 0 240px;
+    overflow: visible;
+
+    /* Move toda a roda para a esquerda */
+    transform: translateX(-180px);
 }
 
 .wheel-svg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+    position: absolute;
+    top: 0;
+    left: -240px;
+    display: block;
+    width: 480px;
+    height: 500px;
+    max-width: none;
+    overflow: visible;
 }
 
-.icone-segmento {
-  fill: #EAE3DA;
-  cursor: pointer;
-  transition: fill 0.18s ease;
-}
-
-.icone-segmento.active { fill: #882B4E; }
-.icone-segmento:hover:not(.active) { fill: #5E986B; }
 
 .icone-conteudo {
   position: absolute;
   transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   pointer-events: none;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  z-index: 2;
 }
 
-.icone-conteudo img { width: 28px; height: 28px; }
-.icone-conteudo.active img { filter: brightness(0) invert(1); }
+
+
+/* Pétalas decorativas: suaves e discretas */
+.leque-fundo path {
+    fill: #DCEACB;
+    opacity: 0.52;
+    stroke: #F8F6F2;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    pointer-events: none;
+}
+
+/* Pétalas interativas */
+.icone-segmento {
+    fill: #DCEACB;
+    stroke: #F8F6F2;
+    stroke-width: 5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    cursor: pointer;
+    transition:
+        fill 240ms ease,
+        filter 240ms ease,
+        stroke 240ms ease;
+}
+
+/* Pétala selecionada */
+.icone-segmento.active {
+    fill: #882B4E;
+    stroke: #F8F6F2;
+    stroke-width: 4;
+    filter: drop-shadow(0 5px 5px rgb(92 38 60 / 18%));
+}
+
+/* Realce delicado ao passar o mouse */
+.icone-segmento:hover:not(.active) {
+    fill: #C9DFB2;
+    filter: drop-shadow(0 3px 4px rgb(69 103 73 / 12%));
+}
+
+/* Área dos ícones */
+.icone-conteudo {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 2;
+    background: transparent;
+    transition: background-color 240ms ease;
+}
+
+/* Ícones consistentes */
+.icone-conteudo img {
+    display: block;
+    width: 34px;
+    height: 34px;
+    object-fit: contain;
+    transition:
+        width 240ms ease,
+        height 240ms ease,
+        filter 240ms ease;
+}
+
+/* Ícone branco na pétala selecionada */
+.icone-conteudo.active {
+    background: transparent;
+}
+
+.icone-conteudo.active img {
+    width: 34px;
+    height: 34px;
+    filter: brightness(0) invert(1);
+}
+
+/* Acessibilidade: respeita quem prefere menos animações */
+@media (prefers-reduced-motion: reduce) {
+    .icone-segmento,
+    .icone-conteudo,
+    .icone-conteudo img {
+        transition: none;
+    }
+}
+
+
+
+
+
+/* Card de benefícios */
+.card-beneficio {
+    position: relative;
+    z-index: 3;
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 540px;
+    margin: 38px 0 0;
+    padding: 32px 34px;
+
+    background: #FFFFFF;
+    border: 1px solid #E5EBDD;
+    border-radius: 24px;
+    box-shadow: 0 12px 32px rgb(54 78 51 / 9%);
+
+    color: #344B36;
+    box-sizing: border-box;
+}
+
+/* Cabeçalho */
+.card-beneficio-topo {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 26px;
+}
+
+/* Ícone do cabeçalho */
 .card-beneficio-icone {
-  width: 64px;
-  height: 64px;
-  border-radius: 54px;
-  background-color: #F6EDEE;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+
+    background: #F0F5E9;
+    border-radius: 18px;
 }
 
+.card-beneficio-icone img {
+    display: block;
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+}
+
+/* Título */
 .card-beneficio-topo h3 {
-  font-size: 24px;
-  font-weight: 700;
-  color: #882B4E;
+    margin: 0 0 7px;
+    color: #456749;
+    font-size: 27px;
+    font-weight: 700;
+    line-height: 1.2;
 }
 
+/* Subtítulo */
 .card-beneficio-topo p {
-  font-size: 15px;
-  font-weight: 500;
-  color: #456749;
-  margin-top: 2px;
+    margin: 0;
+    color: #6D776A;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+/* Lista de benefícios */
+.card-beneficio-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 0;
+    padding: 22px 0 0;
+    border-top: 1px solid #E8EDE3;
+    list-style: none;
 }
 
 .card-beneficio-lista li {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 0;
-  border-bottom: 1px solid #EAE3DA;
-  font-weight: 600;
-  font-size: 16px;
-  color: #2E2E2E;
-  list-style: none;
-}
-
-.card-beneficio-lista li:last-child {
-  border-bottom: none;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #4C584A;
+    font-size: 15px;
+    line-height: 1.6;
 }
 
 .card-beneficio-lista li span {
-  width: 24px;
-  height: 24px;
-  border-radius: 8px;
-  background-color: #E8F0DF;
-  color: #375C2B;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 22px;
+    width: 22px;
+    height: 22px;
+    margin-top: 1px;
+
+    background: #EAF2E2;
+    border-radius: 50%;
+    color: #456749;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+/* Telas menores */
+@media (max-width: 768px) {
+    .card-beneficio {
+        width: 100%;
+        max-width: 100%;
+        margin-top: 20px;
+        padding: 24px;
+        border-radius: 20px;
+    }
+
+    .card-beneficio-topo {
+        gap: 14px;
+        margin-bottom: 22px;
+    }
+
+    .card-beneficio-icone {
+        flex-basis: 54px;
+        width: 54px;
+        height: 54px;
+    }
+
+    .card-beneficio-topo h3 {
+        font-size: 23px;
+    }
+
+    .card-beneficio-topo p,
+    .card-beneficio-lista li {
+        font-size: 14px;
+    }
 }
 
 .bloco_coop {
@@ -1123,6 +1357,7 @@ button {
   padding: 100px 6% 60px;
   overflow: hidden;
   background-color: #EBF0E1;
+  top: 0;
 }
 
 .solucoes-fundo-logo {
@@ -1625,4 +1860,1203 @@ button {
   color: #582136;
   opacity: 0.85;
   line-height: 1.6;
+}
+
+.pesquisa-hero {
+  text-align: center;
+  padding: 60px 6% 40px;
+  position: relative;
+}
+
+.pesquisa-titulo {
+  font-size: 40px;
+  font-weight: 800;
+  color: #375C2B;
+  line-height: 1.25;
+  margin-bottom: 50px;
+}
+
+.pesquisa-mascote {
+  z-index: 2;
+  position: fixed;
+  bottom: 20px;
+  right: 10%;
+  width: 90px;
+  height: 90px;
+  background-color: #F6EDEE;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.pesquisa-mascote img {
+  width: 82px;
+}
+
+.porque-importa {
+  padding: 60px 6%;
+}
+
+.importa-badge {
+  display: inline-block;
+  background-color: #E3E8D9;
+  color: #375C2B;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 6px 18px;
+  border-radius: 30px;
+  margin-bottom: 16px;
+}
+
+.importa-titulo {
+  font-size: 32px;
+  font-weight: 800;
+  color: #375C2B;
+  margin-bottom: 8px;
+}
+
+.importa-subtitulo {
+  font-size: 16px;
+  color: #2E2E2E;
+  margin-bottom: 36px;
+}
+
+.importa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  grid-template-rows: auto auto;
+  gap: 24px;
+  max-width: 1100px;
+}
+
+.importa-card {
+  background-color: #E3EEDD;
+  border-radius: 24px;
+  padding: 28px;
+}
+
+.importa-stat1 {
+  grid-column: 1;
+  grid-row: 1;
+}
+.importa-blank1 {
+  grid-column: 1;
+  grid-row: 2;
+  min-height: 100px;
+}
+.importa-blank2 {
+  grid-column: 2;
+  grid-row: 1;
+  min-height: 100px;
+}
+.importa-stat2 {
+  grid-column: 2;
+  grid-row: 2;
+}
+.importa-texto {
+  grid-column: 3;
+  grid-row: 1 / 3;
+}
+
+.importa-numero {
+  font-size: 46px;
+  font-weight: 900;
+  color: #375C2B;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.importa-numero span {
+  font-size: 15px;
+  font-weight: 700;
+  color: #375C2B;
+}
+
+.importa-texto h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #375C2B;
+  margin-bottom: 16px;
+}
+
+.importa-texto p {
+  font-size: 16px;
+  padding-left: 16px;
+  border-left: 3px solid #A9CB92;
+}
+
+@media (max-width: 900px) {
+  .importa-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .importa-stat1,
+  .importa-blank1,
+  .importa-stat2,
+  .importa-blank2,
+  .importa-texto {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+.caminho {
+  padding: 40px 6% 60px;
+}
+
+.caminho-badge {
+  display: inline-block;
+  color: #375C2B;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.caminho-titulo {
+  font-size: 30px;
+  font-weight: 800;
+  color: #375C2B;
+  line-height: 1.3;
+  margin-bottom: 40px;
+}
+
+.caminho-passos {
+  display: flex;
+  gap: 48px;
+  flex-wrap: wrap;
+}
+
+.caminho-passo {
+  flex: 1;
+  min-width: 630px;
+}
+
+.caminho-numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.caminho-numero-verde {
+  background-color: #519058;
+}
+
+.caminho-numero-rosa {
+  background-color: #B53566;
+}
+
+.caminho-passo-verde {
+  font-size: 22px;
+  font-weight: 700;
+  color: #456749;
+  margin-bottom: 20px;
+  background-color: #E6EAD7;
+  border-radius: 50px;
+  width: 30%;
+}
+
+.caminho-passo-rosa {
+  font-size: 22px;
+  color: #882B4E;
+  background-color: #F8DBDF;
+  border-radius: 50px;
+  width: 30%;
+}
+
+.caminho-conteudo {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.caminho-ilustracao {
+  flex-shrink: 0;
+  width: 500px;
+  height: 460px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.caminho-ilustracao-verde {
+  width: 600px;
+  height: 460px;
+}
+
+.caminho-conteudo p {
+  font-size: 15px;
+  color: #000000;
+  line-height: 1.6;
+}
+
+.caminho-passo-3 {
+  margin-top: 60px;
+  position: relative;
+}
+
+.caminho-passo-3-topo {
+  margin-left: 50px;
+  margin-bottom: 36px;
+  max-width: 700px;
+}
+
+.caminho-passo-3-topo h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2E2E2E;
+  margin-bottom: 10px;
+}
+
+.caminho-passo-3-topo p {
+  font-size: 15px;
+  color: #2E2E2E;
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+.caminho-passo-3-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px 1fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.caminho-feature {
+  background-color: #FAF9F6;
+  border-radius: 20px;
+  padding: 24px;
+}
+
+.caminho-feature-icone {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.caminho-feature h4 {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2E2E2E;
+  margin-bottom: 8px;
+}
+
+.caminho-feature-verde h4 {
+  background-color: #E0E3CE;
+  border-radius: 8px;
+  width: 280px;
+  height: 25px;
+  color: #456749;
+}
+
+.caminho-feature-rosa h4 {
+  background-color: #f5b7ce;
+  border-radius: 8px;
+  width: 280px;
+  height: 25px;
+  color:#882B4E;
+}
+
+.caminho-feature p {
+  font-size: 13px;
+  color: #2E2E2E;
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+.caminho-passo-3-celular {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  display: flex;
+  justify-content: center;
+}
+
+.caminho-passo-3-celular img {
+  width: 220px;
+}
+
+@media (max-width: 900px) {
+  .caminho-passo-3-grid { grid-template-columns: 1fr; }
+  .caminho-passo-3-celular { grid-row: auto; grid-column: 1; order: -1; }
+}
+
+.ods12 {
+  position: relative;
+  padding: 60px 6%;
+}
+
+.simbolo-ods {
+  z-index: 0;
+  position: absolute;
+  left: 160px;
+  top: 0;
+  width: 80%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ods12-badge {
+  display: inline-block;
+  color: #375C2B;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 10px;
+  z-index: 2;
+}
+
+.ods12-titulo {
+  font-size: 30px;
+  font-weight: 800;
+  color: #375C2B;
+  line-height: 1.3;
+  margin-bottom: 40px;
+}
+
+.ods12-icone {
+  width: 48px;
+  height: 48px;
+}
+
+.ods12-grid {
+  display: flex;
+  gap: 60px;
+  margin-bottom: 36px;
+  flex-wrap: wrap;
+}
+
+.ods12-coluna {
+  flex: 1;
+  min-width: 260px;
+  background-color: #EBF0E1;
+  border-radius: 24px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10);
+}
+
+.ods12-coluna h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #456749;
+  margin-bottom: 10px;
+}
+
+.ods12-coluna p {
+  font-size: 15px;
+  color: #283A2A;
+  line-height: 1.6;
+  border-left: 2px solid #456749;
+  padding-left: 15px;
+}
+
+.ods12-destaque {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  background-color: #EBF0E1;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.10);
+}
+
+.ods12-destaque-icone {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ods12-destaque h4 {
+  font-size: 17px;
+  font-weight: 700;
+  color: #882B4E;
+  margin-bottom: 6px;
+}
+
+.ods12-destaque p {
+  font-size: 14px;
+  color: #000000;
+}
+
+/* ===== Nossa Equipe ===== */
+.equipe {
+  padding: 60px 6% 80px;
+}
+
+.equipe-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.equipe-badge {
+  display: inline-block;
+  color: #375C2B;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.equipe-titulo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 30px;
+  font-weight: 800;
+  color: #882B4E;
+}
+
+.equipe-logo { 
+  height: 34px;
+}
+
+.equipe-anos {
+  display: inline-flex;
+  background-color: #fff;
+  border-radius: 30px;
+  padding: 6px;
+  gap: 8px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.equipe-ano {
+  padding: 8px 22px;
+  border-radius: 24px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #519058;
+  background: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.equipe-ano.active {
+  background-color: #519058;
+  color: #fff;
+}
+
+.equipe-ano[data-ano="2"].active {
+  background-color: #882B4E;
+  color: #fff;
+}
+
+/* 2º ano: cards em vinho */
+.equipe[data-ano="2"] .equipe-card {
+  background-color: #882B4E;
+}
+
+.equipe[data-ano="2"] .equipe-card h4 {
+  color: #D5E8C5;
+}
+
+.equipe[data-ano="2"] .equipe-cargo {
+  color: #D5E8C5;
+}
+
+.equipe[data-ano="2"] .equipe-foto-vazia {
+  background-color: #D9D9D9; /* o cinza combinado com vinho; some quando houver foto */
+}
+
+.equipe[data-ano="2"] .equipe-folha {
+  filter: brightness(0) invert(1); /* folhinha branca */
+}
+
+/* Carrossel */
+.equipe-carrossel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.equipe-trilho {
+  flex: 1;
+  display: flex;
+  gap: 28px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding: 10px 4px 30px;
+  cursor: grab;
+}
+
+.equipe-trilho::-webkit-scrollbar { display: none; }
+
+.equipe-trilho.arrastando {
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.equipe-seta {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background-color: #882B4E;
+  color: #fff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+/* 1) Limita a largura para caberem exatamente 3 cards (como no mockup) */
+.equipe-cabecalho,
+.equipe-carrossel {
+  max-width: 1060px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 2) Adicione esta linha dentro de .equipe-trilho (alinha o encaixe do snap com o padding) */
+.equipe-trilho {
+  scroll-padding-left: 4px;
+}
+
+/* 3) Troque as regras de hover/disabled das setas por esta (não há mais "fim") */
+.equipe-seta:hover {
+  transform: scale(1.08);
+}
+
+/* Card */
+.equipe-card {
+  position: relative;
+  flex: 0 0 280px;
+  scroll-snap-align: start;
+  background-color: #D5E8C5;
+  border: 2px solid #FFFFFF;
+  border-radius: 26px;
+  padding: 16px 16px 22px;
+  text-align: center;
+  box-shadow: 0 12px 28px -14px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.equipe-foto {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 18px;
+  margin-bottom: 16px;
+  -webkit-user-drag: none;
+  pointer-events: none;
+}
+
+.equipe-foto-vazia {
+  background-color: #D9D9D9;
+}
+
+.equipe-card h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #882B4E;
+  margin-bottom: 4px;
+}
+
+.equipe-cargo {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #456749;
+}
+
+.equipe-folha {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  width: 34px;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .equipe-seta { display: none; } /* no celular, só o toque */
+  .equipe-card { flex-basis: 240px; }
+}
+
+.valores {
+  padding: 60px 6%;
+}
+
+.valores-grid {
+  display: flex;
+  gap: 40px;
+  background-color: #E3EEDD;
+  border-radius: 32px;
+  padding: 50px;
+  align-items: center;
+}
+
+.valores-letras {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.85;
+}
+
+.valores-letras span {
+  font-size: 120px;
+  font-weight: 900;
+  color: #F7F9F3;
+}
+
+.valores-lista {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+
+}
+
+/* Mantém a caixa fixa na tela enquanto a rolagem troca os grupos */
+.valores-pin {
+  position: sticky;
+  top: 110px; /* fica abaixo da navbar fixa */
+}
+
+.valores-item {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  background-color: whitesmoke;
+  border-radius: 24px;
+  padding-left: 18px;
+  padding-top: 8px;
+}
+
+/* Só esconde se o JS estiver ativo, assim o conteúdo não some se o script falhar */
+.valores.com-js .valores-item {
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.valores.com-js .valores-item.visivel {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .valores-item { transition: none; }
+}
+
+.valores-item h4 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #456749;
+  margin-bottom: 6px;
+  border-bottom: 2px solid #94B598;
+  width: 250px;
+}
+
+.valores-item p {
+  font-size: 14px;
+  color: #283A2A;
+  padding-bottom: 20px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+#footer-sobrenos {
+    scroll-margin-top: 100px;
+}
+
+.admin {
+  background-color: #882B4E;
+}
+/* ===== Ajustes de fidelidade ao mockup ===== */
+.planos_titulo {
+  font-size: 40px;
+  font-weight: 800;
+  margin-bottom: 24px;
+}
+
+.faq {
+  max-width: none;
+  background-color: #EBF0E1;
+  padding: 60px 6% 90px;
+}
+
+.faq-lista {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.pesquisa-hero {
+  text-align: left;
+  padding-top: 90px;
+}
+
+.pesquisa-titulo {
+  font-size: 44px;
+  max-width: 520px;
+  margin-bottom: 40px;
+}
+
+/* ===== Planos da Recicladora (layout do mockup) ===== */
+.planos-pagos-cards {
+  align-items: flex-start;
+  gap: 36px;
+}
+
+.planos-pagos-cards .plano-card {
+  width: 300px;
+  padding: 26px 22px 28px;
+  border: 3px solid transparent;
+  border-radius: 26px;
+  background: #E9F1E0;
+  color: #882B4E;
+  box-shadow: 0 18px 30px -18px rgba(69, 103, 73, 0.45);
+}
+
+.planos-pagos-cards .plano-card-essencial {
+  margin-top: 44px;
+}
+
+.planos-pagos-cards .plano-card-pro {
+  width: 330px;
+  border-color: #B53566;
+  box-shadow: 0 22px 36px -18px rgba(136, 43, 78, 0.45);
+}
+
+.planos-pagos-cards .plano-card h3 {
+  margin-bottom: 2px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #882B4E;
+}
+
+.plano-card-sub {
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: #6D8A6F;
+}
+
+.planos-pagos-cards .plano-preco {
+  margin-bottom: 14px;
+  font-size: 40px;
+  font-weight: 800;
+  color: #882B4E;
+}
+
+.planos-pagos-cards .plano-preco span {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.planos-pagos-cards .plano-card-lista {
+  margin-bottom: 22px;
+  padding: 10px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.planos-pagos-cards .plano-card-lista li {
+  padding: 6px 0;
+  font-size: 14px;
+  font-weight: 500;
+  color: #456749;
+}
+
+.planos-pagos-cards .plano-card-btn {
+  display: block;
+  width: auto;
+  margin: 0 auto;
+  padding: 10px 44px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(#882B4E, #B53566);
+}
+
+/* ===== Posição das imagens: seção "Por que escolher" ===== */
+.hero-frase {
+  margin-bottom: 24px;
+}
+
+/* Só decoração: não ocupa espaço, a roda sobe logo abaixo do título */
+.retangulos {
+  height: 0;
+  min-height: 0;
+}
+
+.retangulos img {
+  pointer-events: none;
+}
+
+.card-beneficio {
+  margin-top: 90px;
+}
+
+/* Mascote no canto do hero (como no mockup) */
+.hero-mascote {
+  position: absolute;
+  right: 5%;
+  bottom: 150px;
+  z-index: 6;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F6EDEE;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.hero-mascote img {
+  width: 76px;
+}
+
+/* Mascote fixo em todas as páginas (início, Renovaí e Quem somos) */
+.hero-mascote,
+.pesquisa-mascote,
+.solucoes-mascote {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  top: auto;
+  left: auto;
+  z-index: 900;
+  width: 90px;
+  height: 90px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F6EDEE;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.hero-mascote img,
+.pesquisa-mascote img {
+  width: 76px;
+}
+
+/* Na página Renovaí o mascote é a própria <img> */
+img.solucoes-mascote {
+  padding: 7px;
+  object-fit: contain;
+}
+
+/* Ícones do seletor de planos: cor acompanha o estado do botão */
+.cooper:not(.active) img {
+  /* branco -> verde #519058 */
+  filter: brightness(0) saturate(100%) invert(51%) sepia(18%) saturate(1245%) hue-rotate(79deg) brightness(92%) contrast(86%);
+}
+
+.recicl.active img {
+  /* vinho -> branco */
+  filter: brightness(0) invert(1);
+}
+
+/* ===== "A solução": folha + linha funcionam como borda do card =====
+   Ficam do lado de fora, encostadas na borda: à esquerda nos cards da
+   esquerda e à direita nos cards da direita (imagens espelhadas). */
+.caminho-feature {
+  position: relative;
+  min-height: 170px;
+  padding: 22px 26px;
+  text-align: left;
+}
+
+.caminho-feature img {
+  position: absolute;
+  top: 0;
+  max-width: none;
+  pointer-events: none;
+}
+
+.caminho-feature .feat-folha {
+  width: 30px;
+  height: 30px;
+}
+
+/* a haste da folha rosa fica à direita da imagem; a linha nasce nela */
+.caminho-feature .feat-linha {
+  top: 33px;
+  width: 2px;
+  height: calc(100% - 41px);
+  object-fit: none;
+  object-position: top;
+}
+
+.caminho-feature .feat-folha-linha {
+  width: 30px;
+  height: 100%;
+  object-fit: none;
+  object-position: top left;
+}
+
+/* A folha sempre aponta para fora do card e a linha (haste) fica rente à borda.
+   esquerda: rosa já nasce com a haste à direita; verde (haste à esquerda) é espelhado */
+.caminho-feature-esq .feat-folha { left: -36px; }
+.caminho-feature-esq .feat-linha { left: -11px; }
+.caminho-feature-esq .feat-folha-linha { left: -36px; transform: scaleX(-1); }
+
+/* direita: rosa é espelhado (haste à esquerda); verde já nasce com a haste à esquerda */
+.caminho-feature-dir .feat-folha { right: -36px; transform: scaleX(-1); }
+.caminho-feature-dir .feat-linha { right: -11px; }
+.caminho-feature-dir .feat-folha-linha { right: -36px; }
+/* título como faixa na largura do card */
+.caminho-feature-verde h4,
+.caminho-feature-rosa h4 {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 14px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-size: 18px;
+}
+/* Página Renovaí: o hero verde começa no topo, por trás da navbar fixa */
+@media (min-width: 901px) {
+  .solucoes-hero {
+    margin-top: -88px;
+    padding-top: 150px;
+    min-height: 700px;
+  }
+}
+
+/* ===== Linha do tempo "Como o Renovaí funciona?" ===== */
+.funciona-timeline {
+  max-width: 980px;
+}
+
+/* linha central some suavemente nas pontas */
+.funciona-linha {
+  width: 3px;
+  border-left: 0;
+  border-radius: 3px;
+  background: linear-gradient(to bottom, transparent, #456749 7%, #456749 93%, transparent);
+}
+
+.funciona-linha-item {
+  min-height: 150px;
+  margin-bottom: 26px;
+}
+
+/* cards acima dos números, com leve elevação ao passar o mouse */
+.funciona-conteudo {
+  position: relative;
+  z-index: 2;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.funciona-conteudo:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 34px -16px rgba(0, 0, 0, 0.28);
+}
+
+/* conector entre o card e o ícone central */
+.funciona-conteudo::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 24px;
+  height: 2px;
+  background: rgba(69, 103, 73, 0.45);
+}
+
+.funciona-esquerda::after {
+  right: -24px;
+}
+
+.funciona-direita::after {
+  left: -24px;
+  background: rgba(136, 43, 78, 0.4);
+}
+
+/* ícone central: anel e sombra na cor do lado do card */
+.funciona-icone-central {
+  width: 60px;
+  height: 60px;
+  border-width: 3px;
+  background: #FAF9F6;
+  box-shadow: 0 6px 16px -6px rgba(0, 0, 0, 0.25);
+}
+
+.funciona-linha-item:has(.funciona-esquerda) .funciona-icone-central {
+  border-color: #456749;
+}
+
+.funciona-linha-item:has(.funciona-direita) .funciona-icone-central {
+  border-color: #B53566;
+}
+
+/* números ficam fora do card, atrás dele */
+.funciona-numero {
+  z-index: 0;
+  line-height: 1;
+}
+
+.funciona-numero-direita {
+  left: -50px;
+}
+
+.funciona-numero-esquerda {
+  right: -50px;
+}
+
+/* números totalmente fora dos cards (telas largas) */
+.funciona-numero-direita {
+  left: -120px;
+}
+
+.funciona-numero-esquerda {
+  right: -120px;
+}
+
+/* sem espaço fora do card, o número só atrapalharia */
+@media (max-width: 1250px) {
+  .funciona-numero {
+    display: none;
+  }
+}
+/* ===== Linha do tempo: animação de entrada conforme a rolagem ===== */
+@media (prefers-reduced-motion: no-preference) {
+  /* cards entram deslizando do próprio lado (a propriedade "translate" não
+     briga com o "transform" do efeito de hover) */
+  .funciona.com-js .funciona-conteudo {
+    opacity: 0;
+    translate: -48px 0;
+    transition: opacity 0.6s ease, translate 0.6s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .funciona.com-js .funciona-direita {
+    translate: 48px 0;
+  }
+
+  .funciona.com-js .funciona-icone-central {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.4);
+    transition: opacity 0.4s ease 0.15s, transform 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) 0.15s;
+  }
+
+  .funciona.com-js .funciona-numero {
+    opacity: 0;
+    transition: opacity 0.8s ease 0.35s;
+  }
+
+  .funciona.com-js .funciona-linha-item.visivel .funciona-conteudo {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  .funciona.com-js .funciona-linha-item.visivel .funciona-icone-central {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .funciona.com-js .funciona-linha-item.visivel .funciona-numero-direita {
+    opacity: 0.65;
+  }
+
+  .funciona.com-js .funciona-linha-item.visivel .funciona-numero-esquerda {
+    opacity: 1;
+  }
+}
+
+/* ===== Animação de entrada (ao abrir a página) =====
+   Usa as propriedades "translate"/"scale", que não brigam com os "transform"
+   já usados no layout. "backwards" mantém cada item escondido durante o atraso. */
+@keyframes entrada-subir  { from { opacity: 0; translate: 0 32px; } }
+@keyframes entrada-descer { from { opacity: 0; translate: 0 -28px; } }
+@keyframes entrada-lado   { from { opacity: 0; translate: 70px 0; } }
+@keyframes entrada-fade   { from { opacity: 0; } }
+@keyframes entrada-pop    { from { opacity: 0; scale: 0.85; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  .navbar {
+    animation: entrada-descer 0.7s ease-out backwards;
+  }
+
+  /* fundo do hero aparece primeiro, bem suave */
+  .hero-img-1, .hero-img-2, .hero-img-3, .hero-img-4, .hero-img-5,
+  .hero-fundo, .hero-predios {
+    animation: entrada-fade 1.2s ease-out backwards;
+  }
+
+  /* texto: título, parágrafo e botões em sequência */
+  .hero-texto .titulo1 { animation: entrada-subir 0.8s ease-out 0.15s backwards; }
+  .hero-texto p        { animation: entrada-subir 0.8s ease-out 0.35s backwards; }
+  .hero-botoes         { animation: entrada-subir 0.8s ease-out 0.55s backwards; }
+
+  /* celular entra pela direita, folhas e mascote surgem depois */
+  .hero-celular { animation: entrada-lado 1s cubic-bezier(0.2, 0.7, 0.2, 1) 0.3s backwards; }
+  .hero-folhas  { animation: entrada-fade 1s ease-out 0.9s backwards; }
+  .hero-mascote { animation: entrada-pop 0.6s cubic-bezier(0.3, 1.5, 0.5, 1) 1.2s backwards; }
+}
+
+/* ===== Entrada por rolagem (todas as páginas) =====
+   Usa animation (não transition) para não sobrescrever transições já existentes. */
+@media (prefers-reduced-motion: no-preference) {
+  html.rev-pronto .rev:not(.visivel) {
+    opacity: 0;
+  }
+
+  html.rev-pronto .rev.visivel {
+    animation: entrada-subir 0.7s ease-out var(--atraso, 0s) backwards;
+  }
+}
+
+/* ===== ODS 12: ícone e caixas de texto ===== */
+.ods12-titulo span {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 10px;
+}
+
+.ods12-icone {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+.ods12-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.ods12-coluna {
+  padding: 26px 28px;
+  border: 1px solid rgba(69, 103, 73, 0.18);
+}
+
+.ods12-coluna p {
+  border-left: 3px solid #456749;
+  padding-left: 16px;
+}
+
+.ods12-destaque {
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(69, 103, 73, 0.18);
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .ods12-icone {
+    width: 48px;
+    height: 48px;
+  }
+
+  .ods12-coluna {
+    padding: 20px;
+  }
 }
