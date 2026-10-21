@@ -62,9 +62,11 @@ public class MaterialServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-
+        System.out.println("Acessou o MaterialServlet");
 
         List<Material> materiais = materialDAO.listarMateriais();
+
+        System.out.println("Quantidade de materiais: " + materiais.size());
 
         request.setAttribute("materiais", materiais);
 

@@ -15,12 +15,18 @@ public class Conexao {
     private static final String PASSWORD = System.getenv("DB_PASSWORD");
 
 
+    
     // METODOS
 
     // Metodo para estabelecer conexao com o banco de dados
     public static Connection conectar() {
+<<<<<<< HEAD
+    
+=======
 
+>>>>>>> origin/master
 
+        
         try {
 
             Class.forName("org.postgresql.Driver");
