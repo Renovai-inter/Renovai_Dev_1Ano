@@ -61,7 +61,11 @@ public class MaterialDAO {
             return material;
 
         } catch (SQLException e) {
+<<<<<<< HEAD
+            return 0;
+=======
             throw new RuntimeException("Falha ao cadastrar material.", e);
+>>>>>>> origin/master
         } finally {
             conn.desconectar(conexao);
         }
@@ -100,7 +104,12 @@ public class MaterialDAO {
             }
             return materiais;
         }catch (SQLException e) {
+<<<<<<< HEAD
+            e.printStackTrace();
+            return new ArrayList<>();
+=======
             throw new RuntimeException("Falha ao listar materiais.", e);
+>>>>>>> origin/master
         } finally {
             conn.desconectar(conexao);
         }
