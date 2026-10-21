@@ -22,6 +22,7 @@ public class Conexao {
     public static Connection conectar() {
     
 
+        
         try {
 
             Class.forName("org.postgresql.Driver");
