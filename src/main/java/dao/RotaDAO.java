@@ -1,7 +1,7 @@
 package dao;
 
 import model.principais.Rota;
-import util.Conexao;
+import util.ConexaoBD;
 import util.Utilitario;
 
 import java.sql.Connection;
@@ -14,7 +14,7 @@ public class RotaDAO {
 
     // ATRIBUTOS
 
-    private Conexao conn = new Conexao();
+    private ConexaoBD conn = new ConexaoBD();
     private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR

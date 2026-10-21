@@ -108,7 +108,7 @@
                     <div class="dado"><small>Usuário</small><span><%= esc(c.getNomeUsuario()) %></span></div>
                     <div class="dado"><small>Senha</small>
                         <div class="linha-senha">
-                            <span class="senha-temp"><%= c.isSenhaTemporaria() ? "Senha temporária pendente de troca" : "Senha definida pelo cooperado" %></span>
+                            <span class="senha-temp"><%= c.isSenhaTemporaria() ? "SenhaAPI temporária pendente de troca" : "SenhaAPI definida pelo cooperado" %></span>
                             <button type="submit" form="formSenha" class="botao claro">Redefinir senha</button>
                         </div>
                     </div>

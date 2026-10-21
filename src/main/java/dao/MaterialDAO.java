@@ -1,6 +1,6 @@
 package dao;
 
-import util.Conexao;
+import util.ConexaoBD;
 import util.Utilitario;
 import model.principais.Material;
 
@@ -14,7 +14,7 @@ public class MaterialDAO {
 
     // ATRIBUTOS
 
-    private Conexao conn = new Conexao();
+    private ConexaoBD conn = new ConexaoBD();
     private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR

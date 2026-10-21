@@ -13,7 +13,7 @@ public class CooperativaDAO {
 
     // ATRIBUTOS
 
-    private final Conexao conn = new Conexao();
+    private final ConexaoBD conn = new ConexaoBD();
     private final Utilitario utilitario = new Utilitario();
     private final CooperadoDAO cooperadoDAO = new CooperadoDAO();
 

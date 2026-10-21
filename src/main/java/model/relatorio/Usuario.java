@@ -1,4 +1,4 @@
-package model;
+package model.relatorio;
 
 public class Usuario {
 

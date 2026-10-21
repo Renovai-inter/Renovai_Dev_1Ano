@@ -1,7 +1,6 @@
 package util;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +9,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.Formatter;
 import java.util.Locale;
 
 public class Utilitario {
@@ -225,7 +223,7 @@ public class Utilitario {
 
         // INICIALIZA CONEXÃO COM BD
 
-        Conexao conn = new Conexao();
+        ConexaoBD conn = new ConexaoBD();
         Connection conexao = conn.conectar();
 
         // SELECIONA PARA TABELA DADA

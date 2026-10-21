@@ -4,7 +4,7 @@ import model.principais.Cooperativa;
 import model.enums.CargoCooperado;
 import model.enums.StatusCooperado;
 import model.enums.TipoUsuario;
-import util.Conexao;
+import util.ConexaoBD;
 import util.Utilitario;
 
 import java.sql.*;
@@ -14,7 +14,7 @@ public class CooperadoDAO {
 
     // ATRIBUTOS
 
-    private Conexao conn = new Conexao();
+    private ConexaoBD conn = new ConexaoBD();
     private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR

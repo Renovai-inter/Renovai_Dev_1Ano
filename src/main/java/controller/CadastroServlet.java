@@ -1,8 +1,8 @@
 package controller;
 
 import dao.UsuarioDAO;
-import model.Usuario;
-import util.Senha;
+import model.relatorio.Usuario;
+import util.SenhaAPI;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -51,7 +51,7 @@ public class CadastroServlet extends HttpServlet {
                 Usuario usuario = new Usuario();
                 usuario.setNome(nome);
                 usuario.setEmail(email);
-                usuario.setSenhaHash(Senha.gerarHash(senha));
+                usuario.setSenhaHash(SenhaAPI.gerarHash(senha));
                 usuario.setTipoUsuario("COOPERADO"); // fixo: o cadastro público nunca cria administrador
 
                 if (!usuarioDAO.cadastrar(usuario)) {

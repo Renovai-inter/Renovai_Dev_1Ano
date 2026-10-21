@@ -1,8 +1,8 @@
 package controller;
 
 import dao.UsuarioDAO;
-import model.Usuario;
-import util.Senha;
+import model.relatorio.Usuario;
+import util.SenhaAPI;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -52,7 +52,7 @@ public class LoginServlet extends HttpServlet {
         }
 
         // Mesma mensagem para e-mail inexistente, senha errada e conta sem permissão
-        if (usuario == null || !Senha.conferir(senha, usuario.getSenhaHash())) {
+        if (usuario == null || !SenhaAPI.conferir(senha, usuario.getSenhaHash())) {
             request.setAttribute("erro", "E-mail ou senha incorretos.");
             request.setAttribute("email", email);
             request.getRequestDispatcher("/login.jsp").forward(request, response);

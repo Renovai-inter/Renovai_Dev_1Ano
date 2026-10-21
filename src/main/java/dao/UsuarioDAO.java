@@ -1,7 +1,7 @@
 package dao;
 
-import model.Usuario;
-import util.Conexao;
+import model.relatorio.Usuario;
+import util.ConexaoBD;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,7 @@ public class UsuarioDAO {
     public boolean emailExiste(String email) {
         String sql = "SELECT 1 FROM usuario WHERE LOWER(email) = ?";
 
-        try (Connection conn = Conexao.conectar();
+        try (Connection conn = ConexaoBD.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email.toLowerCase());
@@ -35,7 +35,7 @@ public class UsuarioDAO {
                 + "VALUES ((SELECT COALESCE(MAX(id_usuario), 0) + 1 FROM usuario), "
                 + "?, ?, ?, false, ?, ?)";
 
-        try (Connection conn = Conexao.conectar();
+        try (Connection conn = ConexaoBD.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             String email = usuario.getEmail().toLowerCase();
@@ -60,7 +60,7 @@ public class UsuarioDAO {
         String sql = "SELECT id_usuario, nome_completo, email, senha_hash, tipo_usuario "
                 + "FROM usuario WHERE LOWER(email) = ?";
 
-        try (Connection conn = Conexao.conectar();
+        try (Connection conn = ConexaoBD.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, email.toLowerCase());

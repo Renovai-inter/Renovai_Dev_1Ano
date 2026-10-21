@@ -2,7 +2,7 @@ package dao;
 
 import model.principais.Negociacao;
 import model.enums.StatusNegociacao;
-import util.Conexao;
+import util.ConexaoBD;
 import util.Utilitario;
 
 import java.sql.Connection;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class NegociacaoDAO {
-    private final Conexao conn = new Conexao();
+    private final ConexaoBD conn = new ConexaoBD();
     private final Utilitario utilitario = new Utilitario();
 
     // Inicializa o acesso aos dados de negociação.

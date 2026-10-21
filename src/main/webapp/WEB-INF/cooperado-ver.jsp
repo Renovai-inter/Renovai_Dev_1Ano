@@ -85,7 +85,7 @@
             <div class="grade">
                 <div class="dado"><small>Usuário</small><span><%= esc(c.getNomeUsuario()) %></span></div>
                 <div class="dado"><small>Senha</small>
-                    <span class="senha-temp"><%= c.isSenhaTemporaria() ? "Senha temporária pendente de troca" : "Senha definida pelo cooperado" %></span>
+                    <span class="senha-temp"><%= c.isSenhaTemporaria() ? "SenhaAPI temporária pendente de troca" : "SenhaAPI definida pelo cooperado" %></span>
                 </div>
             </div>
             <p class="aviso">Por segurança, o painel nunca exibe a senha real, apenas o indicador de senha temporária.</p>

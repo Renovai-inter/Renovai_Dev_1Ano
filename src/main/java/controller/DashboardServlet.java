@@ -2,7 +2,7 @@ package controller;
 
 import dao.ColetaDAO;
 import dao.DashboardDAO;
-import model.Atividade;
+import model.relatorio.Atividade;
 import model.Coleta;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;

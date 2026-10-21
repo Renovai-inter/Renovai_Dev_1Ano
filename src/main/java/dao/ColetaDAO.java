@@ -2,7 +2,7 @@ package dao;
 import model.principais.Coleta;
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
-import util.Conexao;
+import util.ConexaoBD;
 import util.Utilitario;
 import java.math.BigDecimal;
 import java.sql.*;
@@ -14,7 +14,7 @@ public class ColetaDAO {
 
     // ATRIBUTOS
 
-    private Conexao conn = new Conexao();
+    private ConexaoBD conn = new ConexaoBD();
     private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR
