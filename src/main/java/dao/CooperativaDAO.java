@@ -32,6 +32,9 @@ public class CooperativaDAO {
                                             String cep, String endereco, String cidade, String estado,
                                             String nomeGestor, String usuarioGestor,
                                             String emailGestor, String senhaTemporariaGestor) {
+
+        // Declaração
+
         Cooperativa coop = new Cooperativa();
         coop.setNome(nome);
         coop.setCnpj(cnpj);
@@ -49,9 +52,15 @@ public class CooperativaDAO {
         gestor.setNomeUsuario(usuarioGestor);
         gestor.setEmail(emailGestor);
         Connection conexao = conn.conectar();
+
+        // Comando SQL
+
         String sql = "INSERT INTO cooperativa (id_cooperativa, nome, cnpj, nome_publico, " +
                 "descricao_institucional, logo_url, email_institucional, telefone_whatsapp, " +
                 "cep, endereco, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        // Executar PreparedStatement
+
         try {
             conexao.setAutoCommit(false);
             long ultimoId = utilitario.selecionarUltimoId("cooperativa");
@@ -73,11 +82,18 @@ public class CooperativaDAO {
                 pstmt.setString(12, coop.getEstado());
                 retornoCooperativa = pstmt.executeUpdate();
             }
-            int[] retornoGestor = cooperadoDAO.cadastrarGestor(conexao, coop, gestor,
+            if (retornoCooperativa == 0) {
+                conexao.rollback();
+                return null;
+            }
+            boolean gestorCadastrado = cooperadoDAO.cadastrarGestor(conexao, coop, gestor,
                     senhaTemporariaGestor);
+            if (!gestorCadastrado) {
+                conexao.rollback();
+                return null;
+            }
             conexao.commit();
-            return retornoCooperativa == 0 || retornoGestor[0] == 0 || retornoGestor[1] == 0
-                    ? null : coop;
+            return coop;
         } catch (SQLException e) {
             try {
                 conexao.rollback();
@@ -97,8 +113,13 @@ public class CooperativaDAO {
         }
     }
 
+    // === METODOS READ ================================================================================================
+
     // Preenche uma cooperativa com os dados selecionados na consulta.
     private Cooperativa lerCooperativa(ResultSet rs) throws SQLException {
+
+        // Declaração
+
         Cooperativa cooperativa = new Cooperativa();
         cooperativa.setIdCooperativa(rs.getLong("id_cooperativa"));
         cooperativa.setNome(rs.getString("nome"));
@@ -115,8 +136,6 @@ public class CooperativaDAO {
         return cooperativa;
     }
 
-    // === METODOS READ ================================================================================================
-
     private static final String CONSULTA_COOPERATIVAS =
             "SELECT coop.id_cooperativa, coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
             "(SELECT COUNT(*) FROM cooperado c WHERE c.id_cooperativa = coop.id_cooperativa) AS cooperados, " +
@@ -124,38 +143,84 @@ public class CooperativaDAO {
 
     // Lista as cooperativas cadastradas com dados resumidos.
     public ArrayList<Cooperativa> exibirCooperativas() {
-        return consultarCooperativas("");
+
+        // Execução e retorno
+
+        return consultarCooperativas(CONSULTA_COOPERATIVAS, null, null);
     }
 
     // Busca cooperativas pelo nome ou CNPJ informado.
     public ArrayList<Cooperativa> buscarCooperativasPorNomeOuCodigo(String busca) {
+
+        // Declaração
+
         String filtro = "%" + busca.strip() + "%";
-        return consultarCooperativas(" WHERE coop.nome ILIKE ? OR coop.cnpj LIKE ?", filtro, filtro);
+
+        // Execução e retorno
+
+        return consultarCooperativas(CONSULTA_COOPERATIVAS
+                + " WHERE coop.nome ILIKE ? OR coop.cnpj LIKE ?", filtro, filtro);
     }
 
     // Lista as cooperativas da cidade informada.
     public ArrayList<Cooperativa> filtrarCooperativasPorCidade(String cidadeBusca) {
-        return consultarCooperativas(" WHERE coop.cidade ILIKE ?", cidadeBusca.strip());
+
+        // Declaração
+
+        Cooperativa cooperativa = new Cooperativa();
+        cooperativa.setCidade(cidadeBusca);
+
+        // Execução e retorno
+
+        return consultarCooperativas(CONSULTA_COOPERATIVAS
+                + " WHERE coop.cidade ILIKE ?", cooperativa.getCidade(), null);
     }
 
     // Lista as cooperativas do estado informado.
     public ArrayList<Cooperativa> filtrarCooperativasPorEstado(String estadoBusca) {
-        return consultarCooperativas(" WHERE coop.estado = ?", utilitario.validarUf(estadoBusca));
+
+        // Declaração
+
+        Cooperativa cooperativa = new Cooperativa();
+        cooperativa.setEstado(estadoBusca);
+
+        // Execução e retorno
+
+        return consultarCooperativas(CONSULTA_COOPERATIVAS
+                + " WHERE coop.estado = ?", cooperativa.getEstado(), null);
     }
 
     // Lista as cooperativas com o status informado.
     public ArrayList<Cooperativa> filtrarCooperativasPorStatus(String statusBusca) {
-        String status = StatusCooperativa.valueOf(statusBusca.strip().toUpperCase()).name();
-        return consultarCooperativas(" WHERE coop.status = ?", status);
+
+        // Declaração
+
+        Cooperativa cooperativa = new Cooperativa();
+        cooperativa.setStatus(StatusCooperativa.valueOf(statusBusca.strip().toUpperCase()));
+
+        // Execução e retorno
+
+        return consultarCooperativas(CONSULTA_COOPERATIVAS
+                + " WHERE coop.status = ?", cooperativa.getStatus().name(), null);
     }
 
-    // Executa uma consulta com os filtros definidos pelo método público.
-    private ArrayList<Cooperativa> consultarCooperativas(String filtro, String... parametros) {
+    // Executa a consulta e preenche uma Model para cada linha.
+    private ArrayList<Cooperativa> consultarCooperativas(String sql, String parametro1,
+                                                        String parametro2) {
+
+        // Declaração
+
         Connection conexao = conn.conectar();
         ArrayList<Cooperativa> cooperativas = new ArrayList<>();
-        try (PreparedStatement pstmt = conexao.prepareStatement(CONSULTA_COOPERATIVAS + filtro)) {
-            for (int indice = 0; indice < parametros.length; indice++) {
-                pstmt.setString(indice + 1, parametros[indice]);
+
+        // Executar PreparedStatement
+
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            if (parametro1 != null) {
+                pstmt.setString(1, parametro1);
+            }
+            if (parametro2 != null) {
+                pstmt.setString(2, parametro2);
             }
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
@@ -174,6 +239,9 @@ public class CooperativaDAO {
 
     // Atualiza um campo permitido da cooperativa identificada.
     public Cooperativa atualizarCooperativa(Long idCooperativa, String campo, String valorInformado) {
+
+        // Declaração
+
         Cooperativa coop = new Cooperativa();
         coop.setIdCooperativa(idCooperativa);
         if (coop.getIdCooperativa() == null) {
@@ -198,8 +266,14 @@ public class CooperativaDAO {
             case "status" -> { coop.setStatus(valorInformado == null ? null : StatusCooperativa.valueOf(valorInformado)); yield coop.getStatus() == null ? null : coop.getStatus().name(); }
             default -> throw new IllegalArgumentException("Campo da cooperativa não permitido: " + campo);
         };
-        String sql = "UPDATE cooperativa SET " + coluna + " = ? WHERE id_cooperativa = ?";
         Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE cooperativa SET " + coluna + " = ? WHERE id_cooperativa = ?";
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setObject(1, valor);
             pstmt.setLong(2, coop.getIdCooperativa());
@@ -215,13 +289,22 @@ public class CooperativaDAO {
 
     // Exclui a cooperativa identificada pelo ID.
     public Cooperativa excluirCooperativa(Long idCooperativa) {
+
+        // Declaração
+
         Cooperativa coop = new Cooperativa();
         coop.setIdCooperativa(idCooperativa);
         if (coop.getIdCooperativa() == null) {
             throw new IllegalArgumentException("idCooperativa é obrigatório.");
         }
-        String sql = "DELETE FROM cooperativa WHERE id_cooperativa = ?";
         Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "DELETE FROM cooperativa WHERE id_cooperativa = ?";
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, coop.getIdCooperativa());
             return pstmt.executeUpdate() == 0 ? null : coop;

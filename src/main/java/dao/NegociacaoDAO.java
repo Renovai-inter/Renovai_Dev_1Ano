@@ -27,6 +27,9 @@ public class NegociacaoDAO {
     // Registra uma proposta da cooperativa para a negociação informada.
     public Negociacao fazerContraproposta(Long idNegociacao, BigDecimal valorKgAtual,
                                          BigDecimal quantidadeKg) {
+
+        // Declaração
+
         Negociacao negociacao = new Negociacao();
         negociacao.setIdNegociacao(idNegociacao);
         negociacao.setValorKgAtual(valorKgAtual);
@@ -36,17 +39,21 @@ public class NegociacaoDAO {
         }
         long ultimoId = utilitario.selecionarUltimoId("proposta");
         long idProposta = ultimoId == -1 ? 1 : ultimoId + 1;
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
         String sql = "INSERT INTO proposta (id_proposta, id_negociacao, autor, valor_kg, " +
                 "quantidade_kg) VALUES (?, ?, 'COOPERATIVA', ?, ?)";
-        Connection conexao = conn.conectar();
-        try {
-            try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-                pstmt.setLong(1, idProposta);
-                pstmt.setLong(2, negociacao.getIdNegociacao());
-                pstmt.setBigDecimal(3, negociacao.getValorKgAtual());
-                pstmt.setBigDecimal(4, negociacao.getQuantidadeKg());
-                return pstmt.executeUpdate() == 0 ? null : negociacao;
-            }
+
+        // Executar PreparedStatement
+
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setLong(1, idProposta);
+            pstmt.setLong(2, negociacao.getIdNegociacao());
+            pstmt.setBigDecimal(3, negociacao.getValorKgAtual());
+            pstmt.setBigDecimal(4, negociacao.getQuantidadeKg());
+            return pstmt.executeUpdate() == 0 ? null : negociacao;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar contraproposta da cooperativa.", e);
         } finally {
@@ -58,41 +65,68 @@ public class NegociacaoDAO {
 
     // Lista propostas que aguardam resposta.
     public ArrayList<Negociacao> novasPropostas() {
+
+        // Execução e retorno
+
         return consultarNegociacoes(" WHERE status = 'AGUARDANDO_RESPOSTA'");
     }
 
     // Lista os dados da negociação vinculada a uma empresa.
     public ArrayList<Negociacao> analisarDetalhesProposta() {
+
+        // Execução e retorno
+
         return consultarNegociacoes(" WHERE id_empresa IS NOT NULL");
     }
 
     // Lista negociações em andamento.
     public ArrayList<Negociacao> negociacaoEmAndamento() {
+
+        // Execução e retorno
+
         return consultarNegociacoes(" WHERE status = 'EM_NEGOCIACAO'");
     }
 
     // Lista negociações encerradas para consulta do histórico.
     public ArrayList<Negociacao> historicoNegociacao() {
+
+        // Execução e retorno
+
         return consultarNegociacoes(" WHERE status IN ('ACEITA', 'RECUSADA', 'CANCELADA', 'CONCLUIDA')");
     }
 
     // Lista as propostas aceitas.
     public ArrayList<Negociacao> propostasAceitas() {
+
+        // Execução e retorno
+
         return consultarNegociacoes(" WHERE status = 'ACEITA'");
     }
 
     // Lista todas as negociações, inclusive as finalizadas.
     public ArrayList<Negociacao> historicoGeral() {
+
+        // Execução e retorno
+
         return consultarNegociacoes("");
     }
 
     // Executa uma consulta e monta uma Model para cada linha.
     private ArrayList<Negociacao> consultarNegociacoes(String filtro) {
+
+        // Declaração
+
+        Connection conexao = conn.conectar();
+        ArrayList<Negociacao> negociacoes = new ArrayList<>();
+
+        // Comando SQL
+
         String sql = "SELECT id_negociacao, id_cooperativa, id_empresa, id_material, " +
                 "quantidade_kg, valor_kg_atual, valor_total_atual, status, data_criacao, " +
                 "data_conclusao FROM negociacao" + filtro;
-        Connection conexao = conn.conectar();
-        ArrayList<Negociacao> negociacoes = new ArrayList<>();
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
@@ -123,23 +157,38 @@ public class NegociacaoDAO {
 
     // Aceita a proposta identificada e registra sua conclusão.
     public Negociacao aceitarProposta(Long idNegociacao, LocalDateTime dataConclusao) {
+
+        // Declaração
+
         Negociacao negociacao = new Negociacao();
         negociacao.setIdNegociacao(idNegociacao);
         negociacao.setDataConclusao(dataConclusao);
+
+        // Execução e retorno
+
         return atualizarStatusFinal(negociacao, StatusNegociacao.ACEITA) == 0 ? null : negociacao;
     }
 
     // Atualiza o valor de uma negociação em andamento.
     public Negociacao enviarContraProposta(Long idNegociacao, BigDecimal valorKgAtual) {
+
+        // Declaração
+
         Negociacao negociacao = new Negociacao();
         negociacao.setIdNegociacao(idNegociacao);
         negociacao.setValorKgAtual(valorKgAtual);
         if (negociacao.getIdNegociacao() == null || negociacao.getValorKgAtual() == null) {
             throw new IllegalArgumentException("ID e valor por quilo são obrigatórios.");
         }
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
         String sql = "UPDATE negociacao SET valor_kg_atual = ? " +
                 "WHERE id_negociacao = ? AND status = 'EM_NEGOCIACAO'";
-        Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setBigDecimal(1, negociacao.getValorKgAtual());
             pstmt.setLong(2, negociacao.getIdNegociacao());
@@ -154,6 +203,9 @@ public class NegociacaoDAO {
     // Registra a decisão sobre uma oferta em negociação.
     public Negociacao decisaoDeOferta(Long idNegociacao, StatusNegociacao status,
                                      LocalDateTime dataConclusao) {
+
+        // Declaração
+
         Negociacao negociacao = new Negociacao();
         negociacao.setIdNegociacao(idNegociacao);
         negociacao.setStatus(status);
@@ -170,9 +222,15 @@ public class NegociacaoDAO {
         if (negociacao.getIdNegociacao() == null) {
             throw new IllegalArgumentException("idNegociacao é obrigatório.");
         }
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
         String sql = "UPDATE negociacao SET status = ? WHERE id_negociacao = ? " +
                 "AND status = 'EM_NEGOCIACAO'";
-        Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, negociacao.getStatus().name());
             pstmt.setLong(2, negociacao.getIdNegociacao());
@@ -184,31 +242,50 @@ public class NegociacaoDAO {
         }
     }
 
-    // === METODOS DELETE ==============================================================================================
-
     // Recusa a proposta preservando seu histórico.
     public Negociacao recusarProposta(Long idNegociacao, LocalDateTime dataConclusao) {
+
+        // Declaração
+
         Negociacao negociacao = new Negociacao();
         negociacao.setIdNegociacao(idNegociacao);
         negociacao.setDataConclusao(dataConclusao);
+
+        // Execução e retorno
+
         return atualizarStatusFinal(negociacao, StatusNegociacao.RECUSADA) == 0 ? null : negociacao;
     }
 
     // Cancela a negociação preservando seu histórico.
     public Negociacao cancelarNegociacao(Long idNegociacao, LocalDateTime dataConclusao) {
+
+        // Declaração
+
         Negociacao negociacao = new Negociacao();
         negociacao.setIdNegociacao(idNegociacao);
         negociacao.setDataConclusao(dataConclusao);
+
+        // Execução e retorno
+
         return atualizarStatusFinal(negociacao, StatusNegociacao.CANCELADA) == 0 ? null : negociacao;
     }
 
     // Atualiza um status final e sua data obrigatória de conclusão.
     private int atualizarStatusFinal(Negociacao negociacao, StatusNegociacao status) {
+
+        // Declaração
+
         if (negociacao.getIdNegociacao() == null || negociacao.getDataConclusao() == null) {
             throw new IllegalArgumentException("ID e data de conclusão são obrigatórios.");
         }
-        String sql = "UPDATE negociacao SET status = ?, data_conclusao = ? WHERE id_negociacao = ?";
         Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE negociacao SET status = ?, data_conclusao = ? WHERE id_negociacao = ?";
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, status.name());
             pstmt.setTimestamp(2, Timestamp.valueOf(negociacao.getDataConclusao()));

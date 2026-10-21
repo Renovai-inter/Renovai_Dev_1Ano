@@ -30,6 +30,9 @@ public class ColetaDAO {
                                  String origemEntrega, String nomeLocalOrigem, java.util.Date dataAgendada,
                                  LocalDateTime dataInicio, LocalDateTime dataFim, BigDecimal pesoTotalKg,
                                  String observacoes) {
+
+        // Declaração
+
         Coleta coleta = new Coleta();
         coleta.setIdCooperativa(idCooperativa);
         coleta.setTipo(tipo);
@@ -49,11 +52,17 @@ public class ColetaDAO {
         }
         long ultimoId = utilitario.selecionarUltimoId("coleta");
         long idColeta = ultimoId == -1 ? 1 : ultimoId + 1;
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
         String sql = "INSERT INTO coleta (id_coleta, id_cooperativa, tipo, status, id_rota, " +
                 "id_endereco_rota, id_cooperado_responsavel, origem_entrega, nome_local_origem, " +
                 "data_agendada, data_inicio, data_fim, peso_total_kg, observacoes) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, idColeta);
             pstmt.setLong(2, coleta.getIdCooperativa());
@@ -89,60 +98,12 @@ public class ColetaDAO {
     public Coleta registroNaCooperativa(Long idCooperativa, String origemEntrega,
                                        String nomeLocalOrigem, BigDecimal pesoTotalKg,
                                        String observacoes) {
-        Coleta coleta = new Coleta();
-        coleta.setIdCooperativa(idCooperativa);
-        coleta.setTipo(TipoColeta.ENTREGA_COOPERATIVA);
-        coleta.setOrigemEntrega(origemEntrega);
-        coleta.setNomeLocalOrigem(nomeLocalOrigem);
-        coleta.setPesoTotalKg(pesoTotalKg);
-        coleta.setObservacoes(observacoes);
-        return cadastrarColeta(coleta.getIdCooperativa(), coleta.getTipo(), coleta.getStatus(),
-                null, null, null, coleta.getOrigemEntrega(), coleta.getNomeLocalOrigem(),
-                null, null, null, coleta.getPesoTotalKg(), coleta.getObservacoes());
-    }
 
-    // Atualiza a origem de uma coleta existente.
-    public Coleta cadastrarOrigem(Long idColeta, String origemEntrega, String nomeLocalOrigem) {
-        Coleta coleta = new Coleta();
-        coleta.setIdColeta(idColeta);
-        coleta.setOrigemEntrega(origemEntrega);
-        coleta.setNomeLocalOrigem(nomeLocalOrigem);
-        if (coleta.getIdColeta() == null) {
-            throw new IllegalArgumentException("idColeta é obrigatório.");
-        }
-        String sql = "UPDATE coleta SET origem_entrega = ?, nome_local_origem = ? WHERE id_coleta = ?";
-        Connection conexao = conn.conectar();
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setString(1, coleta.getOrigemEntrega());
-            pstmt.setString(2, coleta.getNomeLocalOrigem());
-            pstmt.setLong(3, coleta.getIdColeta());
-            return pstmt.executeUpdate() == 0 ? null : coleta;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao atualizar a origem da coleta.", e);
-        } finally {
-            conn.desconectar(conexao);
-        }
-    }
+        // Execução e retorno
 
-    // Atualiza o peso total de uma coleta existente.
-    public Coleta registrarPesoTotal(Long idColeta, BigDecimal pesoTotalKg) {
-        Coleta coleta = new Coleta();
-        coleta.setIdColeta(idColeta);
-        coleta.setPesoTotalKg(pesoTotalKg);
-        if (coleta.getIdColeta() == null || coleta.getPesoTotalKg() == null) {
-            throw new IllegalArgumentException("ID e peso total são obrigatórios.");
-        }
-        String sql = "UPDATE coleta SET peso_total_kg = ? WHERE id_coleta = ?";
-        Connection conexao = conn.conectar();
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setBigDecimal(1, coleta.getPesoTotalKg());
-            pstmt.setLong(2, coleta.getIdColeta());
-            return pstmt.executeUpdate() == 0 ? null : coleta;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao atualizar o peso da coleta.", e);
-        } finally {
-            conn.desconectar(conexao);
-        }
+        return cadastrarColeta(idCooperativa, TipoColeta.ENTREGA_COOPERATIVA, null,
+                null, null, null, origemEntrega, nomeLocalOrigem, null, null, null,
+                pesoTotalKg, observacoes);
     }
 
     // Os parâmetros ficam preparados para o vínculo quando a Model representar os materiais da coleta.
@@ -159,28 +120,46 @@ public class ColetaDAO {
 
     // Lista as coletas cadastradas.
     public ArrayList<Coleta> listarColetas() {
+
+        // Execução e retorno
+
         return consultarColetas("");
     }
 
     // Lista as coletas que ainda podem ser acompanhadas.
     public ArrayList<Coleta> rastrearColeta() {
+
+        // Execução e retorno
+
         return consultarColetas(" WHERE status IN ('AGENDADA', 'EM_ANDAMENTO')");
     }
 
     // Lista as coletas encerradas para o histórico.
     public ArrayList<Coleta> historicoColetas() {
+
+        // Execução e retorno
+
         return consultarColetas(" WHERE status IN ('CONCLUIDA', 'CANCELADA')");
     }
 
     // Lista as coletas em andamento.
     public ArrayList<Coleta> coletasEmAndamento() {
+
+        // Execução e retorno
+
         return consultarColetas(" WHERE status = 'EM_ANDAMENTO'");
     }
 
     // Executa uma consulta de coletas e monta uma Model para cada linha.
     private ArrayList<Coleta> consultarColetas(String filtro) {
+
+        // Declaração
+
         Connection conexao = conn.conectar();
         ArrayList<Coleta> coletas = new ArrayList<>();
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(CONSULTA_COLETAS + filtro);
              ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
@@ -218,8 +197,73 @@ public class ColetaDAO {
     }
     // === METODOS UPDATE ==============================================================================================
 
+    // Atualiza a origem de uma coleta existente.
+    public Coleta cadastrarOrigem(Long idColeta, String origemEntrega, String nomeLocalOrigem) {
+
+        // Declaração
+
+        Coleta coleta = new Coleta();
+        coleta.setIdColeta(idColeta);
+        coleta.setOrigemEntrega(origemEntrega);
+        coleta.setNomeLocalOrigem(nomeLocalOrigem);
+        if (coleta.getIdColeta() == null) {
+            throw new IllegalArgumentException("idColeta é obrigatório.");
+        }
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE coleta SET origem_entrega = ?, nome_local_origem = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
+
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setString(1, coleta.getOrigemEntrega());
+            pstmt.setString(2, coleta.getNomeLocalOrigem());
+            pstmt.setLong(3, coleta.getIdColeta());
+            return pstmt.executeUpdate() == 0 ? null : coleta;
+        } catch (SQLException e) {
+            throw new RuntimeException("Falha ao atualizar a origem da coleta.", e);
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+    // Atualiza o peso total de uma coleta existente.
+    public Coleta registrarPesoTotal(Long idColeta, BigDecimal pesoTotalKg) {
+
+        // Declaração
+
+        Coleta coleta = new Coleta();
+        coleta.setIdColeta(idColeta);
+        coleta.setPesoTotalKg(pesoTotalKg);
+        if (coleta.getIdColeta() == null || coleta.getPesoTotalKg() == null) {
+            throw new IllegalArgumentException("ID e peso total são obrigatórios.");
+        }
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE coleta SET peso_total_kg = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
+
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setBigDecimal(1, coleta.getPesoTotalKg());
+            pstmt.setLong(2, coleta.getIdColeta());
+            return pstmt.executeUpdate() == 0 ? null : coleta;
+        } catch (SQLException e) {
+            throw new RuntimeException("Falha ao atualizar o peso da coleta.", e);
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
     // Inicia a coleta e registra o horário de início.
     public Coleta iniciarColeta(Long idColeta, LocalDateTime dataInicio, BigDecimal pesoTotalKg) {
+
+        // Declaração
+
         Coleta coleta = new Coleta();
         coleta.setIdColeta(idColeta);
         coleta.setDataInicio(dataInicio);
@@ -227,8 +271,14 @@ public class ColetaDAO {
         if (coleta.getIdColeta() == null || coleta.getDataInicio() == null) {
             throw new IllegalArgumentException("ID e data de início são obrigatórios.");
         }
-        String sql = "UPDATE coleta SET status = ?, peso_total_kg = ?, data_inicio = ? WHERE id_coleta = ?";
         Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE coleta SET status = ?, peso_total_kg = ?, data_inicio = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, StatusColeta.EM_ANDAMENTO.name());
             pstmt.setBigDecimal(2, coleta.getPesoTotalKg());
@@ -251,6 +301,9 @@ public class ColetaDAO {
                                   String origemEntrega, String nomeLocalOrigem,
                                   java.util.Date dataAgendada, LocalDateTime dataInicio,
                                   LocalDateTime dataFim, BigDecimal pesoTotalKg, String observacoes) {
+
+        // Declaração
+
         Coleta coleta = new Coleta();
         coleta.setIdColeta(idColeta);
         coleta.setTipo(tipo);
@@ -265,10 +318,16 @@ public class ColetaDAO {
         if (coleta.getIdColeta() == null || coleta.getTipo() == null || coleta.getStatus() == null) {
             throw new IllegalArgumentException("ID, tipo e status são obrigatórios.");
         }
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
         String sql = "UPDATE coleta SET tipo = ?, status = ?, origem_entrega = ?, " +
                 "nome_local_origem = ?, data_agendada = ?, data_inicio = ?, data_fim = ?, " +
                 "peso_total_kg = ?, observacoes = ? WHERE id_coleta = ?";
-        Connection conexao = conn.conectar();
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, coleta.getTipo().name());
             pstmt.setString(2, coleta.getStatus().name());
@@ -293,6 +352,9 @@ public class ColetaDAO {
 
     // Finaliza a coleta com peso e horário de término.
     public Coleta finalizarColeta(Long idColeta, LocalDateTime dataFim, BigDecimal pesoTotalKg) {
+
+        // Declaração
+
         Coleta coleta = new Coleta();
         coleta.setIdColeta(idColeta);
         coleta.setDataFim(dataFim);
@@ -300,8 +362,14 @@ public class ColetaDAO {
         if (coleta.getIdColeta() == null || coleta.getDataFim() == null) {
             throw new IllegalArgumentException("ID e data de término são obrigatórios.");
         }
-        String sql = "UPDATE coleta SET status = ?, peso_total_kg = ?, data_fim = ? WHERE id_coleta = ?";
         Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE coleta SET status = ?, peso_total_kg = ?, data_fim = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, StatusColeta.CONCLUIDA.name());
             pstmt.setBigDecimal(2, coleta.getPesoTotalKg());
@@ -321,27 +389,48 @@ public class ColetaDAO {
 
     // Finaliza uma entrega feita diretamente na cooperativa.
     public Coleta finalizacaoAutomatica(Long idColeta, LocalDateTime dataFim) {
+
+        // Declaração
+
         Coleta coleta = new Coleta();
         coleta.setIdColeta(idColeta);
         coleta.setDataFim(dataFim);
+
+        // Execução e retorno
+
         return concluirColeta(coleta) == 0 ? null : coleta;
     }
 
     // Encerra o acompanhamento de uma coleta finalizada.
     public Coleta encerramentoRastreamento(Long idColeta, LocalDateTime dataFim) {
+
+        // Declaração
+
         Coleta coleta = new Coleta();
         coleta.setIdColeta(idColeta);
         coleta.setDataFim(dataFim);
+
+        // Execução e retorno
+
         return concluirColeta(coleta) == 0 ? null : coleta;
     }
 
     // Atualiza apenas o status e a data de término.
     private int concluirColeta(Coleta coleta) {
+
+        // Declaração
+
         if (coleta.getIdColeta() == null || coleta.getDataFim() == null) {
             throw new IllegalArgumentException("ID e data de término são obrigatórios.");
         }
-        String sql = "UPDATE coleta SET status = ?, data_fim = ? WHERE id_coleta = ?";
         Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE coleta SET status = ?, data_fim = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, StatusColeta.CONCLUIDA.name());
             pstmt.setTimestamp(2, Timestamp.valueOf(coleta.getDataFim()));
@@ -362,13 +451,22 @@ public class ColetaDAO {
 
     // Cancela uma coleta preservando o registro para o histórico.
     public Coleta excluirColeta(Long idColeta) {
+
+        // Declaração
+
         Coleta coleta = new Coleta();
         coleta.setIdColeta(idColeta);
         if (coleta.getIdColeta() == null) {
             throw new IllegalArgumentException("idColeta é obrigatório.");
         }
-        String sql = "UPDATE coleta SET status = ? WHERE id_coleta = ?";
         Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE coleta SET status = ? WHERE id_coleta = ?";
+
+        // Executar PreparedStatement
+
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, StatusColeta.CANCELADA.name());
             pstmt.setLong(2, coleta.getIdColeta());
