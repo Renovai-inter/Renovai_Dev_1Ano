@@ -17,12 +17,9 @@ public class Coleta {
     // ATRIBUTOS
 
     private Long idColeta; // PK
-    private Long idCooperativa; // FK
+
     private TipoColeta tipo; // NOT NULL
     private StatusColeta status; // NOT NULL com DEFAULT
-    private Long idRota; // FK
-    private Long idEnderecoRota; // FK
-    private Long idCooperadoResponsavel; // FK
     private String origemEntrega; // VARCHAR(15)
     private String nomeLocalOrigem; // VARCHAR(150)
     private LocalDate dataAgendada; // DATE
@@ -39,12 +36,6 @@ public class Coleta {
     // Define o valor de idColeta.
     public void setIdColeta(Long idColeta) { this.idColeta = idColeta; }
 
-    // Retorna o valor de idCooperativa.
-    public Long getIdCooperativa() { return idCooperativa; }
-
-    // Define o valor de idCooperativa.
-    public void setIdCooperativa(Long idCooperativa) { this.idCooperativa = idCooperativa; }
-
     // Retorna o valor de tipo.
     public TipoColeta getTipo() { return tipo; }
 
@@ -60,24 +51,6 @@ public class Coleta {
     public void setStatus(StatusColeta status) {
         this.status = status;
     }
-
-    // Retorna o valor de idRota.
-    public Long getIdRota() { return idRota; }
-
-    // Define o valor de idRota.
-    public void setIdRota(Long idRota) { this.idRota = idRota; }
-
-    // Retorna o valor de idEnderecoRota.
-    public Long getIdEnderecoRota() { return idEnderecoRota; }
-
-    // Define o valor de idEnderecoRota.
-    public void setIdEnderecoRota(Long idEnderecoRota) { this.idEnderecoRota = idEnderecoRota; }
-
-    // Retorna o valor de idCooperadoResponsavel.
-    public Long getIdCooperadoResponsavel() { return idCooperadoResponsavel; }
-
-    // Define o valor de idCooperadoResponsavel.
-    public void setIdCooperadoResponsavel(Long idCooperadoResponsavel) { this.idCooperadoResponsavel = idCooperadoResponsavel; }
 
     // Retorna o valor de origemEntrega.
     public String getOrigemEntrega() { return origemEntrega; }

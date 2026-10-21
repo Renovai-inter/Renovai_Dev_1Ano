@@ -22,16 +22,6 @@ public class Cooperado {
     private StatusCooperado status; // NOT NULL - CHECK COM DEFAULT
     private LocalDateTime dataCadastro; // NOT NULL COM DEFAULT
 
-    // ATRIBUTOS (vem de outras tabelas, preenchidos pelos JOINs da DAO)
-
-    private String nomeCompleto; // NOT NULL - VARCHAR(150)
-    private String nomeUsuario; // NOT NULL - VARCHAR(50)
-    private TipoUsuario tipoUsuario; // NOT NULL - CHECK
-    private String email; // NOT NULL - VARCHAR(150)
-    private String nomeCooperativa; // NOT NULL - VARCHAR(150)
-    private boolean senhaTemporaria; // BOOLEAN COM DEFAULT
-    private ArrayList<String> atividades = new ArrayList<>();
-
     // GETTERS E SETTERS
 
     // Retorna o valor de idCooperado.
@@ -88,73 +78,4 @@ public class Cooperado {
     // Define o valor de dataCadastro.
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 
-    // Retorna o valor de nomeCompleto.
-    public String getNomeCompleto() { return nomeCompleto; }
-
-    // Define o valor de nomeCompleto.
-    public void setNomeCompleto(String nomeCompleto) {
-        nomeCompleto = utilitario.normalizarTextoLivre(nomeCompleto);
-        if (nomeCompleto == null || nomeCompleto.isBlank()) {
-            throw new IllegalArgumentException("nomeCompleto é obrigatório.");
-        }
-        if (nomeCompleto.codePointCount(0, nomeCompleto.length()) > 150) {
-            throw new IllegalArgumentException("nomeCompleto deve ter no máximo 150 caracteres.");
-        }
-        this.nomeCompleto = nomeCompleto;
-    }
-
-    // Retorna o valor de nomeUsuario.
-    public String getNomeUsuario() { return nomeUsuario; }
-
-    // Define o valor de nomeUsuario.
-    public void setNomeUsuario(String nomeUsuario) {
-        nomeUsuario = utilitario.normalizarTextoLivre(nomeUsuario);
-        if (nomeUsuario == null || nomeUsuario.isBlank()) {
-            throw new IllegalArgumentException("nomeUsuario é obrigatório.");
-        }
-        if (nomeUsuario.codePointCount(0, nomeUsuario.length()) > 50) {
-            throw new IllegalArgumentException("nomeUsuario deve ter no máximo 50 caracteres.");
-        }
-        this.nomeUsuario = nomeUsuario;
-    }
-
-    // Retorna o valor de email.
-    public String getEmail() { return email; }
-
-    // Define o valor de email.
-    public void setEmail(String email) {
-        this.email = utilitario.filtrarEmailInstitucional(email);
-    }
-
-    // Retorna o valor de nomeCooperativa.
-    public String getNomeCooperativa() { return nomeCooperativa; }
-
-    // Define o valor de nomeCooperativa.
-    public void setNomeCooperativa(String nomeCooperativa) {
-        nomeCooperativa = utilitario.normalizarTextoLivre(nomeCooperativa);
-        if (nomeCooperativa != null && nomeCooperativa.codePointCount(0, nomeCooperativa.length()) > 150) {
-            throw new IllegalArgumentException("nomeCooperativa deve ter no máximo 150 caracteres.");
-        }
-        this.nomeCooperativa = nomeCooperativa;
-    }
-
-    // Informa o valor de senhaTemporaria.
-    public boolean isSenhaTemporaria() { return senhaTemporaria; }
-
-    // Define o valor de senhaTemporaria.
-    public void setSenhaTemporaria(boolean senhaTemporaria) { this.senhaTemporaria = senhaTemporaria; }
-
-    // Retorna o valor de atividades.
-    public ArrayList<String> getAtividades() { return atividades; }
-
-    // Define o valor de atividades.
-    public void setAtividades(ArrayList<String> atividades) { this.atividades = atividades; }
-
-    public TipoUsuario getTipoUsuario() {
-        return tipoUsuario;
-    }
-
-    public void setTipoUsuario(TipoUsuario tipoUsuario) {
-        this.tipoUsuario = tipoUsuario;
-    }
 }
