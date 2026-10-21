@@ -1,6 +1,6 @@
 # Padrão de código do backend Renovaí
 
-Este documento orienta a revisão didática de `model`, `dao`, servlets afetados e sua integração com os JSPs da área administrativa, com apoio da `Utilitario`. As skills devem mostrar o que precisa ser feito em passos pequenos, para que o grupo possa escolher entre executar as mudanças ou fazê-las por conta própria. Não introduzir frameworks, camadas ou classes de exceção apenas para padronizar o código.
+Este documento orienta a revisão didática de `model`, `dao` e servlets afetados, confrontando seu comportamento com os JSPs da área administrativa por leitura, com apoio da `Utilitario`. As skills devem mostrar o que precisa ser feito em passos pequenos, para que o grupo possa escolher entre executar as mudanças ou fazê-las por conta própria. Não introduzir frameworks, camadas ou classes de exceção apenas para padronizar o código.
 
 ## Referência do banco
 
@@ -11,7 +11,7 @@ Este documento orienta a revisão didática de `model`, `dao`, servlets afetados
 - Classes e tipos ENUM usam `PascalCase`; métodos, atributos, parâmetros e variáveis usam `camelCase`; constantes e valores de ENUM usam `UPPER_SNAKE_CASE`. Nomes de tabelas e colunas nas consultas SQL seguem `snake_case`.
 - Usar nomes em português que indiquem a função do elemento. Manter `DAO` no nome das classes de acesso a dados e preservar os pacotes existentes.
 - Ao revisar uma classe, mostrar como `Conexao`, `Utilitario` e outras dependências são instanciadas. Padronizar com o estilo já usado pelo grupo, sem introduzir injeção de dependências.
-- Antes de renomear ou mudar uma assinatura, identificar as chamadas afetadas. Seguir a ordem: preparar a model; adaptar os métodos das DAOs ao contrato de parâmetros e retorno descrito abaixo; atualizar os servlets que chamam a DAO. Registrar os pontos de JSP necessários à integração; a conferência completa das telas administrativas ocorre na etapa própria abaixo.
+- Antes de renomear ou mudar uma assinatura, identificar as chamadas afetadas. Seguir a ordem: preparar a model; adaptar os métodos das DAOs ao contrato de parâmetros e retorno descrito abaixo; atualizar os servlets que chamam a DAO. Ler os pontos de JSP necessários para verificar entradas e resultados esperados, sem alterar o frontend.
 
 ## Contrato dos métodos DAO
 
@@ -20,6 +20,8 @@ Este documento orienta a revisão didática de `model`, `dao`, servlets afetados
 - Em `CREATE`, `UPDATE` e `DELETE`, usar o resultado de `executeUpdate()` para verificar se a operação afetou a linha esperada antes de devolver a Model. Não interpretar falha de SQL como ausência de registro; manter o `catch (SQLException)` com a causa preservada.
 - Métodos auxiliares internos podem receber `Connection` e `ResultSet` para executar o JDBC e preencher Models. Eles não constituem o contrato público de operações DAO. Métodos de consulta de ID são auxiliares e retornam o tipo do ID.
 - Quando uma assinatura atual não fornece os dados necessários para criar a Model ou localizar uma linha específica, registrar a lacuna e ajustar o contrato com os consumidores afetados. Não preencher atributos obrigatórios com valores inventados.
+- Evitar sobrecargas e métodos que repetem o mesmo cadastro ou atualização. Manter uma implementação clara por operação; criar auxiliar somente quando ele realmente elimina repetição e conferir todas as chamadas antes de mudar uma assinatura. `cadastrarGestor` não deve ter dois fluxos duplicados.
+- Nos métodos `UPDATE` de cooperativa, usar SQL de colunas fixas, parâmetros do `PreparedStatement` e setters da Model, como nas demais DAOs. Não usar `switch/case` para escolher a coluna ou o valor, nem concatenar no SQL um nome de coluna recebido como entrada. Seguir esta regra também em futuras alterações.
 
 ## Organização, espaçamento e comentários
 
@@ -27,6 +29,8 @@ Este documento orienta a revisão didática de `model`, `dao`, servlets afetados
 - Acima de cada método, escrever um comentário simples de uma ou duas linhas dizendo o que ele **deve fazer**. Não usar Javadoc. Se o código não cumprir o objetivo, preservar a intenção no comentário e registrar a divergência no relatório.
 - Dentro dos métodos, usar apenas os títulos de etapa que se aplicarem: `// Declaração`, `// Comando SQL`, `// Executar PreparedStatement` e `// Execução e retorno`. Deixar uma linha vazia antes do título e outra entre o título e o bloco. Não separar os comandos dentro do mesmo bloco com linhas vazias.
 - No bloco de `PreparedStatement`, manter preparação, preenchimento dos parâmetros e execução no `try`; o `catch (SQLException)` trata falhas do banco. Se o método usar a rotina atual de `Conexao` para fechar a conexão, preservar esse formato. Não exigir `try-with-resources` nesta revisão.
+- Preferir `if` e `else` simples, com blocos legíveis, para decisões de valor e retorno. Evitar o operador ternário (`condição ? valor1 : valor2`) e `if` em linha única, inclusive ao tratar `null` e o resultado de `executeUpdate()`.
+- Manter o tratamento de SQL direto, sem `try/catch` aninhado. Não acrescentar `setAutoCommit`, `commit`, `rollback` ou `addSuppressed` às DAOs. Em operações com mais de um `INSERT` ou `UPDATE`, conferir o retorno de cada execução e registrar que, sem transação, uma falha posterior pode deixar gravações anteriores no banco.
 - Comentários de etapa ajudam a localizar o código; comentários de método mostram a intenção. Na execução parcial, ajustar comentários e organização visual sem mudar a lógica.
 
 ## Dados, validação e formatação
@@ -40,24 +44,25 @@ Este documento orienta a revisão didática de `model`, `dao`, servlets afetados
 - Para datas, distinguir a apresentação ao usuário da representação usada na aplicação e no banco. Quando a entrada vier como texto em `dd/MM/aaaa`, validar uma data real e convertê-la para `aaaa-MM-dd` (ISO) antes da persistência; para saída textual, aplicar a conversão inversa. Preferir `LocalDate` para `DATE` e `LocalDateTime` para `TIMESTAMP` no Java/JDBC, sem depender da interpretação de texto ambíguo pelo PostgreSQL. `DateStyle` combina o estilo de saída (`ISO`) com a ordem de interpretação de entradas ambíguas (`MDY`, `DMY` ou `YMD`): `ISO` mostra ano-mês-dia, enquanto a configuração completa da instância deve ser conferida com `SHOW DateStyle` quando necessário. Não presumir que o `ISO, MDY` interno seja a configuração efetiva do banco do grupo.
 - Dado inválido deve gerar `throw` de uma exceção adequada já existente no Java, com mensagem compreensível, em vez de retornar `"invalido"` ou `null`. `IllegalArgumentException` pode indicar formato ou valor inválido; a conversão para inteiro pode gerar `NumberFormatException`. Essas exceções não exigem `throws` na assinatura. Uma exceção verificada, como `SQLException`, exige `catch` ou `throws`; nas DAOs, manter `catch (SQLException)`.
 - Não confundir erro de validação lançado pelo setter com falha de banco. Não transformar `SQLException` em um retorno que pareça sucesso ou ausência normal de dados. Não criar classe de exceção própria para este fluxo. Ao atualizar os servlets afetados, conferir como cada falha chega à resposta apresentada pela JSP, sem expor detalhes SQL ou credenciais.
+- Quando um auxiliar retornar `int` com a quantidade de linhas afetadas, `-1` pode representar falha de SQL se o contrato distinguir esse valor de `0` linhas. Métodos que retornam Model ou lista não podem devolver `-1`: nesses casos, preservar a causa da `SQLException` para o chamador. Não usar `null` para esconder falha de banco.
 
-## Integração com as telas administrativas
+## Conferência do backend com as telas administrativas
 
-`../Área ADM.pdf` é a referência visual da área administrativa. Seu único painel reúne desenhos de dashboard, cooperativas, cooperados, coletas, materiais, negociações e componentes. Ele não comprova que esses fluxos já foram implementados, nem substitui as regras de dados documentadas em `../script-banco.pdf`. Se as opções de um desenho conflitarem com um `CHECK`, enum ou requisito confirmado, registrar a divergência e pedir decisão do grupo antes de alterar o contrato.
+`../Área ADM.pdf` é a referência visual da área administrativa. Seu único painel reúne desenhos de dashboard, cooperativas, cooperados, coletas, materiais, negociações e componentes. Ele não comprova que esses fluxos já foram implementados, nem substitui as regras de dados documentadas em `../script-banco.pdf`. Se as opções de um desenho conflitarem com um `CHECK`, enum ou requisito confirmado, registrar a divergência para decisão do grupo antes de alterar o contrato do backend. O PDF e os JSPs são fontes de consulta; esta conferência não autoriza nem propõe trabalho no frontend dos outros integrantes.
 
 Para cada fluxo administrativo do escopo, conferir:
 
-1. **Tela e entrada:** existência do JSP/JSPF; campos, nomes de parâmetros, valores enviados, ação, método, links e navegação; listas, filtros, botões e estados desenhados no PDF. Não tratar exemplos e textos de demonstração como dados reais.
+1. **Contrato de entrada observado:** ler nos JSPs/JSPFs os campos, nomes de parâmetros, valores enviados, ação e método; usar controles e estados desenhados no PDF para entender o comportamento que o backend deve atender. Não tratar exemplos e textos de demonstração como dados reais.
 2. **Processamento:** rota do servlet; validação da Model; operação da DAO e coluna correspondente no esquema documentado. Conferir se a tela envia todos os dados exigidos e se a operação efetivamente chamada corresponde ao botão.
-3. **Resposta visível:** atributos enviados à JSP; formatação e escape dos dados; confirmação, erro, lista vazia, retorno a formulário e redirecionamento. Uma operação de backend só conta como entregue para a tela quando o resultado esperado pode ser observado no fluxo da interface.
-4. **Conferência:** comparar a estrutura e os estados reais do JSP com o desenho do PDF, indicando o que está implementado, parcialmente implementado, ausente ou depende de decisão. Conferir o comportamento em execução apenas quando houver ambiente adequado; inspeção estática e compilação não provam o resultado visual ou funcional.
+3. **Contrato de saída do backend:** conferir atributos enviados à JSP, valores formatados e mensagens para sucesso, erro e lista vazia, além de redirecionamentos. Registrar quando o backend não fornece o resultado que a tela existente espera.
+4. **Evidência:** classificar o comportamento do backend como atendido, parcial, ausente ou dependente de decisão. Conferir em execução somente quando houver ambiente adequado; inspeção estática e compilação não provam a resposta apresentada ao usuário.
 
-Seguir a dependência `Model → DAO → Servlet → JSP` para executar correções. A análise pode partir da tela e voltar pelo fluxo para localizar a origem de um problema. Manter a checklist de telas separada de alterações de backend já aprovadas; uma escolha para uma etapa não autoriza a outra.
+Na conferência, a análise pode partir do PDF ou do JSP e voltar pelo fluxo para localizar a origem de um problema. Descrever diferenças que dependem do frontend como observações para os responsáveis, sem criar itens de edição dessas telas. Esta etapa é somente leitura e relatório; eventual correção de backend será planejada separadamente e seguirá a ordem `Model → DAO → Servlet` e a checklist aprovada.
 
 ## Relatórios e execução das skills
 
 - Cada análise entrega um arquivo Markdown em `../Relatórios/`, fora do repositório. Use o próximo número disponível no nome (`01-...md`, `02-...md`) e não sobrescreva relatórios anteriores. Não criar DOCX nem exigir identidade visual. O relatório indica classe, método, divergência, ação concreta e como verificar, com checklist numerada em passos pequenos e independentes.
 - Depois do relatório de refatoração ou verificações, o usuário escolhe: **parcial** (somente comentários, seções e espaçamento), **completa** (Codex executa todos os itens de código da checklist apresentada para o escopo) ou **etapas escolhidas** (somente os números indicados). Na skill da `Main`, a escolha é entre construir o menu completo apresentado ou apenas os itens indicados. Preparar o relatório não autoriza alterar código.
 - A skill de testes pela `Main` prepara um menu manual por DAO e método. Operações de escrita ou exclusão só ocorrem após a escolha do teste no menu, usando a conexão configurada pelo usuário; nada desse tipo deve executar ao iniciar.
-- A skill de telas administrativas entrega um mapa por fluxo, do PDF ao JSP e ao backend, com checklist numerada e critérios de verificação. A escolha é executar a checklist completa ou itens específicos; não usar **parcial** para mudar lógica, marcação ou aparência do JSP.
+- A skill de conferência administrativa entrega um mapa por fluxo, do PDF e do JSP ao backend, com checklist numerada de verificações. Ela não executa correções de backend nem alterações de frontend; registre os achados para decisão em outra etapa.
 - A revisão geral gera uma Consolidação de Refatoração em Markdown: o que foi feito, pendências em checklist e sugestões opcionais. Não usar porcentagem de melhoria.
