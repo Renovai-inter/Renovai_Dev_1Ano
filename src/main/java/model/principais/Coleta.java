@@ -17,7 +17,6 @@ public class Coleta {
     // ATRIBUTOS
 
     private Long idColeta; // PK
-
     private TipoColeta tipo; // NOT NULL
     private StatusColeta status; // NOT NULL com DEFAULT
     private String origemEntrega; // VARCHAR(15)

@@ -1,5 +1,7 @@
 package model.auxiliares;
 
+import java.util.List;
+
 public class RelacionamentosColeta {
 
     // ATRIBUTOS
@@ -8,6 +10,7 @@ public class RelacionamentosColeta {
     private Long idRota; // FK para rota
     private Long idEnderecoRota; // FK para en
     private Long idCooperadoResponsavel; // FK
+    private List<ColetaMaterial> materiaisColetados; // Conjunto de materiais coletados
 
     // GETTERS E SETTERS
 
