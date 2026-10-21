@@ -1,5 +1,5 @@
 
-package model;
+package model.principais;
 
 import model.enums.StatusCooperativa;
 import util.Utilitario;

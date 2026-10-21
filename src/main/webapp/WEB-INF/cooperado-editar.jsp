@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.Cooperado" %>
+<%@ page import="java.util.*, model.principais.Cooperado" %>
 <%
     Cooperado c = (Cooperado) request.getAttribute("cooperado");
     Map<Long, String> cooperativas = (Map<Long, String>) request.getAttribute("cooperativas");

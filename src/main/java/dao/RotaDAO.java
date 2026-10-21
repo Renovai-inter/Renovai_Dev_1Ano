@@ -1,6 +1,6 @@
 package dao;
 
-import model.Rota;
+import model.principais.Rota;
 import util.Conexao;
 import util.Utilitario;
 

@@ -1,6 +1,6 @@
 package dao;
-import model.Cooperado;
-import model.Cooperativa;
+import model.principais.Cooperado;
+import model.principais.Cooperativa;
 import model.enums.CargoCooperado;
 import model.enums.StatusCooperado;
 import model.enums.TipoUsuario;

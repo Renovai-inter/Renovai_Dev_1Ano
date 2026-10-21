@@ -1,5 +1,5 @@
 
-package model;
+package model.principais;
 
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;

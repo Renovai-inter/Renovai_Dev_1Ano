@@ -1,7 +1,6 @@
 
-package model;
+package model.principais;
 
-import jdk.jshell.Snippet;
 import model.enums.StatusNegociacao;
 import util.Utilitario;
 

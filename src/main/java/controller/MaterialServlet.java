@@ -1,7 +1,7 @@
 package controller;
 
 import dao.MaterialDAO;
-import model.Material;
+import model.principais.Material;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;

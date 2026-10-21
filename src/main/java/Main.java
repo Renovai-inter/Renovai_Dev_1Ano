@@ -1,6 +1,6 @@
 import dao.CooperativaDAO;
 import dao.RotaDAO;
-import model.Rota;
+import model.principais.Rota;
 
 import java.util.ArrayList;
 

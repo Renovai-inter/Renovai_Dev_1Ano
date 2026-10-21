@@ -1,5 +1,5 @@
 package dao;
-import model.Coleta;
+import model.principais.Coleta;
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
 import util.Conexao;

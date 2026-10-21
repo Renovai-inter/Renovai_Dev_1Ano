@@ -1,4 +1,4 @@
-package model;
+package model.principais;
 
 import model.enums.CargoCooperado;
 import model.enums.StatusCooperado;

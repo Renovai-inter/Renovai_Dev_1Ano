@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.Cooperado, java.time.format.DateTimeFormatter" %>
+<%@ page import="java.util.*, model.principais.Cooperado, java.time.format.DateTimeFormatter" %>
 <%
     Cooperado c = (Cooperado) request.getAttribute("cooperado");
     List<Long> permissoesDoCooperado = (List<Long>) request.getAttribute("permissoesDoCooperado");

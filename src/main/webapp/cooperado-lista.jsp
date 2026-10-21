@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.ArrayList, model.Cooperado" %>
+<%@ page import="java.util.ArrayList, model.principais.Cooperado" %>
 <%
     ArrayList<Cooperado> lista = (ArrayList<Cooperado>) request.getAttribute("lista");
 %>

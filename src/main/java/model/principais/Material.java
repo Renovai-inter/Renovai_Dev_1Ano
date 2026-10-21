@@ -1,5 +1,5 @@
 
-package model;
+package model.principais;
 
 import model.enums.CategoriaMaterial;
 import util.Utilitario;
@@ -29,27 +29,42 @@ public class Material {
     // Define o valor de nome.
     public void setNome(String nome) {
         nome = utilitario.normalizarTextoLivre(nome);
-        if (nome != null && nome.codePointCount(0, nome.length()) > 100) {
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("nome é obrigatório.");
+        }
+        if (nome.codePointCount(0, nome.length()) > 100) {
             throw new IllegalArgumentException("nome deve ter no máximo 100 caracteres.");
         }
         this.nome = nome;
     }
 
     // Retorna o valor de categoria.
-    public String getCategoria() { return categoria == null ? null : categoria.name(); }
+    public String getCategoria() {
+        if (categoria == null) {
+            return null;
+        }
+        return categoria.name();
+    }
 
     // Define o valor de categoria.
     public void setCategoria(String categoria) {
-        this.categoria = categoria == null ? null : CategoriaMaterial.valueOf(utilitario.normalizarTextoLivre(categoria));
+        if (categoria == null || categoria.isBlank()) {
+            throw new IllegalArgumentException("categoria é obrigatória.");
+        }
+        this.categoria = CategoriaMaterial.valueOf(utilitario.normalizarTextoLivre(categoria));
     }
 
     public String getOrigem() {
         return origem;
     }
 
+    // Valida e guarda a origem obrigatória do material.
     public void setOrigem(String origem) {
         origem = utilitario.normalizarTextoLivre(origem);
-        if (nome != null && nome.codePointCount(0, nome.length()) > 10) {
+        if (origem == null || origem.isBlank()) {
+            throw new IllegalArgumentException("origem é obrigatória.");
+        }
+        if (origem.codePointCount(0, origem.length()) > 10) {
             throw new IllegalArgumentException("origem deve ter no máximo 10 caracteres.");
         }
         this.origem = origem;

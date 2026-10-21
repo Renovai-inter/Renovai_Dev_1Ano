@@ -1,6 +1,6 @@
 package dao;
 
-import model.Negociacao;
+import model.principais.Negociacao;
 import model.enums.StatusNegociacao;
 import util.Conexao;
 import util.Utilitario;

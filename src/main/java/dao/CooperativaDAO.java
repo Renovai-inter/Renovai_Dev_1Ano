@@ -1,7 +1,7 @@
 package dao;
 
-import model.Cooperativa;
-import model.Cooperado;
+import model.principais.Cooperativa;
+import model.principais.Cooperado;
 import model.enums.StatusCooperativa;
 import util.*;
 
