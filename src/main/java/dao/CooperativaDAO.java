@@ -62,11 +62,14 @@ public class CooperativaDAO {
         // Executar PreparedStatement
 
         try {
-            conexao.setAutoCommit(false);
             long ultimoId = utilitario.selecionarUltimoId("cooperativa");
-            long idCooperativa = ultimoId == -1 ? 1 : ultimoId + 1;
+            long idCooperativa;
+            if (ultimoId == -1) {
+                idCooperativa = 1;
+            } else {
+                idCooperativa = ultimoId + 1;
+            }
             coop.setIdCooperativa(idCooperativa);
-            int retornoCooperativa;
             try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
                 pstmt.setLong(1, idCooperativa);
                 pstmt.setString(2, coop.getNome());
@@ -80,34 +83,19 @@ public class CooperativaDAO {
                 pstmt.setString(10, coop.getEndereco());
                 pstmt.setString(11, coop.getCidade());
                 pstmt.setString(12, coop.getEstado());
-                retornoCooperativa = pstmt.executeUpdate();
+                if (pstmt.executeUpdate() == 0) {
+                    return null;
+                }
             }
-            if (retornoCooperativa == 0) {
-                conexao.rollback();
-                return null;
-            }
-            boolean gestorCadastrado = cooperadoDAO.cadastrarGestor(conexao, coop, gestor,
-                    senhaTemporariaGestor);
+            boolean gestorCadastrado = cooperadoDAO.gravarGestor(conexao, coop, gestor, senhaTemporariaGestor);
             if (!gestorCadastrado) {
-                conexao.rollback();
                 return null;
             }
-            conexao.commit();
+            coop.setCanalContatoPreferencial("WHATSAPP");
+            coop.setStatus(StatusCooperativa.ATIVA);
             return coop;
         } catch (SQLException e) {
-            try {
-                conexao.rollback();
-            } catch (SQLException rollback) {
-                e.addSuppressed(rollback);
-            }
             throw new RuntimeException("Falha ao cadastrar cooperativa e gestor.", e);
-        } catch (RuntimeException e) {
-            try {
-                conexao.rollback();
-            } catch (SQLException rollback) {
-                e.addSuppressed(rollback);
-            }
-            throw e;
         } finally {
             conn.desconectar(conexao);
         }
@@ -132,7 +120,9 @@ public class CooperativaDAO {
         }
         cooperativa.setQtdCooperados(rs.getInt("cooperados"));
         Timestamp cadastro = rs.getTimestamp("cadastro");
-        cooperativa.setDataCadastro(cadastro == null ? null : cadastro.toLocalDateTime());
+        if (cadastro != null) {
+            cooperativa.setDataCadastro(cadastro.toLocalDateTime());
+        }
         return cooperativa;
     }
 
@@ -154,12 +144,17 @@ public class CooperativaDAO {
 
         // Declaração
 
-        String filtro = "%" + busca.strip() + "%";
+        if (busca == null || busca.isBlank()) {
+            throw new IllegalArgumentException("busca é obrigatória.");
+        }
+        String filtroNome = "%" + busca.strip() + "%";
+        String filtroCnpj = "%" + busca.strip().replace(".", "").replace("/", "")
+                .replace("-", "") + "%";
 
         // Execução e retorno
 
         return consultarCooperativas(CONSULTA_COOPERATIVAS
-                + " WHERE coop.nome ILIKE ? OR coop.cnpj LIKE ?", filtro, filtro);
+                + " WHERE coop.nome ILIKE ? OR coop.cnpj LIKE ?", filtroNome, filtroCnpj);
     }
 
     // Lista as cooperativas da cidade informada.
@@ -237,47 +232,74 @@ public class CooperativaDAO {
 
     // === METODOS UPDATE ==============================================================================================
 
-    // Atualiza um campo permitido da cooperativa identificada.
-    public Cooperativa atualizarCooperativa(Long idCooperativa, String campo, String valorInformado) {
+    // Atualiza os dados informados da cooperativa identificada.
+    public Cooperativa atualizarCooperativa(Long idCooperativa, String nome, String cnpj,
+                                           String nomePublico, String descricaoInstitucional,
+                                           String logoUrl, String emailInstitucional,
+                                           String telefoneWhatsapp, String cep, String endereco,
+                                           String cidade, String estado, LocalDate dataFundacao,
+                                           String canalContatoPreferencial, String linkWhatsapp,
+                                           StatusCooperativa status) {
 
         // Declaração
 
         Cooperativa coop = new Cooperativa();
         coop.setIdCooperativa(idCooperativa);
+        coop.setNome(nome);
+        coop.setCnpj(cnpj);
+        coop.setNomePublico(nomePublico);
+        coop.setDescricaoInstitucional(descricaoInstitucional);
+        coop.setLogoUrl(logoUrl);
+        coop.setEmailInstitucional(emailInstitucional);
+        coop.setTelefoneWhatsapp(telefoneWhatsapp);
+        coop.setCep(cep);
+        coop.setEndereco(endereco);
+        coop.setCidade(cidade);
+        coop.setEstado(estado);
+        coop.setDataFundacao(dataFundacao);
+        coop.setCanalContatoPreferencial(canalContatoPreferencial);
+        coop.setLinkWhatsapp(linkWhatsapp);
+        coop.setStatus(status);
         if (coop.getIdCooperativa() == null) {
             throw new IllegalArgumentException("idCooperativa é obrigatório.");
         }
-        String coluna = campo.strip().toLowerCase(java.util.Locale.ROOT);
-        Object valor = switch (coluna) {
-            case "nome" -> { coop.setNome(valorInformado); yield coop.getNome(); }
-            case "cnpj" -> { coop.setCnpj(valorInformado); yield utilitario.filtrarCnpj(coop.getCnpj()); }
-            case "nome_publico" -> { coop.setNomePublico(valorInformado); yield coop.getNomePublico(); }
-            case "descricao_institucional" -> { coop.setDescricaoInstitucional(valorInformado); yield coop.getDescricaoInstitucional(); }
-            case "logo_url" -> { coop.setLogoUrl(valorInformado); yield coop.getLogoUrl(); }
-            case "email_institucional" -> { coop.setEmailInstitucional(valorInformado); yield coop.getEmailInstitucional(); }
-            case "telefone_whatsapp" -> { coop.setTelefoneWhatsapp(valorInformado); yield utilitario.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp()); }
-            case "cep" -> { coop.setCep(valorInformado); yield utilitario.filtrarCep(coop.getCep()); }
-            case "endereco" -> { coop.setEndereco(valorInformado); yield coop.getEndereco(); }
-            case "cidade" -> { coop.setCidade(valorInformado); yield coop.getCidade(); }
-            case "estado" -> { coop.setEstado(valorInformado); yield coop.getEstado(); }
-            case "data_fundacao" -> { coop.setDataFundacao(valorInformado == null ? null : LocalDate.parse(valorInformado)); yield coop.getDataFundacao() == null ? null : Date.valueOf(coop.getDataFundacao()); }
-            case "canal_contato_preferencial" -> { coop.setCanalContatoPreferencial(valorInformado); yield coop.getCanalContatoPreferencial(); }
-            case "link_whatsapp" -> { coop.setLinkWhatsapp(valorInformado); yield coop.getLinkWhatsapp(); }
-            case "status" -> { coop.setStatus(valorInformado == null ? null : StatusCooperativa.valueOf(valorInformado)); yield coop.getStatus() == null ? null : coop.getStatus().name(); }
-            default -> throw new IllegalArgumentException("Campo da cooperativa não permitido: " + campo);
-        };
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "UPDATE cooperativa SET " + coluna + " = ? WHERE id_cooperativa = ?";
+        String sql = "UPDATE cooperativa SET nome = ?, cnpj = ?, nome_publico = ?, " +
+                "descricao_institucional = ?, logo_url = ?, email_institucional = ?, " +
+                "telefone_whatsapp = ?, cep = ?, endereco = ?, cidade = ?, estado = ?, " +
+                "data_fundacao = ?, canal_contato_preferencial = ?, link_whatsapp = ?, status = ? " +
+                "WHERE id_cooperativa = ?";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setObject(1, valor);
-            pstmt.setLong(2, coop.getIdCooperativa());
-            return pstmt.executeUpdate() == 0 ? null : coop;
+            pstmt.setString(1, coop.getNome());
+            pstmt.setString(2, utilitario.filtrarCnpj(coop.getCnpj()));
+            pstmt.setString(3, coop.getNomePublico());
+            pstmt.setString(4, coop.getDescricaoInstitucional());
+            pstmt.setString(5, coop.getLogoUrl());
+            pstmt.setString(6, coop.getEmailInstitucional());
+            pstmt.setString(7, utilitario.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp()));
+            pstmt.setString(8, utilitario.filtrarCep(coop.getCep()));
+            pstmt.setString(9, coop.getEndereco());
+            pstmt.setString(10, coop.getCidade());
+            pstmt.setString(11, coop.getEstado());
+            if (coop.getDataFundacao() == null) {
+                pstmt.setNull(12, Types.DATE);
+            } else {
+                pstmt.setDate(12, Date.valueOf(coop.getDataFundacao()));
+            }
+            pstmt.setString(13, coop.getCanalContatoPreferencial());
+            pstmt.setString(14, coop.getLinkWhatsapp());
+            pstmt.setString(15, coop.getStatus().name());
+            pstmt.setLong(16, coop.getIdCooperativa());
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return coop;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar cooperativa.", e);
         } finally {
@@ -307,7 +329,10 @@ public class CooperativaDAO {
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, coop.getIdCooperativa());
-            return pstmt.executeUpdate() == 0 ? null : coop;
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return coop;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir cooperativa.", e);
         } finally {

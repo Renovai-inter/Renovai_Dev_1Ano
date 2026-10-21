@@ -7,6 +7,7 @@ import util.Utilitario;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class ColetaDAO {
@@ -27,7 +28,7 @@ public class ColetaDAO {
     // Cadastra uma coleta com os dados informados na Model.
     public Coleta cadastrarColeta(Long idCooperativa, TipoColeta tipo, StatusColeta status,
                                  Long idRota, Long idEnderecoRota, Long idCooperadoResponsavel,
-                                 String origemEntrega, String nomeLocalOrigem, java.util.Date dataAgendada,
+                                 String origemEntrega, String nomeLocalOrigem, LocalDate dataAgendada,
                                  LocalDateTime dataInicio, LocalDateTime dataFim, BigDecimal pesoTotalKg,
                                  String observacoes) {
 
@@ -51,7 +52,12 @@ public class ColetaDAO {
             throw new IllegalArgumentException("Cooperativa e tipo são obrigatórios.");
         }
         long ultimoId = utilitario.selecionarUltimoId("coleta");
-        long idColeta = ultimoId == -1 ? 1 : ultimoId + 1;
+        long idColeta;
+        if (ultimoId == -1) {
+            idColeta = 1;
+        } else {
+            idColeta = ultimoId + 1;
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL
@@ -67,26 +73,38 @@ public class ColetaDAO {
             pstmt.setLong(1, idColeta);
             pstmt.setLong(2, coleta.getIdCooperativa());
             pstmt.setString(3, coleta.getTipo().name());
-            pstmt.setString(4, coleta.getStatus() == null ? StatusColeta.AGENDADA.name() : coleta.getStatus().name());
+            if (coleta.getStatus() == null) {
+                coleta.setStatus(StatusColeta.AGENDADA);
+            }
+            pstmt.setString(4, coleta.getStatus().name());
             pstmt.setObject(5, coleta.getIdRota(), Types.BIGINT);
             pstmt.setObject(6, coleta.getIdEnderecoRota(), Types.BIGINT);
             pstmt.setObject(7, coleta.getIdCooperadoResponsavel(), Types.BIGINT);
             pstmt.setString(8, coleta.getOrigemEntrega());
             pstmt.setString(9, coleta.getNomeLocalOrigem());
-            pstmt.setDate(10, coleta.getDataAgendada() == null ? null
-                    : new java.sql.Date(coleta.getDataAgendada().getTime()));
-            pstmt.setTimestamp(11, coleta.getDataInicio() == null ? null
-                    : Timestamp.valueOf(coleta.getDataInicio()));
-            pstmt.setTimestamp(12, coleta.getDataFim() == null ? null
-                    : Timestamp.valueOf(coleta.getDataFim()));
+            if (coleta.getDataAgendada() == null) {
+                pstmt.setNull(10, Types.DATE);
+            } else {
+                pstmt.setDate(10, Date.valueOf(coleta.getDataAgendada()));
+            }
+            if (coleta.getDataInicio() == null) {
+                pstmt.setNull(11, Types.TIMESTAMP);
+            } else {
+                pstmt.setTimestamp(11, Timestamp.valueOf(coleta.getDataInicio()));
+            }
+            if (coleta.getDataFim() == null) {
+                pstmt.setNull(12, Types.TIMESTAMP);
+            } else {
+                pstmt.setTimestamp(12, Timestamp.valueOf(coleta.getDataFim()));
+            }
             pstmt.setBigDecimal(13, coleta.getPesoTotalKg());
             pstmt.setString(14, coleta.getObservacoes());
             int linhas = pstmt.executeUpdate();
-            coleta.setIdColeta(idColeta);
-            if (coleta.getStatus() == null) {
-                coleta.setStatus(StatusColeta.AGENDADA);
+            if (linhas == 0) {
+                return null;
             }
-            return linhas == 0 ? null : coleta;
+            coleta.setIdColeta(idColeta);
+            return coleta;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar coleta.", e);
         } finally {
@@ -173,11 +191,18 @@ public class ColetaDAO {
                 coleta.setIdCooperadoResponsavel(idOpcional(rs, "id_cooperado_responsavel"));
                 coleta.setOrigemEntrega(rs.getString("origem_entrega"));
                 coleta.setNomeLocalOrigem(rs.getString("nome_local_origem"));
-                coleta.setDataAgendada(rs.getDate("data_agendada"));
+                Date data = rs.getDate("data_agendada");
+                if (data != null) {
+                    coleta.setDataAgendada(data.toLocalDate());
+                }
                 Timestamp inicio = rs.getTimestamp("data_inicio");
                 Timestamp fim = rs.getTimestamp("data_fim");
-                coleta.setDataInicio(inicio == null ? null : inicio.toLocalDateTime());
-                coleta.setDataFim(fim == null ? null : fim.toLocalDateTime());
+                if (inicio != null) {
+                    coleta.setDataInicio(inicio.toLocalDateTime());
+                }
+                if (fim != null) {
+                    coleta.setDataFim(fim.toLocalDateTime());
+                }
                 coleta.setPesoTotalKg(rs.getBigDecimal("peso_total_kg"));
                 coleta.setObservacoes(rs.getString("observacoes"));
                 coletas.add(coleta);
@@ -193,7 +218,10 @@ public class ColetaDAO {
     // Preserva a nulidade de uma chave opcional.
     private Long idOpcional(ResultSet rs, String coluna) throws SQLException {
         long valor = rs.getLong(coluna);
-        return rs.wasNull() ? null : valor;
+        if (rs.wasNull()) {
+            return null;
+        }
+        return valor;
     }
     // === METODOS UPDATE ==============================================================================================
 
@@ -221,7 +249,10 @@ public class ColetaDAO {
             pstmt.setString(1, coleta.getOrigemEntrega());
             pstmt.setString(2, coleta.getNomeLocalOrigem());
             pstmt.setLong(3, coleta.getIdColeta());
-            return pstmt.executeUpdate() == 0 ? null : coleta;
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return coleta;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar a origem da coleta.", e);
         } finally {
@@ -251,7 +282,10 @@ public class ColetaDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setBigDecimal(1, coleta.getPesoTotalKg());
             pstmt.setLong(2, coleta.getIdColeta());
-            return pstmt.executeUpdate() == 0 ? null : coleta;
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return coleta;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar o peso da coleta.", e);
         } finally {
@@ -288,7 +322,10 @@ public class ColetaDAO {
             if (linhas > 0) {
                 coleta.setStatus(StatusColeta.EM_ANDAMENTO);
             }
-            return linhas == 0 ? null : coleta;
+            if (linhas == 0) {
+                return null;
+            }
+            return coleta;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao iniciar coleta.", e);
         } finally {
@@ -299,7 +336,7 @@ public class ColetaDAO {
     // Atualiza os dados de uma coleta identificada.
     public Coleta atualizarColeta(Long idColeta, TipoColeta tipo, StatusColeta status,
                                   String origemEntrega, String nomeLocalOrigem,
-                                  java.util.Date dataAgendada, LocalDateTime dataInicio,
+                                  LocalDate dataAgendada, LocalDateTime dataInicio,
                                   LocalDateTime dataFim, BigDecimal pesoTotalKg, String observacoes) {
 
         // Declaração
@@ -333,16 +370,28 @@ public class ColetaDAO {
             pstmt.setString(2, coleta.getStatus().name());
             pstmt.setString(3, coleta.getOrigemEntrega());
             pstmt.setString(4, coleta.getNomeLocalOrigem());
-            pstmt.setDate(5, coleta.getDataAgendada() == null ? null
-                    : new java.sql.Date(coleta.getDataAgendada().getTime()));
-            pstmt.setTimestamp(6, coleta.getDataInicio() == null ? null
-                    : Timestamp.valueOf(coleta.getDataInicio()));
-            pstmt.setTimestamp(7, coleta.getDataFim() == null ? null
-                    : Timestamp.valueOf(coleta.getDataFim()));
+            if (coleta.getDataAgendada() == null) {
+                pstmt.setNull(5, Types.DATE);
+            } else {
+                pstmt.setDate(5, Date.valueOf(coleta.getDataAgendada()));
+            }
+            if (coleta.getDataInicio() == null) {
+                pstmt.setNull(6, Types.TIMESTAMP);
+            } else {
+                pstmt.setTimestamp(6, Timestamp.valueOf(coleta.getDataInicio()));
+            }
+            if (coleta.getDataFim() == null) {
+                pstmt.setNull(7, Types.TIMESTAMP);
+            } else {
+                pstmt.setTimestamp(7, Timestamp.valueOf(coleta.getDataFim()));
+            }
             pstmt.setBigDecimal(8, coleta.getPesoTotalKg());
             pstmt.setString(9, coleta.getObservacoes());
             pstmt.setLong(10, coleta.getIdColeta());
-            return pstmt.executeUpdate() == 0 ? null : coleta;
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return coleta;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar coleta.", e);
         } finally {
@@ -379,7 +428,10 @@ public class ColetaDAO {
             if (linhas > 0) {
                 coleta.setStatus(StatusColeta.CONCLUIDA);
             }
-            return linhas == 0 ? null : coleta;
+            if (linhas == 0) {
+                return null;
+            }
+            return coleta;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao finalizar coleta.", e);
         } finally {
@@ -398,7 +450,10 @@ public class ColetaDAO {
 
         // Execução e retorno
 
-        return concluirColeta(coleta) == 0 ? null : coleta;
+        if (concluirColeta(coleta) == 0) {
+            return null;
+        }
+        return coleta;
     }
 
     // Encerra o acompanhamento de uma coleta finalizada.
@@ -412,7 +467,10 @@ public class ColetaDAO {
 
         // Execução e retorno
 
-        return concluirColeta(coleta) == 0 ? null : coleta;
+        if (concluirColeta(coleta) == 0) {
+            return null;
+        }
+        return coleta;
     }
 
     // Atualiza apenas o status e a data de término.
@@ -474,7 +532,10 @@ public class ColetaDAO {
             if (linhas > 0) {
                 coleta.setStatus(StatusColeta.CANCELADA);
             }
-            return linhas == 0 ? null : coleta;
+            if (linhas == 0) {
+                return null;
+            }
+            return coleta;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cancelar coleta.", e);
         } finally {

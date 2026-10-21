@@ -60,7 +60,7 @@ public class Negociacao {
             if (quantidadeKg.signum() <= 0) {
                 throw new IllegalArgumentException("quantidadeKg deve ser positiva.");
             }
-            utilitario.validarNumeroDecimal(quantidadeKg.toPlainString(), 12, 2);
+            utilitario.validarNumeroDecimal(quantidadeKg.toPlainString(), 10, 2);
         }
         this.quantidadeKg = quantidadeKg;
     }
@@ -73,7 +73,7 @@ public class Negociacao {
         if (valorKgAtual == null || valorKgAtual.signum() <= 0) {
             throw new IllegalArgumentException("valorKgAtual deve ser positivo.");
         }
-        utilitario.validarNumeroDecimal(valorKgAtual.toPlainString(), 10, 2);
+        utilitario.validarNumeroDecimal(valorKgAtual.toPlainString(), 8, 2);
         this.valorKgAtual = valorKgAtual;
     }
 
@@ -83,7 +83,7 @@ public class Negociacao {
     // Define o valor de valorTotalAtual.
     public void setValorTotalAtual(BigDecimal valorTotalAtual) {
         if (valorTotalAtual != null) {
-            utilitario.validarNumeroDecimal(valorTotalAtual.toPlainString(), 14, 2);
+            utilitario.validarNumeroDecimal(valorTotalAtual.toPlainString(), 12, 2);
         }
         this.valorTotalAtual = valorTotalAtual;
     }

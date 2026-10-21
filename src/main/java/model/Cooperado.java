@@ -18,7 +18,7 @@ public class Cooperado {
     private Long idUsuario; // FK
     private Long idCooperativa; // FK
     private String codigoCooperado; // NOT NULL - VARCHAR(20)
-    private CargoCooperado cargo; // NOT NULL - CHECK
+    private CargoCooperado cargo; // campo opcional com CHECK
     private StatusCooperado status; // NOT NULL - CHECK COM DEFAULT
     private LocalDateTime dataCadastro; // NOT NULL COM DEFAULT
 
@@ -57,7 +57,10 @@ public class Cooperado {
 
     // Define o valor de codigoCooperado.
     public void setCodigoCooperado(String codigoCooperado) {
-        if (codigoCooperado != null && codigoCooperado.codePointCount(0, codigoCooperado.length()) > 20) {
+        if (codigoCooperado == null || codigoCooperado.isBlank()) {
+            throw new IllegalArgumentException("codigoCooperado é obrigatório.");
+        }
+        if (codigoCooperado.codePointCount(0, codigoCooperado.length()) > 20) {
             throw new IllegalArgumentException("codigoCooperado deve ter no máximo 20 caracteres.");
         }
         this.codigoCooperado = codigoCooperado;
@@ -91,7 +94,10 @@ public class Cooperado {
     // Define o valor de nomeCompleto.
     public void setNomeCompleto(String nomeCompleto) {
         nomeCompleto = utilitario.normalizarTextoLivre(nomeCompleto);
-        if (nomeCompleto != null && nomeCompleto.codePointCount(0, nomeCompleto.length()) > 150) {
+        if (nomeCompleto == null || nomeCompleto.isBlank()) {
+            throw new IllegalArgumentException("nomeCompleto é obrigatório.");
+        }
+        if (nomeCompleto.codePointCount(0, nomeCompleto.length()) > 150) {
             throw new IllegalArgumentException("nomeCompleto deve ter no máximo 150 caracteres.");
         }
         this.nomeCompleto = nomeCompleto;
@@ -103,7 +109,10 @@ public class Cooperado {
     // Define o valor de nomeUsuario.
     public void setNomeUsuario(String nomeUsuario) {
         nomeUsuario = utilitario.normalizarTextoLivre(nomeUsuario);
-        if (nomeUsuario != null && nomeUsuario.codePointCount(0, nomeUsuario.length()) > 50) {
+        if (nomeUsuario == null || nomeUsuario.isBlank()) {
+            throw new IllegalArgumentException("nomeUsuario é obrigatório.");
+        }
+        if (nomeUsuario.codePointCount(0, nomeUsuario.length()) > 50) {
             throw new IllegalArgumentException("nomeUsuario deve ter no máximo 50 caracteres.");
         }
         this.nomeUsuario = nomeUsuario;

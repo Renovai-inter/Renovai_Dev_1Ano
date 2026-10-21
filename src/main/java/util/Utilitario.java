@@ -24,7 +24,10 @@ public class Utilitario {
 
     // Prepara textos livres sem remover os espaços internos.
     public String normalizarTextoLivre(String texto) {
-        return texto == null ? null : texto.strip().toUpperCase(Locale.ROOT);
+        if (texto == null) {
+            return null;
+        }
+        return texto.strip().toUpperCase(Locale.ROOT);
     }
 
     // === METODOS DE FILTRO DE ENTRADA ================================================================================
@@ -134,11 +137,15 @@ public class Utilitario {
         if (numero == null) {
             throw new IllegalArgumentException("número é obrigatório");
         }
-        if (valor < 0 || decimal < 0) {
-            throw new IllegalArgumentException("valores devem ser positivos.");
+        if (valor <= 0 || decimal < 0) {
+            throw new IllegalArgumentException("O limite inteiro deve ser positivo e o decimal não pode ser negativo.");
         }
         numero = numero.strip().replace(",", ".");
-        if (numero.matches("^-?[0-9]{1," + valor + "}(\\.[0-9]{1," + decimal + "})?$")) {
+        String formato = "^-?[0-9]{1," + valor + "}$";
+        if (decimal > 0) {
+            formato = "^-?[0-9]{1," + valor + "}(\\.[0-9]{1," + decimal + "})?$";
+        }
+        if (numero.matches(formato)) {
             return new BigDecimal(numero);
         }
         throw new IllegalArgumentException("formato de numero invalido.");

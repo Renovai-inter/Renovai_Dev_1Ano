@@ -37,7 +37,12 @@ public class RotaDAO {
             throw new IllegalArgumentException("idCooperativa deve ser positivo.");
         }
         long ultimoIdRota = utilitario.selecionarUltimoId("rota");
-        long novoIdRota = ultimoIdRota == -1 ? 1 : ultimoIdRota + 1;
+        long novoIdRota;
+        if (ultimoIdRota == -1) {
+            novoIdRota = 1;
+        } else {
+            novoIdRota = ultimoIdRota + 1;
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL
@@ -124,7 +129,10 @@ public class RotaDAO {
             pstmt.setLong(1, rota.getIdCooperativa());
             pstmt.setString(2, rota.getNomeRota());
             pstmt.setLong(3, rota.getIdRota());
-            return pstmt.executeUpdate() == 0 ? null : rota;
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return rota;
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar rota.", e);
@@ -153,7 +161,10 @@ public class RotaDAO {
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, rota.getIdRota());
-            return pstmt.executeUpdate() == 0 ? null : rota;
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return rota;
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir rota.", e);

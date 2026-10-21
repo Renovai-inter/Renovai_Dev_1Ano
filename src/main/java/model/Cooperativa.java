@@ -63,7 +63,10 @@ public class Cooperativa {
     // Define o valor de nome.
     public void setNome(String nome) {
         nome = utilitario.normalizarTextoLivre(nome);
-        if (nome != null && nome.codePointCount(0, nome.length()) > 150) {
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("nome é obrigatório.");
+        }
+        if (nome.codePointCount(0, nome.length()) > 150) {
             throw new IllegalArgumentException("nome deve ter no máximo 150 caracteres.");
         }
         this.nome = nome;
@@ -87,7 +90,10 @@ public class Cooperativa {
     // Define o valor de nomePublico.
     public void setNomePublico(String nomePublico) {
         nomePublico = utilitario.normalizarTextoLivre(nomePublico);
-        if (nomePublico != null && nomePublico.codePointCount(0, nomePublico.length()) > 150) {
+        if (nomePublico == null || nomePublico.isBlank()) {
+            throw new IllegalArgumentException("nomePublico é obrigatório.");
+        }
+        if (nomePublico.codePointCount(0, nomePublico.length()) > 150) {
             throw new IllegalArgumentException("nomePublico deve ter no máximo 150 caracteres.");
         }
         this.nomePublico = nomePublico;
@@ -154,7 +160,10 @@ public class Cooperativa {
     // Define o valor de endereco.
     public void setEndereco(String endereco) {
         endereco = utilitario.normalizarTextoLivre(endereco);
-        if (endereco != null && endereco.codePointCount(0, endereco.length()) > 255) {
+        if (endereco == null || endereco.isBlank()) {
+            throw new IllegalArgumentException("endereco é obrigatório.");
+        }
+        if (endereco.codePointCount(0, endereco.length()) > 255) {
             throw new IllegalArgumentException("endereco deve ter no máximo 255 caracteres.");
         }
         this.endereco = endereco;
@@ -166,7 +175,10 @@ public class Cooperativa {
     // Define o valor de cidade.
     public void setCidade(String cidade) {
         cidade = utilitario.normalizarTextoLivre(cidade);
-        if (cidade != null && cidade.codePointCount(0, cidade.length()) > 100) {
+        if (cidade == null || cidade.isBlank()) {
+            throw new IllegalArgumentException("cidade é obrigatória.");
+        }
+        if (cidade.codePointCount(0, cidade.length()) > 100) {
             throw new IllegalArgumentException("cidade deve ter no máximo 100 caracteres.");
         }
         this.cidade = cidade;
@@ -190,8 +202,10 @@ public class Cooperativa {
     // Define o valor de canalContatoPreferencial.
     public void setCanalContatoPreferencial(String canalContatoPreferencial) {
         canalContatoPreferencial = utilitario.normalizarTextoLivre(canalContatoPreferencial);
-        if (canalContatoPreferencial != null
-                && !canalContatoPreferencial.equals("WHATSAPP")
+        if (canalContatoPreferencial == null) {
+            throw new IllegalArgumentException("canalContatoPreferencial é obrigatório.");
+        }
+        if (!canalContatoPreferencial.equals("WHATSAPP")
                 && !canalContatoPreferencial.equals("TELEFONE")
                 && !canalContatoPreferencial.equals("EMAIL")) {
             throw new IllegalArgumentException("canalContatoPreferencial inválido.");
@@ -215,6 +229,9 @@ public class Cooperativa {
 
     // Define o valor de status.
     public void setStatus(StatusCooperativa status) {
+        if (status == null) {
+            throw new IllegalArgumentException("status é obrigatório.");
+        }
         this.status = status;
     }
 

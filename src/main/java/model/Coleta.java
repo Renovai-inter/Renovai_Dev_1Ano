@@ -8,7 +8,7 @@ import util.Utilitario;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Coleta {
 
@@ -25,7 +25,7 @@ public class Coleta {
     private Long idCooperadoResponsavel; // FK
     private String origemEntrega; // VARCHAR(15)
     private String nomeLocalOrigem; // VARCHAR(150)
-    private Date dataAgendada; // DATE
+    private LocalDate dataAgendada; // DATE
     private LocalDateTime dataInicio; // TIMESTAMP
     private LocalDateTime dataFim; // TIMESTAMP
     private BigDecimal pesoTotalKg; // NUMERIC(12,2)
@@ -104,10 +104,10 @@ public class Coleta {
     }
 
     // Retorna o valor de dataAgendada.
-    public Date getDataAgendada() { return dataAgendada; }
+    public LocalDate getDataAgendada() { return dataAgendada; }
 
     // Define o valor de dataAgendada.
-    public void setDataAgendada(Date dataAgendada) { this.dataAgendada = dataAgendada; }
+    public void setDataAgendada(LocalDate dataAgendada) { this.dataAgendada = dataAgendada; }
 
     // Retorna o valor de dataInicio.
     public LocalDateTime getDataInicio() { return dataInicio; }
