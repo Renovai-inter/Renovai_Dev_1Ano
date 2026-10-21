@@ -1,355 +1,393 @@
 package dao;
-import model.Coleta;
 import model.Cooperado;
+import model.Cooperativa;
+import model.enums.CargoCooperado;
+import model.enums.StatusCooperado;
+import model.enums.TipoUsuario;
 import util.Conexao;
+import util.Utilitario;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.*;
-import java.util.Date;
 
 public class CooperadoDAO {
 
     // ATRIBUTOS
 
     private Conexao conn = new Conexao();
+    private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR
 
+    // Inicializa o acesso aos dados de cooperado.
     public CooperadoDAO() {
     }
 
     // === METODOS CREATE ==============================================================================================
 
-    public int cadastrarCooperado(String nome_completo, String nome_usuario, String senha_hash,
-                                  int senha_temporaria, String email, String tipo_usuario, Date data_criacao){
-
-        String sql = "INSERT INTO cooperado(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo, status, " +
-                "data_cadastro) VALUES (?,?,?,?,?,?,?)";
-
+    // Cadastra um usuário gestor vinculado a uma cooperativa.
+    public Cooperado cadastrarGestor(Long idCooperativa, String nomeCompleto,
+                                    String nomeUsuario, String email, String senhaTemporaria) {
+        Cooperativa cooperativa = new Cooperativa();
+        cooperativa.setIdCooperativa(idCooperativa);
+        Cooperado gestor = new Cooperado();
+        gestor.setNomeCompleto(nomeCompleto);
+        gestor.setNomeUsuario(nomeUsuario == null || nomeUsuario.isBlank()
+                ? nomeCompleto.replace(" ", "") : nomeUsuario);
+        gestor.setEmail(email);
         Connection conexao = conn.conectar();
-
-        try{
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-            //valores esperados pela query
-            pstm.setString(1, nome_completo);
-            pstm.setString(2, nome_usuario);
-            pstm.setString(3, senha_hash);
-            pstm.setInt(4, senha_temporaria);
-            pstm.setString(5, email);
-            pstm.setString(6, tipo_usuario);
-            pstm.setDate(7, new java.sql.Date(data_criacao.getTime()));
-            //executando a query
-            pstm.execute();
-
+        try {
+            conexao.setAutoCommit(false);
+            int[] resultado = cadastrarGestor(conexao, cooperativa, gestor, senhaTemporaria);
+            conexao.commit();
+            return resultado[0] == 0 || resultado[1] == 0 ? null : gestor;
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            try {
+                conexao.rollback();
+            } catch (SQLException rollback) {
+                e.addSuppressed(rollback);
+            }
+            throw new RuntimeException("Falha ao cadastrar gestor.", e);
+        } catch (RuntimeException e) {
+            try {
+                conexao.rollback();
+            } catch (SQLException rollback) {
+                e.addSuppressed(rollback);
+            }
+            throw e;
         } finally {
             conn.desconectar(conexao);
         }
-        return 0;
     }
 
-    /*Selecionar atividades do cooperado – caso não tenha cargo definido, o gestor pode indicar uma
-     ou mais atividades (coleta externa, separação de materiais, organização do galpão, prensagem, pesagem, negociações, administrativo).*/
+    // Cadastra o gestor usando a mesma conexão da cooperativa.
+    int[] cadastrarGestor(Connection conexao, Cooperativa cooperativa, Cooperado gestor,
+                         String senhaTemporaria) throws SQLException {
+        long ultimoIdUsuario = utilitario.selecionarUltimoId("usuario");
+        long ultimoIdCooperado = utilitario.selecionarUltimoId("cooperado");
+        long idUsuario = ultimoIdUsuario == -1 ? 1 : ultimoIdUsuario + 1;
+        long idCooperado = ultimoIdCooperado == -1 ? 1 : ultimoIdCooperado + 1;
+        String sqlUsuario = "INSERT INTO usuario (id_usuario, nome_completo, nome_usuario, " +
+                "senha_hash, email, tipo_usuario) VALUES (?, ?, ?, ?, ?, 'GESTOR_COOPERATIVA')";
+        String sqlCooperado = "INSERT INTO cooperado (id_cooperado, id_usuario, id_cooperativa, " +
+                "codigo_cooperado, cargo) VALUES (?, ?, ?, ?, 'GESTOR')";
+        int usuarios;
+        try (PreparedStatement pstmt = conexao.prepareStatement(sqlUsuario)) {
+            pstmt.setLong(1, idUsuario);
+            pstmt.setString(2, gestor.getNomeCompleto());
+            pstmt.setString(3, gestor.getNomeUsuario());
+            pstmt.setString(4, senhaTemporaria);
+            pstmt.setString(5, gestor.getEmail());
+            usuarios = pstmt.executeUpdate();
+        }
+        int cooperados;
+        try (PreparedStatement pstmt = conexao.prepareStatement(sqlCooperado)) {
+            pstmt.setLong(1, idCooperado);
+            pstmt.setLong(2, idUsuario);
+            pstmt.setLong(3, cooperativa.getIdCooperativa());
+            pstmt.setString(4, "CD-" + idCooperado);
+            cooperados = pstmt.executeUpdate();
+        }
+        gestor.setIdUsuario(idUsuario);
+        gestor.setIdCooperado(idCooperado);
+        gestor.setIdCooperativa(cooperativa.getIdCooperativa());
+        gestor.setCodigoCooperado("CD-" + idCooperado);
+        gestor.setCargo(CargoCooperado.GESTOR);
+        gestor.setStatus(StatusCooperado.ATIVO);
+        gestor.setTipoUsuario(TipoUsuario.GESTOR_COOPERATIVA);
+        return new int[]{usuarios, cooperados};
+    }
 
-    public int selecionarAtividades(Cooperado cooperado){
-
-        String sql = "INSERT INTO cooperado(id_usuario, cargo, codigo_cooperado, status) VALUES(?,?,?,?)";
-
+    // Cadastra usuário e cooperado na mesma transação.
+    public Cooperado cadastrarCooperado(Long idCooperativa, String nomeCompleto,
+                                       String nomeUsuario, String email, String senhaHash,
+                                       boolean senhaTemporaria, CargoCooperado cargo,
+                                       StatusCooperado status) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdCooperativa(idCooperativa);
+        cooperado.setNomeCompleto(nomeCompleto);
+        cooperado.setNomeUsuario(nomeUsuario);
+        cooperado.setEmail(email);
+        cooperado.setSenhaTemporaria(senhaTemporaria);
+        cooperado.setTipoUsuario(TipoUsuario.COOPERADO);
+        cooperado.setCargo(cargo);
+        cooperado.setStatus(status);
+        if (cooperado.getIdCooperativa() == null || cooperado.getNomeCompleto() == null ||
+                cooperado.getNomeUsuario() == null || cooperado.getEmail() == null || senhaHash == null) {
+            throw new IllegalArgumentException("Dados obrigatórios do cooperado e usuário estão ausentes.");
+        }
+        String sqlUsuario = "INSERT INTO usuario (id_usuario, nome_completo, nome_usuario, senha_hash, " +
+                "senha_temporaria, email, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sqlCooperado = "INSERT INTO cooperado (id_cooperado, id_usuario, id_cooperativa, " +
+                "codigo_cooperado, cargo, status) VALUES (?, ?, ?, ?, ?, ?)";
         Connection conexao = conn.conectar();
-
-        try{
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-
-            pstm.setLong(1, cooperado.getIdUsuario());
-            pstm.setString(2, cooperado.getCargo());
-            pstm.setString(3, cooperado.getCodigoCooperado());
-            pstm.setString(4, cooperado.getStatus());
-
-            pstm.executeUpdate();
-
+        try {
+            conexao.setAutoCommit(false);
+            long ultimoIdUsuario = utilitario.selecionarUltimoId("usuario");
+            long ultimoIdCooperado = utilitario.selecionarUltimoId("cooperado");
+            long idUsuario = ultimoIdUsuario == -1 ? 1 : ultimoIdUsuario + 1;
+            long idCooperado = ultimoIdCooperado == -1 ? 1 : ultimoIdCooperado + 1;
+            try (PreparedStatement pstmt = conexao.prepareStatement(sqlUsuario)) {
+                pstmt.setLong(1, idUsuario);
+                pstmt.setString(2, cooperado.getNomeCompleto());
+                pstmt.setString(3, cooperado.getNomeUsuario());
+                pstmt.setString(4, senhaHash);
+                pstmt.setBoolean(5, cooperado.isSenhaTemporaria());
+                pstmt.setString(6, cooperado.getEmail());
+                pstmt.setString(7, cooperado.getTipoUsuario() == null
+                        ? TipoUsuario.COOPERADO.name() : cooperado.getTipoUsuario().name());
+                pstmt.executeUpdate();
+            }
+            try (PreparedStatement pstmt = conexao.prepareStatement(sqlCooperado)) {
+                pstmt.setLong(1, idCooperado);
+                pstmt.setLong(2, idUsuario);
+                pstmt.setLong(3, cooperado.getIdCooperativa());
+                pstmt.setString(4, cooperado.getCodigoCooperado() == null
+                        ? "CD-" + idCooperado : cooperado.getCodigoCooperado());
+                pstmt.setString(5, cooperado.getCargo() == null ? null : cooperado.getCargo().name());
+                pstmt.setString(6, cooperado.getStatus() == null
+                        ? StatusCooperado.ATIVO.name() : cooperado.getStatus().name());
+                int linhas = pstmt.executeUpdate();
+                cooperado.setIdUsuario(idUsuario);
+                cooperado.setIdCooperado(idCooperado);
+                if (cooperado.getCodigoCooperado() == null) {
+                    cooperado.setCodigoCooperado("CD-" + idCooperado);
+                }
+                if (cooperado.getStatus() == null) {
+                    cooperado.setStatus(StatusCooperado.ATIVO);
+                }
+                conexao.commit();
+                return linhas == 0 ? null : cooperado;
+            }
         } catch (SQLException e) {
-            e.getMessage();
+            try {
+                conexao.rollback();
+            } catch (SQLException rollback) {
+                e.addSuppressed(rollback);
+            }
+            throw new RuntimeException("Falha ao cadastrar cooperado.", e);
+        } catch (RuntimeException e) {
+            try {
+                conexao.rollback();
+            } catch (SQLException rollback) {
+                e.addSuppressed(rollback);
+            }
+            throw e;
+        } finally {
+            conn.desconectar(conexao);
         }
-        return 0;
     }
 
-    /*Definir permissões de acesso no cadastro – o gestor define
-     quais funcionalidades (Dashboard, Cooperados, Coletas, Negociações, Vendas, Financeiro, Relatórios, Configurações)
-     estarão disponíveis para o cooperado (por padrão, todas são liberadas).
-Geração automática de conta de acesso – ao cadastrar, o
-sistema cria automaticamente: código do cooperado, nome de usuário e senha temporária.*/
-
-    public int permissoesAcesso(Cooperado cooperado, String nome_completo, String nome_usuario, String senha_hash, Boolean senha_temporaria, String email, String tipo_usario, Date data_criacao){
-
-        String sqlCop = "INSERT INTO cooperado(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo) VALUES(?,?,?,?,?,?)";
-        String sqlUsu = "INSERT INTO usuario(nome_completo, nome_usuario, senha_hash, senha_temporaria, email, tipo_usuario, data_criacao) VALUES(?,?,?,?,?,?,?,?)";
-
+    // Registra as atividades informadas para um cooperado existente.
+    public Cooperado selecionarAtividades(Long idCooperado, ArrayList<String> atividades) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdCooperado(idCooperado);
+        cooperado.setAtividades(atividades);
+        if (cooperado.getIdCooperado() == null) {
+            throw new IllegalArgumentException("idCooperado é obrigatório.");
+        }
+        if (cooperado.getAtividades() == null || cooperado.getAtividades().isEmpty()) {
+            return cooperado;
+        }
+        String sql = "INSERT INTO cooperado_atividade (id_cooperado, atividade) VALUES (?, ?)";
         Connection conexao = conn.conectar();
-
-        try{
-            PreparedStatement pstm = conexao.prepareStatement(sqlCop);
-            PreparedStatement pst = conexao.prepareStatement(sqlUsu);
-
-            //cooperado
-            pstm.setInt(1, Math.toIntExact(cooperado.getIdUsuario()));
-            pstm.setString(2, cooperado.getCodigoCooperado());
-            pstm.setString(3, cooperado.getCargo());
-            pstm.setTimestamp(4, java.sql.Timestamp.valueOf(cooperado.getDataCadastro()));
-            //usuario
-            pst.setString(1, nome_completo);
-            pst.setString(2,nome_usuario);
-            pst.setString(3, senha_hash);
-            pst.setBoolean(4, senha_temporaria);
-            pst.setString(5, email);
-            pst.setString(6, tipo_usario);
-            pst.setDate(7, new java.sql.Date(data_criacao.getTime()));
-        } catch (SQLException e){
-            e.getMessage();
+        try {
+            conexao.setAutoCommit(false);
+            int total = 0;
+            try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+                for (String atividade : cooperado.getAtividades()) {
+                    pstmt.setLong(1, cooperado.getIdCooperado());
+                    pstmt.setString(2, atividade);
+                    total += pstmt.executeUpdate();
+                }
+            }
+            conexao.commit();
+            return total == 0 ? null : cooperado;
+        } catch (SQLException e) {
+            try {
+                conexao.rollback();
+            } catch (SQLException rollback) {
+                e.addSuppressed(rollback);
+            }
+            throw new RuntimeException("Falha ao registrar atividades do cooperado.", e);
+        } finally {
+            conn.desconectar(conexao);
         }
-
-        return 0;
     }
 
-
-
+    // Os parâmetros ficam preparados até a Model representar os vínculos de permissão.
+    public Cooperado permissoesAcesso(Long idCooperado, ArrayList<Long> idsPermissoes) {
+        throw new UnsupportedOperationException("Pendente: representar permissões na Model do cooperado.");
+    }
 
     // === METODOS READ ================================================================================================
 
-    /*Visualizar lista de cooperados – tela principal com código, nome, status e cargo (quando houver) de todos os cooperados cadastrados.
-Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela de edição para ver suas informações completas.*/
-
-    public ArrayList<Cooperado> listaCooperados(){
-
-        ArrayList<Cooperado> cooperados = new ArrayList<>();
-
-        String sql;
-        sql = "SELECT c.codigo_cooperado, u.nome_usuario, c.status, c.cargo FROM cooperado c join usuario u on c.id_usuario = u.id_usuario";
-
+    // Lista cooperados com identificação, usuário, status e cargo.
+    public ArrayList<Cooperado> listaCooperados() {
+        String sql = "SELECT c.id_cooperado, c.id_usuario, c.id_cooperativa, " +
+                "c.codigo_cooperado, c.status, c.cargo, u.nome_usuario " +
+                "FROM cooperado c JOIN usuario u ON c.id_usuario = u.id_usuario";
         Connection conexao = conn.conectar();
-
-        try{
-            PreparedStatement pstm = conexao.prepareStatement(sql);
-
-            ResultSet rst = pstm.executeQuery();
-
-            while(rst.next()){
+        ArrayList<Cooperado> cooperados = new ArrayList<>();
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
                 Cooperado cooperado = new Cooperado();
-
-                cooperado.setCodigoCooperado(rst.getString("codigo_cooperado"));
-                cooperado.setIdUsuario(rst.getLong("nome_usuario"));
-                cooperado.setIdUsuario(rst.getLong("id_usuario"));
-                cooperado.setStatus(rst.getString("status"));
-                cooperado.setCargo(rst.getString("cargo"));
-
+                cooperado.setIdCooperado(rs.getLong("id_cooperado"));
+                cooperado.setIdUsuario(rs.getLong("id_usuario"));
+                cooperado.setIdCooperativa(rs.getLong("id_cooperativa"));
+                cooperado.setCodigoCooperado(rs.getString("codigo_cooperado"));
+                cooperado.setNomeUsuario(rs.getString("nome_usuario"));
+                cooperado.setStatus(StatusCooperado.valueOf(rs.getString("status")));
+                String cargo = rs.getString("cargo");
+                cooperado.setCargo(cargo == null ? null : CargoCooperado.valueOf(cargo));
                 cooperados.add(cooperado);
             }
-
+            return cooperados;
         } catch (SQLException e) {
-            e.getMessage();
+            throw new RuntimeException("Falha ao listar cooperados.", e);
+        } finally {
+            conn.desconectar(conexao);
         }
-
-        return cooperados;
     }
-
-
 
     // === METODOS UPDATE ==============================================================================================
 
-    // Editar cooperado – abre o formulário para edição das informações do cooperado selecionado.
-
-    public int editarCooperado(Cooperado cooperado) {
-
+    // Atualiza os dados de um cooperado identificado.
+    public Cooperado editarCooperado(Long idCooperado, Long idUsuario,
+                                     Long idCooperativa, String codigoCooperado,
+                                     CargoCooperado cargo, StatusCooperado status) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdCooperado(idCooperado);
+        cooperado.setIdUsuario(idUsuario);
+        cooperado.setIdCooperativa(idCooperativa);
+        cooperado.setCodigoCooperado(codigoCooperado);
+        cooperado.setCargo(cargo);
+        cooperado.setStatus(status);
+        if (cooperado.getIdCooperado() == null) {
+            throw new IllegalArgumentException("idCooperado é obrigatório.");
+        }
+        String sql = "UPDATE cooperado SET id_usuario = ?, id_cooperativa = ?, " +
+                "codigo_cooperado = ?, cargo = ?, status = ? WHERE id_cooperado = ?";
         Connection conexao = conn.conectar();
-
-        String sql = "UPDATE cooperado\n" +
-                "SET id_usuario = ?,\n" +
-                "    id_cooperativa = ?,\n" +
-                "    codigo_cooperado = ?,\n" +
-                "    cargo = ?,\n" +
-                "    status = ? WHERE id_cooperado = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setBigDecimal(1, BigDecimal.valueOf(cooperado.getIdUsuario()));
-            pstmt.setBigDecimal(1, BigDecimal.valueOf(cooperado.getIdCooperativa()));
-            pstmt.setString(1, (cooperado.getCodigoCooperado()));
-            pstmt.setString(1, (cooperado.getCargo()));
-            pstmt.setString(1, (cooperado.getStatus()));
-
-            return pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setObject(1, cooperado.getIdUsuario(), Types.BIGINT);
+            pstmt.setObject(2, cooperado.getIdCooperativa(), Types.BIGINT);
+            pstmt.setString(3, cooperado.getCodigoCooperado());
+            pstmt.setString(4, cooperado.getCargo() == null ? null : cooperado.getCargo().name());
+            pstmt.setString(5, cooperado.getStatus() == null ? null : cooperado.getStatus().name());
+            pstmt.setLong(6, cooperado.getIdCooperado());
+            return pstmt.executeUpdate() == 0 ? null : cooperado;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao editar cooperado.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-//Alterar cargo do cooperado.
-
-    public int alterarCargoCooperado(Cooperado cooperado) {
-
+    // Altera o cargo de um cooperado existente.
+    public Cooperado alterarCargoCooperado(Long idCooperado, CargoCooperado cargo) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdCooperado(idCooperado);
+        cooperado.setCargo(cargo);
+        if (cooperado.getIdCooperado() == null) {
+            throw new IllegalArgumentException("idCooperado é obrigatório.");
+        }
+        String sql = "UPDATE cooperado SET cargo = ? WHERE id_cooperado = ?";
         Connection conexao = conn.conectar();
-
-        String sql = "UPDATE cooperado\n" +
-                "SET cargo = ? WHERE id_cooperado = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setString(1, (cooperado.getCargo()));
-
-            return pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setString(1, cooperado.getCargo() == null ? null : cooperado.getCargo().name());
+            pstmt.setLong(2, cooperado.getIdCooperado());
+            return pstmt.executeUpdate() == 0 ? null : cooperado;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao alterar cargo do cooperado.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-//Alterar atividades desempenhadas (múltipla escolha).
-
-    public int alterarAtividadesDesempenhadas(int idCooperado, String atividade) {
-
+    // Altera uma atividade do cooperado identificado.
+    public Cooperado alterarAtividadesDesempenhadas(Long idCooperado, String atividadeAnterior,
+                                                    String atividadeNova) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdCooperado(idCooperado);
+        ArrayList<String> atividades = new ArrayList<>();
+        atividades.add(atividadeNova);
+        cooperado.setAtividades(atividades);
+        String sql = "UPDATE cooperado_atividade SET atividade = ? " +
+                "WHERE id_cooperado = ? AND atividade = ?";
         Connection conexao = conn.conectar();
-
-        String sql = "UPDATE cooperado_atividade\n" +
-                "SET atividade = ? WHERE id_cooperado = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setString(1, atividade);
-            pstmt.setInt(2, idCooperado);
-
-
-            return pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setString(1, atividadeNova);
+            pstmt.setLong(2, idCooperado);
+            pstmt.setString(3, atividadeAnterior);
+            return pstmt.executeUpdate() == 0 ? null : cooperado;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao alterar atividade do cooperado.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-
-//Alterar status do cooperado (Ativo, Afastado ou Inativo).
-
-    public int alterarStatusCooperado(Cooperado cooperado) {
-
+    // Altera o status de um cooperado existente.
+    public Cooperado alterarStatusCooperado(Long idCooperado, StatusCooperado status) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdCooperado(idCooperado);
+        cooperado.setStatus(status);
+        if (cooperado.getIdCooperado() == null || cooperado.getStatus() == null) {
+            throw new IllegalArgumentException("ID e status são obrigatórios.");
+        }
+        String sql = "UPDATE cooperado SET status = ? WHERE id_cooperado = ?";
         Connection conexao = conn.conectar();
-
-        String sql = "UPDATE cooperado\n" +
-                "SET status = ? WHERE id_cooperado = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setString(1, (cooperado.getStatus()));
-
-            return pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setString(1, cooperado.getStatus().name());
+            pstmt.setLong(2, cooperado.getIdCooperado());
+            return pstmt.executeUpdate() == 0 ? null : cooperado;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao alterar status do cooperado.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-//Alterar permissões de acesso ao sistema (somente cooperados com cargo de Gestor podem fazer essa alteração para outros usuários; o gestor sempre mantém acesso total, que não pode ser removido).
-
-    public int alterarPermissoesAcesso(int idCooperado, int idPermissao) {
-
-        Connection conexao = conn.conectar();
-
-        String sql = "UPDATE cooperado_permissao\n" +
-                "SET id_permissao = ? WHERE id_cooperado = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setInt(1, idCooperado);
-            pstmt.setInt(2, idPermissao);
-
-            return pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
-        } finally {
-            conn.desconectar(conexao);
-        }
+    // Altera a permissão vinculada ao cooperado identificado.
+    public Cooperado alterarPermissoesAcesso(Long idCooperado, Long idPermissaoAnterior,
+                                             Long idPermissaoNova) {
+        throw new UnsupportedOperationException("Pendente: representar a permissão anterior e a nova na Model do cooperado.");
     }
 
-//Alterar nome de usuário – pode ser feito posteriormente pelo próprio cooperado, nas configurações da conta.
-
-    public int alterarNomeUsuario(int idUsuario, String nomeUsuario) {
-
+    // Altera o nome de usuário de uma conta existente.
+    public Cooperado alterarNomeUsuario(Long idUsuario, String nomeUsuario) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdUsuario(idUsuario);
+        cooperado.setNomeUsuario(nomeUsuario);
+        String sql = "UPDATE usuario SET nome_usuario = ? WHERE id_usuario = ?";
         Connection conexao = conn.conectar();
-
-        String sql = "UPDATE usuario\n" +
-                "SET nome_usuario = ? WHERE id_usuario = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, nomeUsuario);
-            pstmt.setInt(2, idUsuario);
-
-            return pstmt.executeUpdate();
-
+            pstmt.setLong(2, idUsuario);
+            return pstmt.executeUpdate() == 0 ? null : cooperado;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao alterar nome de usuário.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-//Definir nova senha no primeiro acesso – o cooperado deve trocar a senha temporária ao acessar o sistema pela primeira vez.
-
-    public int alterarSenha(int idUsuario, String senhaHash, boolean senhaTemporaria) {
-
+    // Atualiza senha e indicador de senha temporária.
+    public Cooperado alterarSenha(Long idUsuario, String senhaHash, boolean senhaTemporaria) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdUsuario(idUsuario);
+        cooperado.setSenhaTemporaria(senhaTemporaria);
+        String sql = "UPDATE usuario SET senha_hash = ?, senha_temporaria = ? WHERE id_usuario = ?";
         Connection conexao = conn.conectar();
-
-        String sql = "UPDATE usuario\n" +
-                "SET senha_hash = ?,\n" +
-                "    senha_temporaria = ? WHERE id_usuario = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, senhaHash);
-            pstmt.setBoolean(2, false);
-            pstmt.setInt(3, idUsuario);
-
-            return pstmt.executeUpdate();
-
+            pstmt.setBoolean(2, senhaTemporaria);
+            pstmt.setLong(3, idUsuario);
+            return pstmt.executeUpdate() == 0 ? null : cooperado;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao alterar senha.", e);
         } finally {
             conn.desconectar(conexao);
         }
@@ -357,59 +395,39 @@ Visualizar detalhes do cooperado – ao selecionar um cooperado, acessar a tela 
 
     // === METODOS DELETE ==============================================================================================
 
-    /*Remover cooperado – remove o cooperado da cooperativa, com uma tela de confirmação antes para evitar exclusões acidentais. Recomendado apenas quando o cooperado realmente deixa de fazer parte da cooperativa (para afastamentos temporários, o indicado é usar o status "Afastado" em vez de remover).*/
-
-     public int excluirCooperado(Cooperado cooperado) {
-
+    // Exclui o vínculo do cooperado identificado.
+    public Cooperado excluirCooperado(Long idCooperado) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdCooperado(idCooperado);
+        if (cooperado.getIdCooperado() == null) {
+            throw new IllegalArgumentException("idCooperado é obrigatório.");
+        }
+        String sql = "DELETE FROM cooperado WHERE id_cooperado = ?";
         Connection conexao = conn.conectar();
-
-        String sql = "DELETE FROM cooperado\n" +
-                "WHERE id_cooperado = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, cooperado.getIdCooperado());
-
-            return pstmt.executeUpdate();
-
+            return pstmt.executeUpdate() == 0 ? null : cooperado;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao excluir cooperado.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-//Remover acesso a um módulo específico (permissão) – não exclui os dados relacionados à funcionalidade, apenas impede o acesso a ela (é uma "remoção" parcial, não uma exclusão de dados).*/
-
-    public int removerAcessoModulo(int idCooperado, int idPermissao) {
-
+    // Remove uma permissão específica de um cooperado.
+    public Cooperado removerAcessoModulo(Long idCooperado, Long idPermissao) {
+        Cooperado cooperado = new Cooperado();
+        cooperado.setIdCooperado(idCooperado);
+        String sql = "DELETE FROM cooperado_permissao WHERE id_cooperado = ? AND id_permissao = ?";
         Connection conexao = conn.conectar();
-
-        String sql = "DELETE FROM cooperado_permissao\n" +
-                "WHERE id_cooperado = ? AND id_permissao = ?";
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-
-            pstmt.setLong(1,idCooperado);
-            pstmt.setLong(1,idPermissao);
-
-
-            return pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setLong(1, idCooperado);
+            pstmt.setLong(2, idPermissao);
+            return pstmt.executeUpdate() == 0 ? null : cooperado;
         } catch (SQLException e) {
-
-            throw new RuntimeException(e);
-
+            throw new RuntimeException("Falha ao remover acesso do cooperado.", e);
         } finally {
             conn.desconectar(conexao);
         }
     }
-
 }

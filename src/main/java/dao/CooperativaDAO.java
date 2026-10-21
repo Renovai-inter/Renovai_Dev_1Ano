@@ -1,572 +1,234 @@
 package dao;
 
 import model.Cooperativa;
-import util.Conexao;
+import model.Cooperado;
+import model.enums.StatusCooperativa;
+import util.*;
 
 import java.sql.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class CooperativaDAO {
 
     // ATRIBUTOS
 
-    private static Conexao conn = new Conexao();
+    private final Conexao conn = new Conexao();
+    private final Utilitario utilitario = new Utilitario();
+    private final CooperadoDAO cooperadoDAO = new CooperadoDAO();
 
     // CONSTRUTOR
 
+    // Inicializa o acesso aos dados de cooperativa.
     public CooperativaDAO() {
     }
 
-    // === METODOS DE FILTRO PARA NUMERICO =============================================================================
-
-    // Filtrar CNPJ todo: reestruturar filtragem
-    private static String filtrarCnpj(String cnpj) {
-
-        // Tratamento inicial
-        cnpj.trim();
-
-        // Retirar "." e "-"
-        cnpj.replace(".", "");
-        cnpj.replace("-", "");
-
-        // Verificar formato (regex) correto
-        if (cnpj.matches("^\\d{11}$")) {
-            return cnpj;
-        } else {
-            return "invalido";
-        }
-
-    }
-
-    // Filtrar Telefone/Whatsapp
-    private static String filtrarTelefoneWhatsapp(String telefoneWhatsapp) {
-
-        // Tratamento inicial
-        telefoneWhatsapp.trim(); // (00) 00000-0000
-
-        // Retirar "(", ")", e "-", depois, retirar o " " presente entre o DDD e o numero
-        telefoneWhatsapp.replace("(", "");
-        telefoneWhatsapp.replace(")", "");
-        telefoneWhatsapp.replace("-", "");
-        telefoneWhatsapp.replace(" ", "");
-
-        // Formato de telefone comum tem 10 digitos, whatsapp tem 11
-        if (telefoneWhatsapp.matches("^\\d{10,11}$")) {
-            return telefoneWhatsapp;
-        }
-        return "invalido";
-
-    }
-
-    // Filtrar email institucional
-    private static String filtrarEmailInstitucional(String email) {
-
-        // Tratamento inicial
-        email.trim().toLowerCase();
-
-        // todo: Verificação de existência de email
-
-        // Verificação usando regex. ex: joel.gracek@email.com
-        if (email.matches("^[\\w.-]+@[\\w.-]+\\.\\w+$")) {
-            return email;
-        }
-        return "invalido";
-
-    }
-
-    // Validar CEP
-    private static String filtrarCep(String cep) {
-
-        // Tratamento inicial
-        cep.trim();
-
-        // Validação usando formato 00000-000
-        if (cep.matches("^\\d{5}-\\d{3}")) {
-            return cep;
-        }
-        return "invalido";
-
-    }
-
-    // Validar Endereço
-    private static String filtrarEndereco(String endereco) {
-
-        // Tratamento inicial
-        String[] valoresEndereco = endereco.trim().toLowerCase().split(",");
-
-        // Formato esperado: Rua, Número, Bairro
-        if (valoresEndereco.length == 3) {
-
-            if (!(valoresEndereco[0].trim().matches("^\\w+$")
-                    && valoresEndereco[1].trim().matches("^\\d+$")
-                    && valoresEndereco[2].trim().matches("^\\w+$"))) {
-                return "invalido";
-            }
-
-        }
-        return endereco;
-
-    }
-
-    // Validar UF
-    private static String validarUf(String uf) {
-
-        // Tratamento inicial
-        uf.trim().toUpperCase();
-
-        // Lista de UFs possíveis
-        String[] listaUfs = {"AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB",
-                "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"};
-
-        // Verificação de formato: CIDADE X / UF
-        for (String ufVer : listaUfs) {
-            if (ufVer.equals(uf)) {
-                return uf;
-            }
-        }
-        return "invalido";
-
-    }
-
-    // todo: formatação de datas
-
-    // === OUTROS METODOS ==============================================================================================
-
-    // Retorna o último índice de ID das cooperativas
-    public long getUltimoIdCooperativa() {
-
-        Connection conexao = conn.conectar();
-
-        String sql = "SELECT id_cooperativa " +
-                "FROM cooperativa " +
-                "ORDER BY 1 DESC LIMIT 1";
-
-        try {
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()){
-                return rs.getLong("id_cooperativa");
-            }
-            else {
-                return -1;
-            }
-        }
-        catch (SQLException e) {
-            return -1;
-        } finally { conn.desconectar(conexao); } }
-
     // === METODOS CREATE ==============================================================================================
 
-    // Metodo de cadastrar cooperativa | todo: implementar API de buscar endereço por CEP
-    public int cadastrarCooperativa(Cooperativa coop) {
-
-        // DECLARACAO
-
+    // Cadastra uma cooperativa e seu gestor inicial.
+    public Cooperativa cadastrarCooperativa(String nome, String cnpj, String nomePublico,
+                                            String descricaoInstitucional, String logoUrl,
+                                            String emailInstitucional, String telefoneWhatsapp,
+                                            String cep, String endereco, String cidade, String estado,
+                                            String nomeGestor, String usuarioGestor,
+                                            String emailGestor, String senhaTemporariaGestor) {
+        Cooperativa coop = new Cooperativa();
+        coop.setNome(nome);
+        coop.setCnpj(cnpj);
+        coop.setNomePublico(nomePublico);
+        coop.setDescricaoInstitucional(descricaoInstitucional);
+        coop.setLogoUrl(logoUrl);
+        coop.setEmailInstitucional(emailInstitucional);
+        coop.setTelefoneWhatsapp(telefoneWhatsapp);
+        coop.setCep(cep);
+        coop.setEndereco(endereco);
+        coop.setCidade(cidade);
+        coop.setEstado(estado);
+        Cooperado gestor = new Cooperado();
+        gestor.setNomeCompleto(nomeGestor);
+        gestor.setNomeUsuario(usuarioGestor);
+        gestor.setEmail(emailGestor);
         Connection conexao = conn.conectar();
-        String sql;
-
-        // COMANDO SQL PADRÃO
-
-        // todo: ver possível geração de link de whatsapp automático pelo numero usando API
-        // Caso afirmativo, adicionar link_whatsapp no comando e statement
-
-        sql = (
-                "INSERT INTO cooperativa " +
-                    "(id_cooperativa, nome, cnpj, nome_publico, descricao_institucional, " +
-                    "logo_url, email_institucional, telefone_whatsapp, cep, endereco, cidade, estado) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-        );
-
+        String sql = "INSERT INTO cooperativa (id_cooperativa, nome, cnpj, nome_publico, " +
+                "descricao_institucional, logo_url, email_institucional, telefone_whatsapp, " +
+                "cep, endereco, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
-
-            // EXECUTAR PREPARED STATEMENT E PREENCHER PLACEHOLDERS
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setLong(0, getUltimoIdCooperativa());
-
-            pstmt.setString(1, coop.getNome().toLowerCase());
-
-            String cnpj = filtrarCnpj(coop.getCnpj());
-            if (cnpj.equals("invalido")) {
-                pstmt.setNull(3, Types.VARCHAR);
-            } else {
-                pstmt.setString(3, cnpj);
-            }
-
-            pstmt.setString(4, coop.getNomePublico());
-
-            if (coop.getDescricaoInstitucional().isEmpty()) {
-                pstmt.setNull(5, Types.LONGVARCHAR);
-            } else {
+            conexao.setAutoCommit(false);
+            long ultimoId = utilitario.selecionarUltimoId("cooperativa");
+            long idCooperativa = ultimoId == -1 ? 1 : ultimoId + 1;
+            coop.setIdCooperativa(idCooperativa);
+            int retornoCooperativa;
+            try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+                pstmt.setLong(1, idCooperativa);
+                pstmt.setString(2, coop.getNome());
+                pstmt.setString(3, utilitario.filtrarCnpj(coop.getCnpj()));
+                pstmt.setString(4, coop.getNomePublico());
                 pstmt.setString(5, coop.getDescricaoInstitucional());
-            }
-
-            if (coop.getLogoUrl().isEmpty()) {
-                pstmt.setNull(6, Types.VARCHAR);
-            } else {
                 pstmt.setString(6, coop.getLogoUrl());
-            }
-
-            String emailInstucional = filtrarEmailInstitucional(coop.getEmailInstitucional());
-            if (emailInstucional.equals("invalido")) {
-                pstmt.setNull(7, Types.VARCHAR);
-            } else {
                 pstmt.setString(7, coop.getEmailInstitucional());
+                pstmt.setString(8, utilitario.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp()));
+                pstmt.setString(9, utilitario.filtrarCep(coop.getCep()));
+                pstmt.setString(10, coop.getEndereco());
+                pstmt.setString(11, coop.getCidade());
+                pstmt.setString(12, coop.getEstado());
+                retornoCooperativa = pstmt.executeUpdate();
             }
-
-            String telefoneWhatsapp = filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp());
-            if (telefoneWhatsapp.equals("invalido")) {
-                pstmt.setNull(8, Types.VARCHAR);
-            } else {
-                pstmt.setString(8, telefoneWhatsapp);
-            }
-
-            String cep = filtrarCep(coop.getCep());
-            if (cep.equals("invalido")) {
-                pstmt.setNull(9, Types.VARCHAR);
-            } else {
-                pstmt.setString(9, cep);
-            }
-
-            String endereco = filtrarEndereco(coop.getEndereco());
-            if (endereco.equals("invalido")) {
-                pstmt.setNull(10, Types.VARCHAR);
-            } else {
-                pstmt.setString(10, endereco);
-            }
-
-            pstmt.setString(11, coop.getCidade().trim().toLowerCase());
-
-            pstmt.setString(12, validarUf(coop.getEstado()));
-
-            return pstmt.executeUpdate();
-
+            int[] retornoGestor = cooperadoDAO.cadastrarGestor(conexao, coop, gestor,
+                    senhaTemporariaGestor);
+            conexao.commit();
+            return retornoCooperativa == 0 || retornoGestor[0] == 0 || retornoGestor[1] == 0
+                    ? null : coop;
         } catch (SQLException e) {
-            return 0;
+            try {
+                conexao.rollback();
+            } catch (SQLException rollback) {
+                e.addSuppressed(rollback);
+            }
+            throw new RuntimeException("Falha ao cadastrar cooperativa e gestor.", e);
+        } catch (RuntimeException e) {
+            try {
+                conexao.rollback();
+            } catch (SQLException rollback) {
+                e.addSuppressed(rollback);
+            }
+            throw e;
         } finally {
             conn.desconectar(conexao);
         }
+    }
 
-        // todo: CADASTRO DE GESTOR EMBUTIDO
-
+    // Preenche uma cooperativa com os dados selecionados na consulta.
+    private Cooperativa lerCooperativa(ResultSet rs) throws SQLException {
+        Cooperativa cooperativa = new Cooperativa();
+        cooperativa.setIdCooperativa(rs.getLong("id_cooperativa"));
+        cooperativa.setNome(rs.getString("nome"));
+        cooperativa.setCnpj(rs.getString("cnpj"));
+        cooperativa.setCidade(rs.getString("cidade"));
+        cooperativa.setEstado(rs.getString("estado"));
+        String status = rs.getString("status");
+        if (status != null) {
+            cooperativa.setStatus(StatusCooperativa.valueOf(status));
+        }
+        cooperativa.setQtdCooperados(rs.getInt("cooperados"));
+        Timestamp cadastro = rs.getTimestamp("cadastro");
+        cooperativa.setDataCadastro(cadastro == null ? null : cadastro.toLocalDateTime());
+        return cooperativa;
     }
 
     // === METODOS READ ================================================================================================
 
-    // Exibe todas as cooperativas no banco - sem filtros ou buscas
+    private static final String CONSULTA_COOPERATIVAS =
+            "SELECT coop.id_cooperativa, coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
+            "(SELECT COUNT(*) FROM cooperado c WHERE c.id_cooperativa = coop.id_cooperativa) AS cooperados, " +
+            "coop.data_cadastro AS cadastro FROM cooperativa coop";
+
+    // Lista as cooperativas cadastradas com dados resumidos.
     public ArrayList<Cooperativa> exibirCooperativas() {
-
-        // DECLARACAO
-
-        Connection conexao = conn.conectar();
-        ArrayList<Cooperativa> cooperativas = new ArrayList<>();
-
-        // COMANDO SQL
-
-        String sql = "SELECT" +
-                "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
-                "    (select coalesce(count(c.*), 0) from cooperado c where c.id_cooperativa = coop.id_cooperativa) as cooperados, " +
-                "    coop.data_cadastro as cadastro " +
-                "FROM cooperativa coop;";
-
-        try {
-
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            // todo: formatatar saídas: CNPJ
-            while (rs.next()) {
-
-                cooperativas.add(new Cooperativa(
-                        rs.getString("nome"),
-                        rs.getString("cnpj"),
-                        rs.getString("cidade"),
-                        rs.getString("estado"),
-                        rs.getString("status"),
-                        rs.getInt("cooperados"),
-                        LocalDateTime.parse(rs.getString( "cadastro"))
-                ));
-
-            }
-
-            return cooperativas;
-
-        } catch (SQLException e) {
-            return null;
-        } finally {
-            conn.desconectar(conexao);
-        }
-
+        return consultarCooperativas("");
     }
 
-    // Exibe as cooperativas filtradas por nome ou código
+    // Busca cooperativas pelo nome ou CNPJ informado.
     public ArrayList<Cooperativa> buscarCooperativasPorNomeOuCodigo(String busca) {
-
-        // DECLARACAO
-
-        Connection conexao = conn.conectar();
-        ArrayList<Cooperativa> cooperativas = new ArrayList<>();
-
-        // COMANDO SQL
-
-        String sql = "SELECT" +
-                "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
-                "    (select coalesce(count(c.*), 0) from cooperado c where c.id_cooperativa = coop.id_cooperativa) as cooperados, " +
-                "    coop.data_cadastro as cadastro " +
-                "FROM cooperativa coop" +
-                "WHERE coop.nome LIKE '%" + busca + "%' OR coop.cnpj LIKE '%" + busca + "%';";
-
-        try {
-
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-            // todo: formatatar saídas: CNPJ
-            while (rs.next()) {
-
-                cooperativas.add(new Cooperativa(
-                        rs.getString("nome"),
-                        rs.getString("cnpj"),
-                        rs.getString("cidade"),
-                        rs.getString("estado"),
-                        rs.getString("status"),
-                        rs.getInt("cooperados"),
-                        LocalDateTime.parse(rs.getString( "cadastro"))
-                ));
-
-            }
-
-            return cooperativas;
-
-        } catch (SQLException e) {
-            return null;
-        } finally {
-            conn.desconectar(conexao);
-        }
-
+        String filtro = "%" + busca.strip() + "%";
+        return consultarCooperativas(" WHERE coop.nome ILIKE ? OR coop.cnpj LIKE ?", filtro, filtro);
     }
 
-    // Filtrar Cooperativas por Cidade
+    // Lista as cooperativas da cidade informada.
     public ArrayList<Cooperativa> filtrarCooperativasPorCidade(String cidadeBusca) {
-
-        // DECLARACAO
-
-        Connection conexao = conn.conectar();
-        ArrayList<Cooperativa> cooperativas = new ArrayList<>();
-
-        // COMANDO SQL
-
-        String sql = "SELECT" +
-                "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
-                "    (select coalesce(count(c.*), 0) from cooperado c where c.id_cooperativa = coop.id_cooperativa) as cooperados, " +
-                "    coop.data_cadastro as cadastro " +
-                "FROM cooperativa coop" +
-                "WHERE coop.nome LIKE '%" + cidadeBusca + "%' OR coop.cnpj LIKE '%" + cidadeBusca + "%';";
-
-        try {
-
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            // todo: formatatar saídas: CNPJ
-            while (rs.next()) {
-
-                cooperativas.add(new Cooperativa(
-                        rs.getString("nome"),
-                        rs.getString("cnpj"),
-                        rs.getString("cidade"),
-                        rs.getString("estado"),
-                        rs.getString("status"),
-                        rs.getInt("cooperados"),
-                        LocalDateTime.parse(rs.getString( "cadastro"))
-                ));
-
-            }
-
-            return cooperativas;
-
-        } catch (SQLException e) {
-            return null;
-        } finally {
-            conn.desconectar(conexao);
-        }
-
+        return consultarCooperativas(" WHERE coop.cidade ILIKE ?", cidadeBusca.strip());
     }
 
-    // Filtrar Cooperativas por Estado (UF)
+    // Lista as cooperativas do estado informado.
     public ArrayList<Cooperativa> filtrarCooperativasPorEstado(String estadoBusca) {
-
-        // DECLARACAO
-
-        Connection conexao = conn.conectar();
-        ArrayList<Cooperativa> cooperativas = new ArrayList<>();
-
-        // COMANDO SQL
-
-        String sql = "SELECT" +
-                "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
-                "    (select coalesce(count(c.*), 0) from cooperado c where c.id_cooperativa = coop.id_cooperativa) as cooperados, " +
-                "    coop.data_cadastro as cadastro " +
-                "FROM cooperativa coop" +
-                "WHERE coop.nome LIKE '%" + estadoBusca + "%' OR coop.cnpj LIKE '%" + estadoBusca + "%';";
-
-        try {
-
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            // todo: formatatar saídas: CNPJ
-            while (rs.next()) {
-
-                cooperativas.add(new Cooperativa(
-                        rs.getString("nome"),
-                        rs.getString("cnpj"),
-                        rs.getString("cidade"),
-                        rs.getString("estado"),
-                        rs.getString("status"),
-                        rs.getInt("cooperados"),
-                        LocalDateTime.parse(rs.getString( "cadastro"))
-                ));
-
-            }
-
-            return cooperativas;
-
-        } catch (SQLException e) {
-            return null;
-        } finally {
-            conn.desconectar(conexao);
-        }
-
+        return consultarCooperativas(" WHERE coop.estado = ?", utilitario.validarUf(estadoBusca));
     }
 
-    // Filtrar Cooperativas por Status
+    // Lista as cooperativas com o status informado.
     public ArrayList<Cooperativa> filtrarCooperativasPorStatus(String statusBusca) {
+        String status = StatusCooperativa.valueOf(statusBusca.strip().toUpperCase()).name();
+        return consultarCooperativas(" WHERE coop.status = ?", status);
+    }
 
-        // DECLARACAO
-
+    // Executa uma consulta com os filtros definidos pelo método público.
+    private ArrayList<Cooperativa> consultarCooperativas(String filtro, String... parametros) {
         Connection conexao = conn.conectar();
         ArrayList<Cooperativa> cooperativas = new ArrayList<>();
-
-        // COMANDO SQL
-
-        String sql = "SELECT" +
-                "    coop.nome, coop.cnpj, coop.cidade, coop.estado, coop.status, " +
-                "    (select coalesce(count(c.*), 0) from cooperado c where c.id_cooperativa = coop.id_cooperativa) as cooperados, " +
-                "    coop.data_cadastro as cadastro " +
-                "FROM cooperativa coop" +
-                "WHERE coop.nome LIKE '%" + statusBusca + "%' OR coop.cnpj LIKE '%" + statusBusca + "%';";
-
-        try {
-
-            // EXECUTAR PREPARED STATEMENT E RODAR O RESULT SET
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            // todo: formatatar saídas: CNPJ
-            while (rs.next()) {
-
-                cooperativas.add(new Cooperativa(
-                        rs.getString("nome"),
-                        rs.getString("cnpj"),
-                        rs.getString("cidade"),
-                        rs.getString("estado"),
-                        rs.getString("status"),
-                        rs.getInt("cooperados"),
-                        LocalDateTime.parse(rs.getString( "cadastro"))
-                ));
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(CONSULTA_COOPERATIVAS + filtro)) {
+            for (int indice = 0; indice < parametros.length; indice++) {
+                pstmt.setString(indice + 1, parametros[indice]);
             }
-
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    cooperativas.add(lerCooperativa(rs));
+                }
+            }
             return cooperativas;
-
         } catch (SQLException e) {
-            return null;
+            throw new RuntimeException("Falha ao consultar cooperativas.", e);
         } finally {
             conn.desconectar(conexao);
         }
-
     }
-
-    // todo: exibir uma única cooperativa e todos os seus dados
 
     // === METODOS UPDATE ==============================================================================================
 
-    // Atualiza determinado campo do objeto Cooperativa
-    public int atualizarCooperativa(Cooperativa coop, String campo) {
-
-        // DECLARACAO
-
+    // Atualiza um campo permitido da cooperativa identificada.
+    public Cooperativa atualizarCooperativa(Long idCooperativa, String campo, String valorInformado) {
+        Cooperativa coop = new Cooperativa();
+        coop.setIdCooperativa(idCooperativa);
+        if (coop.getIdCooperativa() == null) {
+            throw new IllegalArgumentException("idCooperativa é obrigatório.");
+        }
+        String coluna = campo.strip().toLowerCase(java.util.Locale.ROOT);
+        Object valor = switch (coluna) {
+            case "nome" -> { coop.setNome(valorInformado); yield coop.getNome(); }
+            case "cnpj" -> { coop.setCnpj(valorInformado); yield utilitario.filtrarCnpj(coop.getCnpj()); }
+            case "nome_publico" -> { coop.setNomePublico(valorInformado); yield coop.getNomePublico(); }
+            case "descricao_institucional" -> { coop.setDescricaoInstitucional(valorInformado); yield coop.getDescricaoInstitucional(); }
+            case "logo_url" -> { coop.setLogoUrl(valorInformado); yield coop.getLogoUrl(); }
+            case "email_institucional" -> { coop.setEmailInstitucional(valorInformado); yield coop.getEmailInstitucional(); }
+            case "telefone_whatsapp" -> { coop.setTelefoneWhatsapp(valorInformado); yield utilitario.filtrarTelefoneWhatsapp(coop.getTelefoneWhatsapp()); }
+            case "cep" -> { coop.setCep(valorInformado); yield utilitario.filtrarCep(coop.getCep()); }
+            case "endereco" -> { coop.setEndereco(valorInformado); yield coop.getEndereco(); }
+            case "cidade" -> { coop.setCidade(valorInformado); yield coop.getCidade(); }
+            case "estado" -> { coop.setEstado(valorInformado); yield coop.getEstado(); }
+            case "data_fundacao" -> { coop.setDataFundacao(valorInformado == null ? null : LocalDate.parse(valorInformado)); yield coop.getDataFundacao() == null ? null : Date.valueOf(coop.getDataFundacao()); }
+            case "canal_contato_preferencial" -> { coop.setCanalContatoPreferencial(valorInformado); yield coop.getCanalContatoPreferencial(); }
+            case "link_whatsapp" -> { coop.setLinkWhatsapp(valorInformado); yield coop.getLinkWhatsapp(); }
+            case "status" -> { coop.setStatus(valorInformado == null ? null : StatusCooperativa.valueOf(valorInformado)); yield coop.getStatus() == null ? null : coop.getStatus().name(); }
+            default -> throw new IllegalArgumentException("Campo da cooperativa não permitido: " + campo);
+        };
+        String sql = "UPDATE cooperativa SET " + coluna + " = ? WHERE id_cooperativa = ?";
         Connection conexao = conn.conectar();
-        ArrayList<Cooperativa> cooperativas = new ArrayList<>();
-
-        // COMANDO SQL
-
-        String sql = "UPDATE cooperativa " +
-                "SET " + campo.toLowerCase() + " WHERE id_cooperativa = " + coop.getIdCooperativa();
-
-        try {
-
-            // EXECUTAR PREPARED STATEMENT E PREENCHER PLACEHOLDERS
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            return pstmt.executeUpdate();
-
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setObject(1, valor);
+            pstmt.setLong(2, coop.getIdCooperativa());
+            return pstmt.executeUpdate() == 0 ? null : coop;
         } catch (SQLException e) {
-            return 0;
+            throw new RuntimeException("Falha ao atualizar cooperativa.", e);
         } finally {
             conn.desconectar(conexao);
         }
-
     }
 
     // === METODOS DELETE ==============================================================================================
 
-    // Deleta cooperativa determinada rota por meio do ID
-    public int excluirCooperativa(Cooperativa coop) {
-
-        // DECLARACAO
-
-        Connection conexao = conn.conectar();
-
-        // COMANDO SQL
-
-        String sql = "DELETE FROM COOPERATIVA WHERE id_cooperativa = ?";
-
-        // EXECUTAR PREPARED STATEMENT
-
-        try {
-
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            pstmt.setLong(1, coop.getIdCooperativa());
-
-            return pstmt.executeUpdate();
-
-        } catch (SQLException e) {
-
-            return -1;
-
+    // Exclui a cooperativa identificada pelo ID.
+    public Cooperativa excluirCooperativa(Long idCooperativa) {
+        Cooperativa coop = new Cooperativa();
+        coop.setIdCooperativa(idCooperativa);
+        if (coop.getIdCooperativa() == null) {
+            throw new IllegalArgumentException("idCooperativa é obrigatório.");
         }
-
+        String sql = "DELETE FROM cooperativa WHERE id_cooperativa = ?";
+        Connection conexao = conn.conectar();
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setLong(1, coop.getIdCooperativa());
+            return pstmt.executeUpdate() == 0 ? null : coop;
+        } catch (SQLException e) {
+            throw new RuntimeException("Falha ao excluir cooperativa.", e);
+        } finally {
+            conn.desconectar(conexao);
+        }
     }
-
 }
