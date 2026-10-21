@@ -1,5 +1,7 @@
 package model.auxiliares;
 
+import model.enums.AtividadeCooperado;
+import model.enums.PermissaoCooperado;
 import util.Utilitario;
 
 import java.util.ArrayList;
@@ -11,7 +13,8 @@ public class RelacionamentosCooperado {
     // ATRIBUTOS
 
     private long idCooperativa; // NOT NULL - VARCHAR(150)
-    private ArrayList<String> atividades = new ArrayList<>();
+    private ArrayList<AtividadeCooperado> atividadesCooperado = new ArrayList<>(); // Lista de atividades para Cooperado (ENUM)
+    private ArrayList<PermissaoCooperado> permissoesCooperado = new ArrayList<>(); // Lista de permissoes para Cooperado (ENUM)
 
     // GETTERS E SETTERS
 
@@ -21,10 +24,20 @@ public class RelacionamentosCooperado {
     // Define o valor de idCooperativa.
     public void setIdCooperativa(String nomeCooperativa) { this.idCooperativa = idCooperativa; }
 
-    // Retorna o valor de atividades.
-    public ArrayList<String> getAtividades() { return atividades; }
+    public ArrayList<AtividadeCooperado> getAtividadesCooperado() {
+        return atividadesCooperado;
+    }
 
-    // Define o valor de atividades.
-    public void setAtividades(ArrayList<String> atividades) { this.atividades = atividades; }
+    public void setAtividadesCooperado(ArrayList<AtividadeCooperado> atividadesCooperado) {
+        this.atividadesCooperado = atividadesCooperado;
+    }
+
+    public ArrayList<PermissaoCooperado> getPermissoesCooperado() {
+        return permissoesCooperado;
+    }
+
+    public void setPermissoesCooperado(ArrayList<PermissaoCooperado> permissoesCooperado) {
+        this.permissoesCooperado = permissoesCooperado;
+    }
 
 }

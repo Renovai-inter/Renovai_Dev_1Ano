@@ -12,7 +12,7 @@ public class Cooperado {
 
     private final Utilitario utilitario = new Utilitario();
 
-    // ATRIBUTOS (tabela cooperado)
+    // ATRIBUTOS
 
     private Long idCooperado; // PK
     private Long idUsuario; // FK
