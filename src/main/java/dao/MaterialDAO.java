@@ -2,7 +2,7 @@ package dao;
 
 import util.Conexao;
 import util.Utilitario;
-import model.Material;
+import model.principais.Material;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -26,21 +26,27 @@ public class MaterialDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra um material com os campos exigidos pelo esquema.
-    public Material cadastrarMaterial(String nome, String categoria) {
+    public Material cadastrarMaterial(String nome, String categoria, String origem) {
 
         // Declaração
 
         Material material = new Material();
         material.setNome(nome);
         material.setCategoria(categoria);
+        material.setOrigem(origem);
         long ultimoId = utilitario.selecionarUltimoId("material");
-        long novoId = ultimoId == -1 ? 1 : ultimoId + 1;
+        long novoId;
+        if (ultimoId == -1) {
+            novoId = 1;
+        } else {
+            novoId = ultimoId + 1;
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "INSERT INTO material (id_material, nome, categoria) " +
-                "VALUES (?, ?, ?)";
+        String sql = "INSERT INTO material (id_material, nome, categoria, \"Origem\") " +
+                "VALUES (?, ?, ?, ?)";
 
         // Executar PreparedStatement
 
@@ -48,6 +54,7 @@ public class MaterialDAO {
             pstmt.setLong(1, novoId);
             pstmt.setString(2, material.getNome());
             pstmt.setString(3, material.getCategoria());
+            pstmt.setString(4, material.getOrigem());
             int linhas = pstmt.executeUpdate();
             if (linhas == 0) {
                 return null;
@@ -73,7 +80,7 @@ public class MaterialDAO {
 
         // Comando SQL
 
-        String sql = "SELECT id_material, nome, categoria FROM material";
+        String sql = "SELECT id_material, nome, categoria, \"Origem\" FROM material";
 
         // Executar PreparedStatement
 
@@ -87,6 +94,7 @@ public class MaterialDAO {
                 material.setIdMaterial(idMaterial);
                 material.setNome(nomeMaterial);
                 material.setCategoria(categoria);
+                material.setOrigem(rs.getString("Origem"));
                 materiais.add(material);
             }
             return materiais;
@@ -108,6 +116,9 @@ public class MaterialDAO {
         material.setIdMaterial(idMaterial);
         material.setNome(nome);
         material.setCategoria(categoria);
+        if (material.getIdMaterial() == null || material.getIdMaterial() <= 0) {
+            throw new IllegalArgumentException("idMaterial deve ser positivo.");
+        }
 
         Connection conexao = conn.conectar();
 
@@ -121,7 +132,10 @@ public class MaterialDAO {
             pstmt.setString(1, material.getNome());
             pstmt.setString(2, material.getCategoria());
             pstmt.setLong(3, material.getIdMaterial());
-            return pstmt.executeUpdate() == 0 ? null : material;
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return material;
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar material.", e);
@@ -140,6 +154,9 @@ public class MaterialDAO {
 
         Material material = new Material();
         material.setIdMaterial(idMaterial);
+        if (material.getIdMaterial() == null || material.getIdMaterial() <= 0) {
+            throw new IllegalArgumentException("idMaterial deve ser positivo.");
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL
@@ -150,7 +167,10 @@ public class MaterialDAO {
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, material.getIdMaterial());
-            return pstmt.executeUpdate() == 0 ? null : material;
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return material;
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir material.", e);
