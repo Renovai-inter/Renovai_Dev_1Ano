@@ -38,9 +38,6 @@ public class ColetaMaterial {
 
     public void setPesoTotalInformadoKg(BigDecimal pesoTotalInformadoKg) {
         if (pesoTotalInformadoKg != null) {
-            if (pesoTotalInformadoKg.signum() < 0) {
-                throw new IllegalArgumentException("pesoTotalInformadoKg não pode ser negativo.");
-            }
             utilitario.validarNumeroDecimal(pesoTotalInformadoKg.toPlainString(), 10L, 2);
         }
         this.pesoTotalInformadoKg = pesoTotalInformadoKg;
