@@ -19,4 +19,4 @@ Entregue um novo `NN-Validacao-Dados.md` em `../Relatórios/` antes de mudar có
 - **Completa:** executar todos os itens de código definidos no relatório, desde que os regex e formatos necessários tenham sido fornecidos.
 - **Etapas escolhidas:** executar somente os números indicados, deixando os demais pendentes.
 
-Em qualquer modalidade, registre o que foi feito e como foi verificado. Na execução de código aprovada, atualize as chamadas dos servlets afetadas para passar os valores à DAO e lidar com a validação dos setters; confira a resposta exibida pela JSP apenas na integração necessária.
+Em qualquer modalidade, registre o que foi feito e como foi verificado. Na execução de código aprovada, atualize as chamadas dos servlets afetadas para passar os valores à DAO e lidar com a validação dos setters; confira a resposta exibida pela JSP apenas na integração necessária. Para a área administrativa, anote também se o valor formatado, a validação e a mensagem alcançam a tela correspondente em `../Área ADM.pdf`; encaminhe a comparação integral a `$conferir-telas-admin`.

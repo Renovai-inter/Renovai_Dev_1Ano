@@ -43,4 +43,15 @@ public class Material {
         this.categoria = categoria == null ? null : CategoriaMaterial.valueOf(utilitario.normalizarTextoLivre(categoria));
     }
 
+    public String getOrigem() {
+        return origem;
+    }
+
+    public void setOrigem(String origem) {
+        origem = utilitario.normalizarTextoLivre(origem);
+        if (nome != null && nome.codePointCount(0, nome.length()) > 10) {
+            throw new IllegalArgumentException("origem deve ter no máximo 10 caracteres.");
+        }
+        this.origem = origem;
+    }
 }

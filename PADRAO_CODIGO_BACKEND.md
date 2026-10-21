@@ -1,6 +1,6 @@
 # Padrão de código do backend Renovaí
 
-Este documento orienta a revisão didática de `model`, `dao` e dos servlets afetados, com apoio da `Utilitario`. As skills devem mostrar o que precisa ser feito em passos pequenos, para que o grupo possa escolher entre executar as mudanças ou fazê-las por conta própria. Não introduzir frameworks, camadas ou classes de exceção apenas para padronizar o código.
+Este documento orienta a revisão didática de `model`, `dao`, servlets afetados e sua integração com os JSPs da área administrativa, com apoio da `Utilitario`. As skills devem mostrar o que precisa ser feito em passos pequenos, para que o grupo possa escolher entre executar as mudanças ou fazê-las por conta própria. Não introduzir frameworks, camadas ou classes de exceção apenas para padronizar o código.
 
 ## Referência do banco
 
@@ -11,7 +11,7 @@ Este documento orienta a revisão didática de `model`, `dao` e dos servlets afe
 - Classes e tipos ENUM usam `PascalCase`; métodos, atributos, parâmetros e variáveis usam `camelCase`; constantes e valores de ENUM usam `UPPER_SNAKE_CASE`. Nomes de tabelas e colunas nas consultas SQL seguem `snake_case`.
 - Usar nomes em português que indiquem a função do elemento. Manter `DAO` no nome das classes de acesso a dados e preservar os pacotes existentes.
 - Ao revisar uma classe, mostrar como `Conexao`, `Utilitario` e outras dependências são instanciadas. Padronizar com o estilo já usado pelo grupo, sem introduzir injeção de dependências.
-- Antes de renomear ou mudar uma assinatura, identificar as chamadas afetadas. Seguir a ordem: preparar a model; adaptar os métodos das DAOs ao contrato de parâmetros e retorno descrito abaixo; atualizar os servlets que chamam a DAO. Verificar pontos de JSP necessários à integração, sem iniciar uma revisão geral das telas.
+- Antes de renomear ou mudar uma assinatura, identificar as chamadas afetadas. Seguir a ordem: preparar a model; adaptar os métodos das DAOs ao contrato de parâmetros e retorno descrito abaixo; atualizar os servlets que chamam a DAO. Registrar os pontos de JSP necessários à integração; a conferência completa das telas administrativas ocorre na etapa própria abaixo.
 
 ## Contrato dos métodos DAO
 
@@ -41,9 +41,23 @@ Este documento orienta a revisão didática de `model`, `dao` e dos servlets afe
 - Dado inválido deve gerar `throw` de uma exceção adequada já existente no Java, com mensagem compreensível, em vez de retornar `"invalido"` ou `null`. `IllegalArgumentException` pode indicar formato ou valor inválido; a conversão para inteiro pode gerar `NumberFormatException`. Essas exceções não exigem `throws` na assinatura. Uma exceção verificada, como `SQLException`, exige `catch` ou `throws`; nas DAOs, manter `catch (SQLException)`.
 - Não confundir erro de validação lançado pelo setter com falha de banco. Não transformar `SQLException` em um retorno que pareça sucesso ou ausência normal de dados. Não criar classe de exceção própria para este fluxo. Ao atualizar os servlets afetados, conferir como cada falha chega à resposta apresentada pela JSP, sem expor detalhes SQL ou credenciais.
 
+## Integração com as telas administrativas
+
+`../Área ADM.pdf` é a referência visual da área administrativa. Seu único painel reúne desenhos de dashboard, cooperativas, cooperados, coletas, materiais, negociações e componentes. Ele não comprova que esses fluxos já foram implementados, nem substitui as regras de dados documentadas em `../script-banco.pdf`. Se as opções de um desenho conflitarem com um `CHECK`, enum ou requisito confirmado, registrar a divergência e pedir decisão do grupo antes de alterar o contrato.
+
+Para cada fluxo administrativo do escopo, conferir:
+
+1. **Tela e entrada:** existência do JSP/JSPF; campos, nomes de parâmetros, valores enviados, ação, método, links e navegação; listas, filtros, botões e estados desenhados no PDF. Não tratar exemplos e textos de demonstração como dados reais.
+2. **Processamento:** rota do servlet; validação da Model; operação da DAO e coluna correspondente no esquema documentado. Conferir se a tela envia todos os dados exigidos e se a operação efetivamente chamada corresponde ao botão.
+3. **Resposta visível:** atributos enviados à JSP; formatação e escape dos dados; confirmação, erro, lista vazia, retorno a formulário e redirecionamento. Uma operação de backend só conta como entregue para a tela quando o resultado esperado pode ser observado no fluxo da interface.
+4. **Conferência:** comparar a estrutura e os estados reais do JSP com o desenho do PDF, indicando o que está implementado, parcialmente implementado, ausente ou depende de decisão. Conferir o comportamento em execução apenas quando houver ambiente adequado; inspeção estática e compilação não provam o resultado visual ou funcional.
+
+Seguir a dependência `Model → DAO → Servlet → JSP` para executar correções. A análise pode partir da tela e voltar pelo fluxo para localizar a origem de um problema. Manter a checklist de telas separada de alterações de backend já aprovadas; uma escolha para uma etapa não autoriza a outra.
+
 ## Relatórios e execução das skills
 
 - Cada análise entrega um arquivo Markdown em `../Relatórios/`, fora do repositório. Use o próximo número disponível no nome (`01-...md`, `02-...md`) e não sobrescreva relatórios anteriores. Não criar DOCX nem exigir identidade visual. O relatório indica classe, método, divergência, ação concreta e como verificar, com checklist numerada em passos pequenos e independentes.
 - Depois do relatório de refatoração ou verificações, o usuário escolhe: **parcial** (somente comentários, seções e espaçamento), **completa** (Codex executa todos os itens de código da checklist apresentada para o escopo) ou **etapas escolhidas** (somente os números indicados). Na skill da `Main`, a escolha é entre construir o menu completo apresentado ou apenas os itens indicados. Preparar o relatório não autoriza alterar código.
 - A skill de testes pela `Main` prepara um menu manual por DAO e método. Operações de escrita ou exclusão só ocorrem após a escolha do teste no menu, usando a conexão configurada pelo usuário; nada desse tipo deve executar ao iniciar.
+- A skill de telas administrativas entrega um mapa por fluxo, do PDF ao JSP e ao backend, com checklist numerada e critérios de verificação. A escolha é executar a checklist completa ou itens específicos; não usar **parcial** para mudar lógica, marcação ou aparência do JSP.
 - A revisão geral gera uma Consolidação de Refatoração em Markdown: o que foi feito, pendências em checklist e sugestões opcionais. Não usar porcentagem de melhoria.
