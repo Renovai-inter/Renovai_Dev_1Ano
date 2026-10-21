@@ -31,25 +31,7 @@ public class Cooperativa {
     private StatusCooperativa status; // NOT NULL - CHECK COM DEFAULT
     private LocalDateTime dataCadastro; // NOT NULL - TIMESTAMP COM DEFAULT
 
-    // ATRIBUTOS (agregações com outras tabelas)
-
-    private int qtdCooperados;
-    private int qtdRotas;
-    private int qtdColetas;
-    private int qtdNegociacoes;
-
-
     // GETTERS E SETTERS
-
-    // Retorna o valor de qtdCooperados.
-    public int getQtdCooperados() {
-        return qtdCooperados;
-    }
-
-    // Define o valor de qtdCooperados.
-    public void setQtdCooperados(int qtdCooperados) {
-        this.qtdCooperados = qtdCooperados;
-    }
 
     // Retorna o valor de idCooperativa.
     public Long getIdCooperativa() { return idCooperativa; }
@@ -241,33 +223,4 @@ public class Cooperativa {
     // Define o valor de dataCadastro.
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 
-    // Retorna o valor de qtdRotas.
-    public int getQtdRotas() {
-        return qtdRotas;
-    }
-
-    // Define o valor de qtdRotas.
-    public void setQtdRotas(int qtdRotas) {
-        this.qtdRotas = qtdRotas;
-    }
-
-    // Retorna o valor de qtdColetas.
-    public int getQtdColetas() {
-        return qtdColetas;
-    }
-
-    // Define o valor de qtdColetas.
-    public void setQtdColetas(int qtdColetas) {
-        this.qtdColetas = qtdColetas;
-    }
-
-    // Retorna o valor de qtdNegociacoes.
-    public int getQtdNegociacoes() {
-        return qtdNegociacoes;
-    }
-
-    // Define o valor de qtdNegociacoes.
-    public void setQtdNegociacoes(int qtdNegociacoes) {
-        this.qtdNegociacoes = qtdNegociacoes;
-    }
 }
