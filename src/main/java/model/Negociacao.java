@@ -1,111 +1,140 @@
-
 package model;
-
-import jdk.jshell.Snippet;
-import model.enums.StatusNegociacao;
-import util.Utilitario;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Negociacao {
 
-    private final Utilitario utilitario = new Utilitario();
+    // ATRIBUTOS (tabela negociacao)
 
-    // ATRIBUTOS
+    private Long idNegociacao;
+    private Long idCooperativa;
+    private Long idEmpresa;
+    private Long idMaterial;
+    private BigDecimal quantidadeKg;
+    private BigDecimal valorKgAtual;
+    private BigDecimal valorTotalAtual;
+    private String status;
+    private LocalDateTime dataCriacao;
+    private LocalDateTime dataConclusao;
 
-    private Long idNegociacao; // PK
-    private Long idCooperativa; // FK
-    private Long idEmpresa; // FK
-    private Long idMaterial; // FK
-    private BigDecimal quantidadeKg; // NUMERIC(12, 2)
-    private BigDecimal valorKgAtual; // NOT NULL - NUMERIC(10, 2)
-    private BigDecimal valorTotalAtual; // NUMERIC(14, 2)
-    private StatusNegociacao status; // NOT NULL COM CHECK E DEFAULT
-    private LocalDateTime dataCriacao; // NOT NULL - TIMESTAMP COM DEFAULT
-    private LocalDateTime dataConclusao; // TIMESTAMP
+    // ATRIBUTOS (vem de outras tabelas, preenchidos pelos JOINs da DAO)
 
-    // GETTERS E SETTERS
+    private String nomeCooperativa;
+    private String cnpjCooperativa;
+    private String cidadeCooperativa;
+    private String estadoCooperativa;
+    private String nomeEmpresa;
+    private String cnpjEmpresa;
+    private String cidadeEmpresa;
+    private String estadoEmpresa;
+    private String nomeMaterial;
+    private LocalDateTime ultimaAtualizacao;
 
-    // Retorna o valor de idNegociacao.
+    // GETTERS E SETTERS (tabela negociacao)
+
     public Long getIdNegociacao() { return idNegociacao; }
 
-    // Define o valor de idNegociacao.
     public void setIdNegociacao(Long idNegociacao) { this.idNegociacao = idNegociacao; }
 
-    // Retorna o valor de idCooperativa.
     public Long getIdCooperativa() { return idCooperativa; }
 
-    // Define o valor de idCooperativa.
     public void setIdCooperativa(Long idCooperativa) { this.idCooperativa = idCooperativa; }
 
-    // Retorna o valor de idEmpresa.
     public Long getIdEmpresa() { return idEmpresa; }
 
-    // Define o valor de idEmpresa.
     public void setIdEmpresa(Long idEmpresa) { this.idEmpresa = idEmpresa; }
 
-    // Retorna o valor de idMaterial.
     public Long getIdMaterial() { return idMaterial; }
 
-    // Define o valor de idMaterial.
     public void setIdMaterial(Long idMaterial) { this.idMaterial = idMaterial; }
 
-    // Retorna o valor de quantidadeKg.
     public BigDecimal getQuantidadeKg() { return quantidadeKg; }
 
-    // Define o valor de quantidadeKg.
-    public void setQuantidadeKg(BigDecimal quantidadeKg) {
-        if (quantidadeKg != null) {
-            if (quantidadeKg.signum() <= 0) {
-                throw new IllegalArgumentException("quantidadeKg deve ser positiva.");
-            }
-            utilitario.validarNumeroDecimal(quantidadeKg.toPlainString(), 12, 2);
-        }
-        this.quantidadeKg = quantidadeKg;
-    }
+    public void setQuantidadeKg(BigDecimal quantidadeKg) { this.quantidadeKg = quantidadeKg; }
 
-    // Retorna o valor de valorKgAtual.
     public BigDecimal getValorKgAtual() { return valorKgAtual; }
 
-    // Define o valor de valorKgAtual.
-    public void setValorKgAtual(BigDecimal valorKgAtual) {
-        if (valorKgAtual == null || valorKgAtual.signum() <= 0) {
-            throw new IllegalArgumentException("valorKgAtual deve ser positivo.");
-        }
-        utilitario.validarNumeroDecimal(valorKgAtual.toPlainString(), 10, 2);
-        this.valorKgAtual = valorKgAtual;
-    }
+    public void setValorKgAtual(BigDecimal valorKgAtual) { this.valorKgAtual = valorKgAtual; }
 
-    // Retorna o valor de valorTotalAtual.
     public BigDecimal getValorTotalAtual() { return valorTotalAtual; }
 
-    // Define o valor de valorTotalAtual.
-    public void setValorTotalAtual(BigDecimal valorTotalAtual) {
-        if (valorTotalAtual != null) {
-            utilitario.validarNumeroDecimal(valorTotalAtual.toPlainString(), 14, 2);
-        }
-        this.valorTotalAtual = valorTotalAtual;
-    }
+    public void setValorTotalAtual(BigDecimal valorTotalAtual) { this.valorTotalAtual = valorTotalAtual; }
 
-    // Retorna o valor de status.
-    public StatusNegociacao getStatus() { return status; }
+    public String getStatus() { return status; }
 
-    // Define o valor de status.
-    public void setStatus(StatusNegociacao status) {
-        this.status = status;
-    }
+    public void setStatus(String status) { this.status = status; }
 
-    // Retorna o valor de dataCriacao.
     public LocalDateTime getDataCriacao() { return dataCriacao; }
 
-    // Define o valor de dataCriacao.
     public void setDataCriacao(LocalDateTime dataCriacao) { this.dataCriacao = dataCriacao; }
 
-    // Retorna o valor de dataConclusao.
     public LocalDateTime getDataConclusao() { return dataConclusao; }
 
-    // Define o valor de dataConclusao.
     public void setDataConclusao(LocalDateTime dataConclusao) { this.dataConclusao = dataConclusao; }
+
+    // GETTERS E SETTERS (dados dos JOINs)
+
+    public String getNomeCooperativa() { return nomeCooperativa; }
+
+    public void setNomeCooperativa(String nomeCooperativa) { this.nomeCooperativa = nomeCooperativa; }
+
+    public String getCnpjCooperativa() { return cnpjCooperativa; }
+
+    public void setCnpjCooperativa(String cnpjCooperativa) { this.cnpjCooperativa = cnpjCooperativa; }
+
+    public String getCidadeCooperativa() { return cidadeCooperativa; }
+
+    public void setCidadeCooperativa(String cidadeCooperativa) { this.cidadeCooperativa = cidadeCooperativa; }
+
+    public String getEstadoCooperativa() { return estadoCooperativa; }
+
+    public void setEstadoCooperativa(String estadoCooperativa) { this.estadoCooperativa = estadoCooperativa; }
+
+    public String getNomeEmpresa() { return nomeEmpresa; }
+
+    public void setNomeEmpresa(String nomeEmpresa) { this.nomeEmpresa = nomeEmpresa; }
+
+    public String getCnpjEmpresa() { return cnpjEmpresa; }
+
+    public void setCnpjEmpresa(String cnpjEmpresa) { this.cnpjEmpresa = cnpjEmpresa; }
+
+    public String getCidadeEmpresa() { return cidadeEmpresa; }
+
+    public void setCidadeEmpresa(String cidadeEmpresa) { this.cidadeEmpresa = cidadeEmpresa; }
+
+    public String getEstadoEmpresa() { return estadoEmpresa; }
+
+    public void setEstadoEmpresa(String estadoEmpresa) { this.estadoEmpresa = estadoEmpresa; }
+
+    public String getNomeMaterial() { return nomeMaterial; }
+
+    public void setNomeMaterial(String nomeMaterial) { this.nomeMaterial = nomeMaterial; }
+
+    public LocalDateTime getUltimaAtualizacao() { return ultimaAtualizacao; }
+
+    public void setUltimaAtualizacao(LocalDateTime ultimaAtualizacao) { this.ultimaAtualizacao = ultimaAtualizacao; }
+
+    // METODOS AUXILIARES (calculados, nao existem no banco)
+
+    // Codigo mostrado nas telas: id 143 vira NE-0143
+    public String getCodigo() {
+        if (idNegociacao == null) {
+            return "";
+        }
+        return "NE-" + String.format("%04d", idNegociacao);
+    }
+
+    // Status pronto para exibir: EM_NEGOCIACAO vira "Em negociacao"; textos ja normais ficam como estao
+    public String getStatusLegivel() {
+        if (status == null) {
+            return "";
+        }
+        String texto = status.replace('_', ' ').trim();
+        if (!texto.isEmpty() && texto.equals(texto.toUpperCase())) {
+            texto = texto.substring(0, 1) + texto.substring(1).toLowerCase();
+        }
+        return texto;
+    }
 
 }

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Cooperado;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 @WebServlet("/cooperado")
@@ -76,7 +77,7 @@ public class CooperadoServlet extends HttpServlet {
         }
     }
 
-    // === ABRIR TELAS (cada uma busca os dados no DAO e entrega para o JSP) ===========================================
+    // === ABRIR TELAS =================================================================================================
 
     private void abrirLista(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -106,6 +107,8 @@ public class CooperadoServlet extends HttpServlet {
         request.setAttribute("permissoesDoCooperado", dao.listarPermissoes(id));
         request.setAttribute("todasPermissoes", dao.listarTodasPermissoes());
         request.setAttribute("totalColetas", dao.contarColetasDoCooperado(id));
+        request.setAttribute("atividadesOpcoes", dao.listarValoresPermitidos("ck_coopatv_atividade",
+                "Coleta externa", "Financeiro", "Pesagem", "Direção de veículo", "Prensagem", "Triagem"));
 
         request.getRequestDispatcher("/cooperado-ver.jsp").forward(request, response);
     }
@@ -115,6 +118,9 @@ public class CooperadoServlet extends HttpServlet {
 
         request.setAttribute("cooperativas", dao.listarCooperativas());
         request.setAttribute("todasPermissoes", dao.listarTodasPermissoes());
+        request.setAttribute("cargos", dao.listarValoresPermitidos("ck_cooperado_cargo"));
+        request.setAttribute("atividadesOpcoes", dao.listarValoresPermitidos("ck_coopatv_atividade",
+                "Coleta externa", "Financeiro", "Pesagem", "Direção de veículo", "Prensagem", "Triagem"));
 
         request.getRequestDispatcher("/cooperado-novo.jsp").forward(request, response);
     }
@@ -137,12 +143,17 @@ public class CooperadoServlet extends HttpServlet {
         request.setAttribute("cooperado", cooperado);
         request.setAttribute("cooperativas", dao.listarCooperativas());
         request.setAttribute("totalColetas", dao.contarColetasDoCooperado(id));
+        request.setAttribute("cargos", dao.listarValoresPermitidos("ck_cooperado_cargo"));
+        request.setAttribute("statusOpcoes", dao.listarValoresPermitidos("ck_cooperado_status", "Ativo", "Afastado", "Inativo"));
+        request.setAttribute("atividadesOpcoes", dao.listarValoresPermitidos("ck_coopatv_atividade",
+                "Coleta externa", "Financeiro", "Pesagem", "Direção de veículo", "Prensagem", "Triagem"));
 
         request.getRequestDispatcher("/cooperado-editar.jsp").forward(request, response);
     }
 
     // === GRAVAR ======================================================================================================
 
+    // Botao "Cadastrar cooperado" da tela Novo
     // Botao "Cadastrar cooperado" da tela Novo
     private void salvar(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -151,7 +162,6 @@ public class CooperadoServlet extends HttpServlet {
         String email = request.getParameter("email");
         String idCooperativa = request.getParameter("idCooperativa");
 
-        // validacao: sem isso o banco recusa e aparece erro 500
         if (nome == null || nome.trim().isEmpty()
                 || email == null || email.trim().isEmpty()
                 || idCooperativa == null || idCooperativa.isEmpty()) {
@@ -161,9 +171,18 @@ public class CooperadoServlet extends HttpServlet {
             return;
         }
 
+        email = email.trim();
+
+        if (!emailValido(email)) {
+            request.setAttribute("erro", MSG_EMAIL_INVALIDO);
+            abrirNovo(request, response);
+            return;
+        }
+
         Cooperado cooperado = new Cooperado();
         cooperado.setIdCooperativa(Long.parseLong(idCooperativa));
         cooperado.setCargo(request.getParameter("cargo"));
+        cooperado.setStatus(escolherStatus("Ativo"));
 
         String[] atividades = request.getParameterValues("atividades");
         String[] permissoes = request.getParameterValues("permissoes");
@@ -173,9 +192,15 @@ public class CooperadoServlet extends HttpServlet {
             permissoes = new String[0];
         }
 
-        long idNovo = dao.cadastrarCooperado(cooperado, nome.trim(), email.trim(), atividades, permissoes);
+        try {
+            long idNovo = dao.cadastrarCooperado(cooperado, nome.trim(), email, atividades, permissoes);
 
-        response.sendRedirect("cooperado?acao=ver&id=" + idNovo);
+            response.sendRedirect("cooperado?acao=ver&id=" + idNovo);
+
+        } catch (RuntimeException e) {
+            request.setAttribute("erro", "Não foi possível cadastrar. " + mensagemDoBanco(e));
+            abrirNovo(request, response);
+        }
     }
 
     // Botao "Salvar" da tela Editar
@@ -202,21 +227,35 @@ public class CooperadoServlet extends HttpServlet {
             return;
         }
 
+        email = email.trim();
+
+        if (!emailValido(email)) {
+            request.setAttribute("erro", MSG_EMAIL_INVALIDO);
+            abrirEditar(request, response, id);
+            return;
+        }
+
         Cooperado cooperado = new Cooperado();
         cooperado.setIdCooperado(id);
         cooperado.setNomeCompleto(nome.trim());
-        cooperado.setEmail(email.trim());
+        cooperado.setEmail(email);
         cooperado.setIdCooperativa(Long.parseLong(idCooperativa));
         cooperado.setCargo(request.getParameter("cargo"));
         cooperado.setStatus(request.getParameter("status"));
 
-        dao.editarCooperado(cooperado);
-        dao.alterarAtividadesDesempenhadas(id, request.getParameterValues("atividades"));
+        try {
+            dao.editarCooperado(cooperado);
+            dao.alterarAtividadesDesempenhadas(id, request.getParameterValues("atividades"));
 
-        response.sendRedirect("cooperado?acao=ver&id=" + id);
+            response.sendRedirect("cooperado?acao=ver&id=" + id);
+
+        } catch (RuntimeException e) {
+            request.setAttribute("erro", "Não foi possível salvar. " + mensagemDoBanco(e));
+            abrirEditar(request, response, id);
+        }
     }
 
-    // Botao "Redefinir senha" da tela Editar
+    // Botão "Redefinir senha" da tela Editar
     private void redefinirSenha(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -227,10 +266,18 @@ public class CooperadoServlet extends HttpServlet {
             return;
         }
 
-        String senhaNova = dao.redefinirSenha(id);
+        try {
+            String senhaNova = dao.redefinirSenha(id);
 
-        // a tela Editar mostra a senha nova uma unica vez
-        request.setAttribute("senhaNova", senhaNova);
+            // Define o atributo antes de abrir a tela
+            request.setAttribute("senhaNova", senhaNova);
+
+        } catch (RuntimeException e) {
+            request.setAttribute("erro",
+                    "Não foi possível redefinir a senha. " + mensagemDoBanco(e));
+        }
+
+        // Abre a tela de edição com os atributos já definidos
         abrirEditar(request, response, id);
     }
 
@@ -243,7 +290,14 @@ public class CooperadoServlet extends HttpServlet {
         Long id = lerId(request);
 
         if (id != null) {
-            dao.inativarCooperado(id);
+            try {
+                dao.inativarCooperado(id, escolherStatus("Inativo"));
+
+            } catch (RuntimeException e) {
+                request.setAttribute("erro", "Não foi possível inativar. " + mensagemDoBanco(e));
+                abrirVer(request, response, id);
+                return;
+            }
         }
 
         response.sendRedirect("cooperado");
@@ -263,11 +317,18 @@ public class CooperadoServlet extends HttpServlet {
         Cooperado cooperado = new Cooperado();
         cooperado.setIdCooperado(id);
 
-        int resultado = dao.excluirCooperado(cooperado);
+        try {
+            int resultado = dao.excluirCooperado(cooperado);
 
-        // -1 = o banco nao deixa apagar quem tem rateio ou relatorio
-        if (resultado == -1) {
-            request.setAttribute("erro", "Este cooperado tem rateios ou relatórios e não pode ser excluído. Use a opção Alterar status para inativo.");
+            // -1 = o banco nao deixa apagar quem tem rateio ou relatorio
+            if (resultado == -1) {
+                request.setAttribute("erro", "Este cooperado tem rateios ou relatórios e não pode ser excluído. Use a opção Alterar status para inativo.");
+                abrirVer(request, response, id);
+                return;
+            }
+
+        } catch (RuntimeException e) {
+            request.setAttribute("erro", "Não foi possível excluir. " + mensagemDoBanco(e));
             abrirVer(request, response, id);
             return;
         }
@@ -275,7 +336,7 @@ public class CooperadoServlet extends HttpServlet {
         response.sendRedirect("cooperado");
     }
 
-    // === AUXILIAR ====================================================================================================
+    // === AUXILIARES ==================================================================================================
 
     // Le o parametro "id" e transforma em numero. Se nao veio ou veio errado, devolve null.
     private Long lerId(HttpServletRequest request) {
@@ -284,6 +345,54 @@ public class CooperadoServlet extends HttpServlet {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    // Procura no banco como o status esta escrito (Ativo, ATIVO...) e usa exatamente esse texto.
+    private String escolherStatus(String desejado) {
+
+        ArrayList<String> opcoes = dao.listarValoresPermitidos("ck_cooperado_status", "Ativo", "Afastado", "Inativo");
+
+        for (String s : opcoes) {
+            if (s.equalsIgnoreCase(desejado)) {
+                return s;
+            }
+        }
+        return desejado;
+    }
+
+    // Aceita nome@dominio.com. Recusa pontos seguidos (a..b@x.com), ponto no começo/fim e espaços.
+    private static final String REGEX_EMAIL =
+            "^[A-Za-z0-9]+([._%+-][A-Za-z0-9]+)*@[A-Za-z0-9]+([.-][A-Za-z0-9]+)*\\.[A-Za-z]{2,}$";
+
+    private static final String MSG_EMAIL_INVALIDO =
+            "O formato do e-mail não é válido. Use algo como nome@exemplo.com";
+
+    private boolean emailValido(String email) {
+        return email != null && email.matches(REGEX_EMAIL);
+    }
+
+    // Pega a mensagem original do erro e troca pelas mensagens amigáveis quando conhece o motivo.
+    // Traduz o erro do banco para uma mensagem amigável.
+    private String mensagemDoBanco(Throwable e) {
+
+        Throwable causa = e;
+
+        while (causa.getCause() != null) {
+            causa = causa.getCause();
+        }
+
+        String msg = causa.getMessage() == null ? "" : causa.getMessage();
+
+        if (msg.contains("uq_usuario_email")) {
+            return "Este e-mail já está cadastrado. Use outro e-mail.";
+        }
+
+        if (msg.contains("ck_usuario_email_formato")) {
+            return "O formato do e-mail não é válido. Use algo como nome@exemplo.com";
+        }
+
+        // Qualquer outro erro: só a primeira linha (esconde o "Detalhe", que mostra a senha temporária)
+        return msg.split("\\R")[0];
     }
 
 }

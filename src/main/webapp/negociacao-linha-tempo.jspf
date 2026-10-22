@@ -1,0 +1,27 @@
+<%-- Linha do tempo das movimentacoes (telas Ver e Editar).
+     Usa as variaveis "negociacao" e "movimentacoes" da pagina que inclui este arquivo. --%>
+<% if (movimentacoes.isEmpty()) { %>
+    <p class="aviso">Nenhuma movimentação registrada.</p>
+<% } else { %>
+    <div class="linha-tempo">
+        <% for (Movimentacao mov : movimentacoes) {
+               boolean daCooperativa = mov.isCooperativa();
+        %>
+            <div class="mov <%= daCooperativa ? "mov-coop" : "mov-reci" %>">
+                <div class="mov-topo">
+                    <span class="etiqueta <%= daCooperativa ? "etiqueta-coop" : "etiqueta-reci" %>"><%= daCooperativa ? "Cooperativa" : "Recicladora" %></span>
+                    <b><%= esc(daCooperativa ? negociacao.getNomeCooperativa() : negociacao.getNomeEmpresa()) %></b>
+                    <span class="tipo"><%= esc(mov.getTipo()) %></span>
+                </div>
+                <div class="mov-dados">
+                    <span>Valor: <b><%= moeda(mov.getValorKg()) %>/kg</b></span>
+                    <span>Quantidade: <b><%= kg(mov.getQuantidadeKg()) %></b></span>
+                    <small><%= data(mov.getDataProposta()) %></small>
+                </div>
+                <% if (mov.getObservacoes() != null && !mov.getObservacoes().trim().isEmpty()) { %>
+                    <p class="mov-obs">&ldquo;<%= esc(mov.getObservacoes()) %>&rdquo;</p>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+<% } %>

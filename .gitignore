@@ -39,5 +39,9 @@ build/
 .DS_Store
 
 ### Outros arquivos ###
-.env
 .idea/dataSources/
+
+# Variáveis de ambiente e credenciais
+.env
+.env.*
+!.env.example
