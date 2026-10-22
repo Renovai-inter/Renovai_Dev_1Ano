@@ -1,6 +1,7 @@
 
 package model.principais;
 
+import model.auxiliares.RelacionamentosColeta;
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
 import model.enums.OrigemEntrega;
@@ -17,6 +18,7 @@ public class Coleta {
     // ATRIBUTOS
 
     private Long idColeta; // PK
+    private final RelacionamentosColeta relacionamentos = new RelacionamentosColeta();
     private TipoColeta tipo; // NOT NULL
     private StatusColeta status; // NOT NULL com DEFAULT
     private String origemEntrega; // VARCHAR(15)
@@ -34,6 +36,9 @@ public class Coleta {
 
     // Define o valor de idColeta.
     public void setIdColeta(Long idColeta) { this.idColeta = idColeta; }
+
+    // Reúne as chaves e os materiais associados à coleta.
+    public RelacionamentosColeta getRelacionamentos() { return relacionamentos; }
 
     // Retorna o valor de tipo.
     public TipoColeta getTipo() { return tipo; }

@@ -12,7 +12,7 @@ public class ColetaMaterial {
 
     private long idColeta; // PK para relacionamento com Coleta
     private long idMaterial; // PK para relacionamento com Material
-    private BigDecimal pesoTotalInformadoKg; // Peso total de cada material individual
+    private BigDecimal pesoTotalInformadoKg; //  NUMERIC(12,2) [not null]
 
     // GETTERS E SETTERS
 
@@ -37,9 +37,13 @@ public class ColetaMaterial {
     }
 
     public void setPesoTotalInformadoKg(BigDecimal pesoTotalInformadoKg) {
-        if (pesoTotalInformadoKg != null) {
-            utilitario.validarNumeroDecimal(pesoTotalInformadoKg.toPlainString(), 10L, 2);
+        if (pesoTotalInformadoKg == null) {
+            throw new IllegalArgumentException("pesoTotalInformadoKg é obrigatório.");
         }
+        if (pesoTotalInformadoKg.signum() < 0) {
+            throw new IllegalArgumentException("pesoTotalInformadoKg não pode ser negativo.");
+        }
+        utilitario.validarNumeroDecimal(pesoTotalInformadoKg.toPlainString(), 10L, 2);
         this.pesoTotalInformadoKg = pesoTotalInformadoKg;
     }
 

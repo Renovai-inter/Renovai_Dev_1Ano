@@ -2,7 +2,7 @@ package controller;
 
 import dao.ColetaDAO;
 import dao.DashboardDAO;
-import model.relatorio.Atividade;
+import model.relatorio.AtividadeRecenteDashboard;
 import model.Coleta;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -94,8 +94,8 @@ public class DashboardServlet extends HttpServlet {
     }
 
     // As 5 últimas coletas cadastradas, descritas pelo status atual
-    private List<Atividade> atividadesRecentes(LocalDate hoje) {
-        List<Atividade> atividades = new ArrayList<>();
+    private List<AtividadeRecenteDashboard> atividadesRecentes(LocalDate hoje) {
+        List<AtividadeRecenteDashboard> atividades = new ArrayList<>();
 
         List<Coleta> coletas = carregar(coletaDAO::listarColetas, "atividades recentes");
         if (coletas == null) return atividades;
@@ -132,7 +132,7 @@ public class DashboardServlet extends HttpServlet {
                     }
             }
 
-            atividades.add(new Atividade(horario(quando, temHora, hoje), destaque, texto));
+            atividades.add(new AtividadeRecenteDashboard(horario(quando, temHora, hoje), destaque, texto));
         }
 
         return atividades;

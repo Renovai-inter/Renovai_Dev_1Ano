@@ -35,12 +35,12 @@ public class ColetaDAO {
         // Declaração
 
         Coleta coleta = new Coleta();
-        coleta.setIdCooperativa(idCooperativa);
+        coleta.getRelacionamentos().setIdCooperativa(idCooperativa);
         coleta.setTipo(tipo);
         coleta.setStatus(status);
-        coleta.setIdRota(idRota);
-        coleta.setIdEnderecoRota(idEnderecoRota);
-        coleta.setIdCooperadoResponsavel(idCooperadoResponsavel);
+        coleta.getRelacionamentos().setIdRota(idRota);
+        coleta.getRelacionamentos().setIdEnderecoRota(idEnderecoRota);
+        coleta.getRelacionamentos().setIdCooperadoResponsavel(idCooperadoResponsavel);
         coleta.setOrigemEntrega(origemEntrega);
         coleta.setNomeLocalOrigem(nomeLocalOrigem);
         coleta.setDataAgendada(dataAgendada);
@@ -48,7 +48,7 @@ public class ColetaDAO {
         coleta.setDataFim(dataFim);
         coleta.setPesoTotalKg(pesoTotalKg);
         coleta.setObservacoes(observacoes);
-        if (coleta.getIdCooperativa() == null || coleta.getTipo() == null) {
+        if (coleta.getRelacionamentos().getIdCooperativa() == null || coleta.getTipo() == null) {
             throw new IllegalArgumentException("Cooperativa e tipo são obrigatórios.");
         }
         long ultimoId = utilitario.selecionarUltimoId("coleta");
@@ -71,15 +71,15 @@ public class ColetaDAO {
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, idColeta);
-            pstmt.setLong(2, coleta.getIdCooperativa());
+            pstmt.setLong(2, coleta.getRelacionamentos().getIdCooperativa());
             pstmt.setString(3, coleta.getTipo().name());
             if (coleta.getStatus() == null) {
                 coleta.setStatus(StatusColeta.AGENDADA);
             }
             pstmt.setString(4, coleta.getStatus().name());
-            pstmt.setObject(5, coleta.getIdRota(), Types.BIGINT);
-            pstmt.setObject(6, coleta.getIdEnderecoRota(), Types.BIGINT);
-            pstmt.setObject(7, coleta.getIdCooperadoResponsavel(), Types.BIGINT);
+            pstmt.setObject(5, coleta.getRelacionamentos().getIdRota(), Types.BIGINT);
+            pstmt.setObject(6, coleta.getRelacionamentos().getIdEnderecoRota(), Types.BIGINT);
+            pstmt.setObject(7, coleta.getRelacionamentos().getIdCooperadoResponsavel(), Types.BIGINT);
             pstmt.setString(8, coleta.getOrigemEntrega());
             pstmt.setString(9, coleta.getNomeLocalOrigem());
             if (coleta.getDataAgendada() == null) {
@@ -183,12 +183,12 @@ public class ColetaDAO {
             while (rs.next()) {
                 Coleta coleta = new Coleta();
                 coleta.setIdColeta(rs.getLong("id_coleta"));
-                coleta.setIdCooperativa(rs.getLong("id_cooperativa"));
+                coleta.getRelacionamentos().setIdCooperativa(rs.getLong("id_cooperativa"));
                 coleta.setTipo(TipoColeta.valueOf(rs.getString("tipo")));
                 coleta.setStatus(StatusColeta.valueOf(rs.getString("status")));
-                coleta.setIdRota(idOpcional(rs, "id_rota"));
-                coleta.setIdEnderecoRota(idOpcional(rs, "id_endereco_rota"));
-                coleta.setIdCooperadoResponsavel(idOpcional(rs, "id_cooperado_responsavel"));
+                coleta.getRelacionamentos().setIdRota(idOpcional(rs, "id_rota"));
+                coleta.getRelacionamentos().setIdEnderecoRota(idOpcional(rs, "id_endereco_rota"));
+                coleta.getRelacionamentos().setIdCooperadoResponsavel(idOpcional(rs, "id_cooperado_responsavel"));
                 coleta.setOrigemEntrega(rs.getString("origem_entrega"));
                 coleta.setNomeLocalOrigem(rs.getString("nome_local_origem"));
                 Date data = rs.getDate("data_agendada");

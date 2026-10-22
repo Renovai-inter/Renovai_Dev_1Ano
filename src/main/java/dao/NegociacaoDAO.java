@@ -1,6 +1,7 @@
 package dao;
 
 import model.principais.Negociacao;
+import model.principais.PropostaNegociacao;
 import model.enums.StatusNegociacao;
 import util.ConexaoBD;
 import util.Utilitario;
@@ -25,16 +26,18 @@ public class NegociacaoDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Registra uma proposta da cooperativa para a negociação informada.
-    public Negociacao fazerContraproposta(Long idNegociacao, BigDecimal valorKgAtual,
-                                         BigDecimal quantidadeKg) {
+    public PropostaNegociacao fazerContraproposta(Long idNegociacao, BigDecimal valorKg,
+                                                  BigDecimal quantidadeKg, String observacoes) {
 
         // Declaração
 
-        Negociacao negociacao = new Negociacao();
-        negociacao.setIdNegociacao(idNegociacao);
-        negociacao.setValorKgAtual(valorKgAtual);
-        negociacao.setQuantidadeKg(quantidadeKg);
-        if (negociacao.getIdNegociacao() == null) {
+        PropostaNegociacao proposta = new PropostaNegociacao();
+        proposta.setIdNegociacao(idNegociacao);
+        proposta.setAutor("COOPERATIVA");
+        proposta.setValorKg(valorKg);
+        proposta.setQuantidadeKg(quantidadeKg);
+        proposta.setObservacoes(observacoes);
+        if (proposta.getIdNegociacao() == null) {
             throw new IllegalArgumentException("ID da negociação e valor por quilo são obrigatórios.");
         }
         long ultimoId = utilitario.selecionarUltimoId("proposta");
@@ -44,24 +47,27 @@ public class NegociacaoDAO {
         } else {
             idProposta = ultimoId + 1;
         }
+        proposta.setIdProposta(idProposta);
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
         String sql = "INSERT INTO proposta (id_proposta, id_negociacao, autor, valor_kg, " +
-                "quantidade_kg) VALUES (?, ?, 'COOPERATIVA', ?, ?)";
+                "quantidade_kg, observacoes) VALUES (?, ?, ?, ?, ?, ?)";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1, idProposta);
-            pstmt.setLong(2, negociacao.getIdNegociacao());
-            pstmt.setBigDecimal(3, negociacao.getValorKgAtual());
-            pstmt.setBigDecimal(4, negociacao.getQuantidadeKg());
+            pstmt.setLong(1, proposta.getIdProposta());
+            pstmt.setLong(2, proposta.getIdNegociacao());
+            pstmt.setString(3, proposta.getAutor());
+            pstmt.setBigDecimal(4, proposta.getValorKg());
+            pstmt.setBigDecimal(5, proposta.getQuantidadeKg());
+            pstmt.setString(6, proposta.getObservacoes());
             if (pstmt.executeUpdate() == 0) {
                 return null;
             }
-            return negociacao;
+            return proposta;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar contraproposta da cooperativa.", e);
         } finally {

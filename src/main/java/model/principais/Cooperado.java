@@ -1,12 +1,12 @@
 package model.principais;
 
+import model.auxiliares.RelacionamentosCooperado;
+import model.auxiliares.Usuario;
 import model.enums.CargoCooperado;
 import model.enums.StatusCooperado;
-import model.enums.TipoUsuario;
 import util.Utilitario;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 
 public class Cooperado {
 
@@ -15,6 +15,8 @@ public class Cooperado {
     // ATRIBUTOS
 
     private Long idCooperado; // PK
+    private Usuario usuario;
+    private final RelacionamentosCooperado relacionamentos = new RelacionamentosCooperado();
     private Long idUsuario; // FK
     private Long idCooperativa; // FK
     private String codigoCooperado; // NOT NULL - VARCHAR(20)
@@ -29,6 +31,15 @@ public class Cooperado {
 
     // Define o valor de idCooperado.
     public void setIdCooperado(Long idCooperado) { this.idCooperado = idCooperado; }
+
+    // Retorna a conta associada ao cooperado, quando carregada.
+    public Usuario getUsuario() { return usuario; }
+
+    // Associa a conta já preenchida pelos seus próprios setters.
+    public void setUsuario(Usuario usuario) { this.usuario = usuario; }
+
+    // Reúne as atividades e permissões associadas ao cooperado.
+    public RelacionamentosCooperado getRelacionamentos() { return relacionamentos; }
 
     // Retorna o valor de idUsuario.
     public Long getIdUsuario() { return idUsuario; }

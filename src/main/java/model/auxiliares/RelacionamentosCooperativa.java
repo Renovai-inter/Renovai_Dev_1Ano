@@ -1,10 +1,6 @@
 package model.auxiliares;
 
-import util.Utilitario;
-
 public class RelacionamentosCooperativa {
-
-    private final Utilitario utilitario = new Utilitario();
 
     // ATRIBUTOS
 
@@ -21,7 +17,7 @@ public class RelacionamentosCooperativa {
     }
 
     // Define o valor de qtdCooperados.
-    public void setqtdCooperados(int qtdRotas) {
+    public void setQtdCooperados(int qtdCooperados) {
         this.qtdCooperados = qtdCooperados;
     }
 

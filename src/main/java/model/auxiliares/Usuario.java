@@ -3,7 +3,7 @@ package model.auxiliares;
 import model.enums.TipoUsuario;
 import util.Utilitario;
 
-public class CooperadoUsuario {
+public class Usuario {
 
     private final Utilitario utilitario = new Utilitario();
 
@@ -13,7 +13,7 @@ public class CooperadoUsuario {
     private String nomeCompleto; // NOT NULL - VARCHAR(150)
     private String nomeUsuario; // NOT NULL - VARCHAR(50)
     private TipoUsuario tipoUsuario; // NOT NULL - CHECK
-    private String senhaHash; // NOT NULL
+    private String senhaHash; // NOT NULL - VARCHAR(255)
     private boolean senhaTemporaria; // BOOLEAN COM DEFAULT
     private String email; // NOT NULL - VARCHAR(150)
 
@@ -28,7 +28,7 @@ public class CooperadoUsuario {
         if (nomeCompleto == null || nomeCompleto.isBlank()) {
             throw new IllegalArgumentException("nomeCompleto é obrigatório.");
         }
-        if (nomeCompleto.codePointCount(0, nomeCompleto.length()) > 150) {
+        if (nomeCompleto.length() > 150) {
             throw new IllegalArgumentException("nomeCompleto deve ter no máximo 150 caracteres.");
         }
         this.nomeCompleto = nomeCompleto;
@@ -43,7 +43,7 @@ public class CooperadoUsuario {
         if (nomeUsuario == null || nomeUsuario.isBlank()) {
             throw new IllegalArgumentException("nomeUsuario é obrigatório.");
         }
-        if (nomeUsuario.codePointCount(0, nomeUsuario.length()) > 50) {
+        if (nomeUsuario.length() > 50) {
             throw new IllegalArgumentException("nomeUsuario deve ter no máximo 50 caracteres.");
         }
         this.nomeUsuario = nomeUsuario;
@@ -64,6 +64,9 @@ public class CooperadoUsuario {
 
     // Define o valor de tipo de usuário
     public void setTipoUsuario(TipoUsuario tipoUsuario) {
+        if (tipoUsuario == null) {
+            throw new IllegalArgumentException("tipoUsuario é obrigatório.");
+        }
         this.tipoUsuario = tipoUsuario;
     }
 
@@ -73,4 +76,25 @@ public class CooperadoUsuario {
     // Define o valor de senhaTemporaria.
     public void setSenhaTemporaria(boolean senhaTemporaria) { this.senhaTemporaria = senhaTemporaria; }
 
+    public long getIdUsuario() {
+        return idUsuario;
+    }
+
+    public void setIdUsuario(long idUsuario) {
+        this.idUsuario = idUsuario;
+    }
+
+    public String getSenhaHash() {
+        return senhaHash;
+    }
+
+    public void setSenhaHash(String senhaHash) {
+        if (senhaHash == null || senhaHash.isBlank()) {
+            throw new IllegalArgumentException("senhaHash é obrigatória.");
+        }
+        if (senhaHash.length() > 255) {
+            throw new IllegalArgumentException("senhaHash deve ter no máximo 255 caracteres.");
+        }
+        this.senhaHash = senhaHash;
+    }
 }

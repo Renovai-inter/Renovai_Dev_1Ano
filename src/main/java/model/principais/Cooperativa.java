@@ -1,6 +1,7 @@
 
 package model.principais;
 
+import model.auxiliares.RelacionamentosCooperativa;
 import model.enums.StatusCooperativa;
 import util.Utilitario;
 
@@ -14,6 +15,7 @@ public class Cooperativa {
     // ATRIBUTOS (tabela cooperativa)
 
     private Long idCooperativa; // PK
+    private final RelacionamentosCooperativa relacionamentos = new RelacionamentosCooperativa();
     private String nome; // NOT NULL - VARCHAR(150)
     private String cnpj; // NOT NULL - ENTRADA VALIDADA COM METODO
     private String nomePublico; // NOT NULL - VARCHAR(150)
@@ -38,6 +40,9 @@ public class Cooperativa {
 
     // Define o valor de idCooperativa.
     public void setIdCooperativa(Long idCooperativa) { this.idCooperativa = idCooperativa; }
+
+    // Retorna os totais carregados pelas consultas de relacionamentos.
+    public RelacionamentosCooperativa getRelacionamentos() { return relacionamentos; }
 
     // Retorna o valor de nome.
     public String getNome() { return nome; }

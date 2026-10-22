@@ -2,6 +2,8 @@ package dao;
 
 import model.principais.Cooperativa;
 import model.principais.Cooperado;
+import model.auxiliares.Usuario;
+import model.enums.TipoUsuario;
 import model.enums.StatusCooperativa;
 import util.*;
 
@@ -47,10 +49,15 @@ public class CooperativaDAO {
         coop.setEndereco(endereco);
         coop.setCidade(cidade);
         coop.setEstado(estado);
+        Usuario usuario = new Usuario();
+        usuario.setNomeCompleto(nomeGestor);
+        usuario.setNomeUsuario(usuarioGestor);
+        usuario.setEmail(emailGestor);
+        usuario.setSenhaHash(senhaTemporariaGestor);
+        usuario.setSenhaTemporaria(true);
+        usuario.setTipoUsuario(TipoUsuario.GESTOR_COOPERATIVA);
         Cooperado gestor = new Cooperado();
-        gestor.setNomeCompleto(nomeGestor);
-        gestor.setNomeUsuario(usuarioGestor);
-        gestor.setEmail(emailGestor);
+        gestor.setUsuario(usuario);
         Connection conexao = conn.conectar();
 
         // Comando SQL
@@ -87,7 +94,7 @@ public class CooperativaDAO {
                     return null;
                 }
             }
-            boolean gestorCadastrado = cooperadoDAO.gravarGestor(conexao, coop, gestor, senhaTemporariaGestor);
+            boolean gestorCadastrado = cooperadoDAO.gravarGestor(conexao, coop, usuario, gestor);
             if (!gestorCadastrado) {
                 return null;
             }
@@ -118,7 +125,7 @@ public class CooperativaDAO {
         if (status != null) {
             cooperativa.setStatus(StatusCooperativa.valueOf(status));
         }
-        cooperativa.setQtdCooperados(rs.getInt("cooperados"));
+        cooperativa.getRelacionamentos().setQtdCooperados(rs.getInt("cooperados"));
         Timestamp cadastro = rs.getTimestamp("cadastro");
         if (cadastro != null) {
             cooperativa.setDataCadastro(cadastro.toLocalDateTime());

@@ -2,27 +2,30 @@ package model.auxiliares;
 
 import model.enums.AtividadeCooperado;
 import model.enums.PermissaoCooperado;
-import util.Utilitario;
-
 import java.util.ArrayList;
 
 public class RelacionamentosCooperado {
 
-    private final Utilitario util = new Utilitario();
-
     // ATRIBUTOS
 
-    private long idCooperativa; // NOT NULL - VARCHAR(150)
+    private Long idCooperado; // Chave dos vínculos de atividade e permissão
+    private String nomeCooperativa; // Nome consultado para a listagem
     private ArrayList<AtividadeCooperado> atividadesCooperado = new ArrayList<>(); // Lista de atividades para Cooperado (ENUM)
     private ArrayList<PermissaoCooperado> permissoesCooperado = new ArrayList<>(); // Lista de permissoes para Cooperado (ENUM)
 
     // GETTERS E SETTERS
 
-    // Retorna o valor de idCooperativa.
-    public long getIdCooperativa() { return idCooperativa; }
+    // Retorna o cooperado associado aos vínculos.
+    public Long getIdCooperado() { return idCooperado; }
 
-    // Define o valor de idCooperativa.
-    public void setIdCooperativa(String nomeCooperativa) { this.idCooperativa = idCooperativa; }
+    // Define o cooperado associado aos vínculos.
+    public void setIdCooperado(Long idCooperado) { this.idCooperado = idCooperado; }
+
+    // Retorna o nome da cooperativa quando selecionado por JOIN.
+    public String getNomeCooperativa() { return nomeCooperativa; }
+
+    // Define o nome da cooperativa obtido na consulta.
+    public void setNomeCooperativa(String nomeCooperativa) { this.nomeCooperativa = nomeCooperativa; }
 
     public ArrayList<AtividadeCooperado> getAtividadesCooperado() {
         return atividadesCooperado;
