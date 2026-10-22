@@ -1,6 +1,7 @@
 package model.auxiliares;
 
 import java.util.List;
+import java.util.ArrayList;
 
 public class RelacionamentosColeta {
 
@@ -10,7 +11,7 @@ public class RelacionamentosColeta {
     private Long idRota; // FK para rota
     private Long idEnderecoRota; // FK para en
     private Long idCooperadoResponsavel; // FK
-    private List<ColetaMaterial> materiaisColetados; // Conjunto de materiais coletados
+    private List<ColetaMaterial> materiaisColetados = new ArrayList<>(); // Conjunto de materiais coletados
 
     // GETTERS E SETTERS
 
@@ -37,5 +38,16 @@ public class RelacionamentosColeta {
 
     // Define o valor de idCooperadoResponsavel.
     public void setIdCooperadoResponsavel(Long idCooperadoResponsavel) { this.idCooperadoResponsavel = idCooperadoResponsavel; }
+
+    // Retorna os materiais associados à coleta.
+    public List<ColetaMaterial> getMateriaisColetados() { return materiaisColetados; }
+
+    // Define os materiais associados à coleta.
+    public void setMateriaisColetados(List<ColetaMaterial> materiaisColetados) {
+        if (materiaisColetados == null) {
+            throw new IllegalArgumentException("materiaisColetados é obrigatório.");
+        }
+        this.materiaisColetados = new ArrayList<>(materiaisColetados);
+    }
 
 }

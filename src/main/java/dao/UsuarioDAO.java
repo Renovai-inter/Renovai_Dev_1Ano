@@ -46,22 +46,36 @@ public class UsuarioDAO {
         } else {
             idUsuario = ultimoId + 1;
         }
-        String sql = "INSERT INTO usuario (id_usuario, nome_completo, nome_usuario, senha_hash, " +
-                "senha_temporaria, email, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = sqlInserirUsuario();
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1, idUsuario);
-            pstmt.setString(2, usuario.getNomeCompleto());
-            pstmt.setString(3, usuario.getNomeUsuario());
-            pstmt.setString(4, usuario.getSenhaHash());
-            pstmt.setBoolean(5, usuario.isSenhaTemporaria());
-            pstmt.setString(6, usuario.getEmail());
-            pstmt.setString(7, usuario.getTipoUsuario().name());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
+            preencherCadastro(pstmt, 1, idUsuario, usuario);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (!rs.next()) {
+                    return null;
+                }
+                usuario.setIdUsuario(rs.getLong("id_usuario"));
             }
-            usuario.setIdUsuario(idUsuario);
             return usuario;
         }
+    }
+
+    // Fornece o mesmo cadastro de usuário às operações compostas.
+    String sqlInserirUsuario() {
+        return "INSERT INTO usuario (id_usuario, nome_completo, nome_usuario, senha_hash, " +
+                "senha_temporaria, email, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?, ?) " +
+                "RETURNING id_usuario";
+    }
+
+    // Preenche os campos do cadastro de usuário a partir do índice informado.
+    void preencherCadastro(PreparedStatement pstmt, int primeiroIndice, long idUsuario,
+                           Usuario usuario) throws SQLException {
+        pstmt.setLong(primeiroIndice, idUsuario);
+        pstmt.setString(primeiroIndice + 1, usuario.getNomeCompleto());
+        pstmt.setString(primeiroIndice + 2, usuario.getNomeUsuario());
+        pstmt.setString(primeiroIndice + 3, usuario.getSenhaHash());
+        pstmt.setBoolean(primeiroIndice + 4, usuario.isSenhaTemporaria());
+        pstmt.setString(primeiroIndice + 5, usuario.getEmail());
+        pstmt.setString(primeiroIndice + 6, usuario.getTipoUsuario().name());
     }
 
     // === METODOS READ ================================================================================================

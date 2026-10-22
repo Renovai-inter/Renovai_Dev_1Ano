@@ -5,6 +5,8 @@ import model.principais.Cooperado;
 import model.auxiliares.Usuario;
 import model.enums.TipoUsuario;
 import model.enums.StatusCooperativa;
+import model.enums.CargoCooperado;
+import model.enums.StatusCooperado;
 import util.*;
 
 import java.sql.*;
@@ -17,7 +19,7 @@ public class CooperativaDAO {
 
     private final ConexaoBD conn = new ConexaoBD();
     private final Utilitario utilitario = new Utilitario();
-    private final CooperadoDAO cooperadoDAO = new CooperadoDAO();
+    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
 
     // CONSTRUTOR
 
@@ -62,9 +64,19 @@ public class CooperativaDAO {
 
         // Comando SQL
 
-        String sql = "INSERT INTO cooperativa (id_cooperativa, nome, cnpj, nome_publico, " +
+        String sql = "WITH cooperativa_nova AS (" +
+                "INSERT INTO cooperativa (id_cooperativa, nome, cnpj, nome_publico, " +
                 "descricao_institucional, logo_url, email_institucional, telefone_whatsapp, " +
-                "cep, endereco, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "cep, endereco, cidade, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                "RETURNING id_cooperativa), usuario_novo AS (" +
+                usuarioDAO.sqlInserirUsuario() + "), gestor_novo AS (" +
+                "INSERT INTO cooperado (id_cooperado, id_usuario, id_cooperativa, " +
+                "codigo_cooperado, cargo) " +
+                "SELECT ?, u.id_usuario, c.id_cooperativa, ?, ? " +
+                "FROM usuario_novo u CROSS JOIN cooperativa_nova c " +
+                "RETURNING id_cooperado) " +
+                "SELECT c.id_cooperativa, u.id_usuario, g.id_cooperado " +
+                "FROM cooperativa_nova c CROSS JOIN usuario_novo u CROSS JOIN gestor_novo g";
 
         // Executar PreparedStatement
 
@@ -77,6 +89,23 @@ public class CooperativaDAO {
                 idCooperativa = ultimoId + 1;
             }
             coop.setIdCooperativa(idCooperativa);
+            long ultimoIdUsuario = utilitario.selecionarUltimoId("usuario");
+            long idUsuario;
+            if (ultimoIdUsuario == -1) {
+                idUsuario = 1;
+            } else {
+                idUsuario = ultimoIdUsuario + 1;
+            }
+            long ultimoIdCooperado = utilitario.selecionarUltimoId("cooperado");
+            long idCooperado;
+            if (ultimoIdCooperado == -1) {
+                idCooperado = 1;
+            } else {
+                idCooperado = ultimoIdCooperado + 1;
+            }
+            gestor.setCodigoCooperado("CD-" + idCooperado);
+            gestor.setCargo(CargoCooperado.GESTOR);
+            gestor.setStatus(StatusCooperado.ATIVO);
             try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
                 pstmt.setLong(1, idCooperativa);
                 pstmt.setString(2, coop.getNome());
@@ -90,14 +119,21 @@ public class CooperativaDAO {
                 pstmt.setString(10, coop.getEndereco());
                 pstmt.setString(11, coop.getCidade());
                 pstmt.setString(12, coop.getEstado());
-                if (pstmt.executeUpdate() == 0) {
-                    return null;
+                usuarioDAO.preencherCadastro(pstmt, 13, idUsuario, usuario);
+                pstmt.setLong(20, idCooperado);
+                pstmt.setString(21, gestor.getCodigoCooperado());
+                pstmt.setString(22, gestor.getCargo().name());
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (!rs.next()) {
+                        return null;
+                    }
+                    usuario.setIdUsuario(rs.getLong("id_usuario"));
+                    gestor.setIdCooperado(rs.getLong("id_cooperado"));
                 }
             }
-            boolean gestorCadastrado = cooperadoDAO.gravarGestor(conexao, coop, usuario, gestor);
-            if (!gestorCadastrado) {
-                return null;
-            }
+            gestor.setIdUsuario(usuario.getIdUsuario());
+            gestor.setIdCooperativa(coop.getIdCooperativa());
+            gestor.setUsuario(usuario);
             coop.setCanalContatoPreferencial("WHATSAPP");
             coop.setStatus(StatusCooperativa.ATIVA);
             return coop;

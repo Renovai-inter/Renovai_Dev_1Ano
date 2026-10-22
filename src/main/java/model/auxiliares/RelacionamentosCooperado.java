@@ -12,6 +12,7 @@ public class RelacionamentosCooperado {
     private String nomeCooperativa; // Nome consultado para a listagem
     private ArrayList<AtividadeCooperado> atividadesCooperado = new ArrayList<>(); // Lista de atividades para Cooperado (ENUM)
     private ArrayList<PermissaoCooperado> permissoesCooperado = new ArrayList<>(); // Lista de permissoes para Cooperado (ENUM)
+    private ArrayList<CooperadoPermissao> vinculosPermissao = new ArrayList<>(); // Chaves dos vínculos gravados
 
     // GETTERS E SETTERS
 
@@ -41,6 +42,17 @@ public class RelacionamentosCooperado {
 
     public void setPermissoesCooperado(ArrayList<PermissaoCooperado> permissoesCooperado) {
         this.permissoesCooperado = permissoesCooperado;
+    }
+
+    // Retorna os vínculos identificados pelos IDs do catálogo.
+    public ArrayList<CooperadoPermissao> getVinculosPermissao() { return vinculosPermissao; }
+
+    // Define os vínculos identificados pelos IDs do catálogo.
+    public void setVinculosPermissao(ArrayList<CooperadoPermissao> vinculosPermissao) {
+        if (vinculosPermissao == null) {
+            throw new IllegalArgumentException("vinculosPermissao é obrigatório.");
+        }
+        this.vinculosPermissao = new ArrayList<>(vinculosPermissao);
     }
 
 }

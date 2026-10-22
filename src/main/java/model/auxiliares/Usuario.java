@@ -54,7 +54,11 @@ public class Usuario {
 
     // Define o valor de email.
     public void setEmail(String email) {
-        this.email = utilitario.filtrarEmailInstitucional(email);
+        email = utilitario.filtrarEmailInstitucional(email);
+        if (email.length() > 150) {
+            throw new IllegalArgumentException("email deve ter no máximo 150 caracteres.");
+        }
+        this.email = email;
     }
 
     // Retorna o valor de tipo de usuário

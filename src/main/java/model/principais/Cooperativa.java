@@ -64,6 +64,9 @@ public class Cooperativa {
 
     // Define o valor de cnpj.
     public void setCnpj(String cnpj) {
+        if (cnpj == null) {
+            throw new IllegalArgumentException("cnpj é obrigatório.");
+        }
         cnpj = utilitario.filtrarCnpj(cnpj);
         if (cnpj != null && cnpj.length() > 18) {
             throw new IllegalArgumentException("cnpj deve ter no máximo 18 caracteres.");

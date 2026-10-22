@@ -1,4 +1,4 @@
-package model.principais;
+package model.auxiliares;
 
 import util.Utilitario;
 

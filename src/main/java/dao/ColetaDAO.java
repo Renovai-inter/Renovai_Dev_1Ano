@@ -1,5 +1,6 @@
 package dao;
 import model.principais.Coleta;
+import model.auxiliares.ColetaMaterial;
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
 import util.ConexaoBD;
@@ -48,6 +49,7 @@ public class ColetaDAO {
         coleta.setDataFim(dataFim);
         coleta.setPesoTotalKg(pesoTotalKg);
         coleta.setObservacoes(observacoes);
+        coleta.validarTipoEVinculos();
         if (coleta.getRelacionamentos().getIdCooperativa() == null || coleta.getTipo() == null) {
             throw new IllegalArgumentException("Cooperativa e tipo são obrigatórios.");
         }
@@ -124,9 +126,42 @@ public class ColetaDAO {
                 pesoTotalKg, observacoes);
     }
 
-    // Os parâmetros ficam preparados para o vínculo quando a Model representar os materiais da coleta.
+    // Registra a quantidade de um material vinculado à coleta.
     public Coleta quantidadeTipoMaterial(Long idColeta, Long idMaterial, BigDecimal quantidadeKg) {
-        throw new UnsupportedOperationException("Pendente: representar idMaterial e quantidadeKg na Model da coleta.");
+
+        // Declaração
+
+        ColetaMaterial item = new ColetaMaterial();
+        item.setIdColeta(idColeta);
+        item.setIdMaterial(idMaterial);
+        item.setQuantidadeKg(quantidadeKg);
+        Coleta coleta = new Coleta();
+        coleta.setIdColeta(item.getIdColeta());
+        ArrayList<ColetaMaterial> itens = new ArrayList<>();
+        itens.add(item);
+        coleta.getRelacionamentos().setMateriaisColetados(itens);
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "INSERT INTO coleta_material (id_coleta, id_material, quantidade_kg) " +
+                "VALUES (?, ?, ?)";
+
+        // Executar PreparedStatement
+
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setLong(1, item.getIdColeta());
+            pstmt.setLong(2, item.getIdMaterial());
+            pstmt.setBigDecimal(3, item.getQuantidadeKg());
+            if (pstmt.executeUpdate() == 0) {
+                return null;
+            }
+            return coleta;
+        } catch (SQLException e) {
+            throw new RuntimeException("Falha ao registrar material da coleta.", e);
+        } finally {
+            conn.desconectar(conexao);
+        }
     }
 
     // === METODOS READ ================================================================================================
@@ -352,6 +387,7 @@ public class ColetaDAO {
         coleta.setDataFim(dataFim);
         coleta.setPesoTotalKg(pesoTotalKg);
         coleta.setObservacoes(observacoes);
+        coleta.validarTipoEVinculos();
         if (coleta.getIdColeta() == null || coleta.getTipo() == null || coleta.getStatus() == null) {
             throw new IllegalArgumentException("ID, tipo e status são obrigatórios.");
         }

@@ -1,7 +1,7 @@
 package dao;
 
 import model.principais.Negociacao;
-import model.principais.PropostaNegociacao;
+import model.auxiliares.PropostaNegociacao;
 import model.enums.StatusNegociacao;
 import util.ConexaoBD;
 import util.Utilitario;

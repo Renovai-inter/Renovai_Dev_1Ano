@@ -10,41 +10,47 @@ public class ColetaMaterial {
 
     // ATRIBUTOS
 
-    private long idColeta; // PK para relacionamento com Coleta
-    private long idMaterial; // PK para relacionamento com Material
-    private BigDecimal pesoTotalInformadoKg; //  NUMERIC(12,2) [not null]
+    private Long idColeta; // PK para relacionamento com Coleta
+    private Long idMaterial; // PK para relacionamento com Material
+    private BigDecimal quantidadeKg; // NUMERIC(12,2) [not null]
 
     // GETTERS E SETTERS
 
-    public long getIdColeta() {
+    public Long getIdColeta() {
         return idColeta;
     }
 
-    public void setIdColeta(long idColeta) {
+    public void setIdColeta(Long idColeta) {
+        if (idColeta == null) {
+            throw new IllegalArgumentException("idColeta é obrigatório.");
+        }
         this.idColeta = idColeta;
     }
 
-    public long getIdMaterial() {
+    public Long getIdMaterial() {
         return idMaterial;
     }
 
-    public void setIdMaterial(long idMaterial) {
+    public void setIdMaterial(Long idMaterial) {
+        if (idMaterial == null) {
+            throw new IllegalArgumentException("idMaterial é obrigatório.");
+        }
         this.idMaterial = idMaterial;
     }
 
-    public BigDecimal getPesoTotalInformadoKg() {
-        return pesoTotalInformadoKg;
+    public BigDecimal getQuantidadeKg() {
+        return quantidadeKg;
     }
 
-    public void setPesoTotalInformadoKg(BigDecimal pesoTotalInformadoKg) {
-        if (pesoTotalInformadoKg == null) {
-            throw new IllegalArgumentException("pesoTotalInformadoKg é obrigatório.");
+    public void setQuantidadeKg(BigDecimal quantidadeKg) {
+        if (quantidadeKg == null) {
+            throw new IllegalArgumentException("quantidadeKg é obrigatória.");
         }
-        if (pesoTotalInformadoKg.signum() < 0) {
-            throw new IllegalArgumentException("pesoTotalInformadoKg não pode ser negativo.");
+        if (quantidadeKg.signum() < 0) {
+            throw new IllegalArgumentException("quantidadeKg não pode ser negativa.");
         }
-        utilitario.validarNumeroDecimal(pesoTotalInformadoKg.toPlainString(), 10L, 2);
-        this.pesoTotalInformadoKg = pesoTotalInformadoKg;
+        utilitario.validarNumeroDecimal(quantidadeKg.toPlainString(), 10L, 2);
+        this.quantidadeKg = quantidadeKg;
     }
 
 }

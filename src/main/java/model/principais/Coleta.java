@@ -68,6 +68,22 @@ public class Coleta {
         this.origemEntrega = origemEntrega;
     }
 
+    // Confere a combinação entre tipo, rota e origem prevista para a coleta.
+    public void validarTipoEVinculos() {
+        if (tipo == null) {
+            throw new IllegalArgumentException("tipo é obrigatório.");
+        }
+        if (tipo == TipoColeta.ENTREGA_COOPERATIVA) {
+            if (relacionamentos.getIdRota() != null || relacionamentos.getIdEnderecoRota() != null) {
+                throw new IllegalArgumentException("Entrega na cooperativa não usa rota nem endereço da rota.");
+            }
+        } else {
+            if (origemEntrega != null) {
+                throw new IllegalArgumentException("Coleta externa não usa origem de entrega.");
+            }
+        }
+    }
+
     // Retorna o valor de nomeLocalOrigem.
     public String getNomeLocalOrigem() { return nomeLocalOrigem; }
 

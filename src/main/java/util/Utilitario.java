@@ -232,20 +232,18 @@ public class Utilitario {
                 " FROM " + tabela +
                 " ORDER BY 1 DESC LIMIT 1";
 
-        try {
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()){
-                return rs.getLong("id_"+tabela);
-            }
-            else {
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getLong("id_" + tabela);
+            } else {
                 return -1;
             }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Falha ao consultar o último ID de " + tabela + ".", e);
+        } finally {
+            conn.desconectar(conexao);
         }
-        catch (SQLException e) {
-            return -1;
-        } finally { conn.desconectar(conexao); } }
+    }
 
 }
