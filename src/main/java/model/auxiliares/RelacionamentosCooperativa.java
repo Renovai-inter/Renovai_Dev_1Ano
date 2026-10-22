@@ -9,6 +9,17 @@ public class RelacionamentosCooperativa {
     private int qtdColetas; // Quantidade de coletas definida através de JOIN e COUNT
     private int qtdNegociacoes; // Quantidade de negociações definida através de JOIN e COUNT
 
+    public RelacionamentosCooperativa() {
+    }
+
+    public RelacionamentosCooperativa(int qtdCooperados, int qtdRotas,
+                                     int qtdColetas, int qtdNegociacoes) {
+        setQtdCooperados(qtdCooperados);
+        setQtdRotas(qtdRotas);
+        setQtdColetas(qtdColetas);
+        setQtdNegociacoes(qtdNegociacoes);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o valor de qtdCooperados.

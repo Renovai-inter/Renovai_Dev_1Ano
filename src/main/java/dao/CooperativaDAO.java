@@ -2,7 +2,6 @@ package dao;
 
 import model.principais.Cooperativa;
 import model.principais.Cooperado;
-import model.auxiliares.Usuario;
 import model.enums.TipoUsuario;
 import model.enums.StatusCooperativa;
 import model.enums.CargoCooperado;
@@ -30,36 +29,21 @@ public class CooperativaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma cooperativa e seu gestor inicial.
-    public Cooperativa cadastrarCooperativa(String nome, String cnpj, String nomePublico,
-                                            String descricaoInstitucional, String logoUrl,
-                                            String emailInstitucional, String telefoneWhatsapp,
-                                            String cep, String endereco, String cidade, String estado,
-                                            String nomeGestor, String usuarioGestor,
-                                            String emailGestor, String senhaTemporariaGestor) {
+    public Cooperativa cadastrarCooperativa(Cooperativa coop, Cooperado gestor) {
 
         // Declaração
 
-        Cooperativa coop = new Cooperativa();
-        coop.setNome(nome);
-        coop.setCnpj(cnpj);
-        coop.setNomePublico(nomePublico);
-        coop.setDescricaoInstitucional(descricaoInstitucional);
-        coop.setLogoUrl(logoUrl);
-        coop.setEmailInstitucional(emailInstitucional);
-        coop.setTelefoneWhatsapp(telefoneWhatsapp);
-        coop.setCep(cep);
-        coop.setEndereco(endereco);
-        coop.setCidade(cidade);
-        coop.setEstado(estado);
-        Usuario usuario = new Usuario();
-        usuario.setNomeCompleto(nomeGestor);
-        usuario.setNomeUsuario(usuarioGestor);
-        usuario.setEmail(emailGestor);
-        usuario.setSenhaHash(senhaTemporariaGestor);
-        usuario.setSenhaTemporaria(true);
-        usuario.setTipoUsuario(TipoUsuario.GESTOR_COOPERATIVA);
-        Cooperado gestor = new Cooperado();
-        gestor.setUsuario(usuario);
+        if (coop == null || gestor == null || coop.getNome() == null
+                || coop.getCnpj() == null || coop.getNomePublico() == null
+                || coop.getEmailInstitucional() == null || coop.getTelefoneWhatsapp() == null
+                || coop.getCep() == null || coop.getEndereco() == null
+                || coop.getCidade() == null || coop.getEstado() == null
+                || gestor.getNomeCompleto() == null || gestor.getNomeUsuario() == null
+                || gestor.getEmail() == null || gestor.getSenhaHash() == null) {
+            throw new IllegalArgumentException("Dados da cooperativa e do gestor são obrigatórios.");
+        }
+        gestor.setSenhaTemporaria(true);
+        gestor.setTipoUsuario(TipoUsuario.GESTOR_COOPERATIVA);
         Connection conexao = conn.conectar();
 
         // Comando SQL
@@ -74,9 +58,13 @@ public class CooperativaDAO {
                 "codigo_cooperado, cargo) " +
                 "SELECT ?, u.id_usuario, c.id_cooperativa, ?, ? " +
                 "FROM usuario_novo u CROSS JOIN cooperativa_nova c " +
-                "RETURNING id_cooperado) " +
+                "RETURNING id_cooperado), permissoes_gestor AS (" +
+                "INSERT INTO cooperado_permissao (id_cooperado, id_permissao) " +
+                "SELECT g.id_cooperado, p.id_permissao FROM gestor_novo g " +
+                "CROSS JOIN permissao p RETURNING id_cooperado) " +
                 "SELECT c.id_cooperativa, u.id_usuario, g.id_cooperado " +
-                "FROM cooperativa_nova c CROSS JOIN usuario_novo u CROSS JOIN gestor_novo g";
+                "FROM cooperativa_nova c CROSS JOIN usuario_novo u CROSS JOIN gestor_novo g " +
+                "CROSS JOIN (SELECT COUNT(*) FROM permissoes_gestor) pg";
 
         // Executar PreparedStatement
 
@@ -119,21 +107,19 @@ public class CooperativaDAO {
                 pstmt.setString(10, coop.getEndereco());
                 pstmt.setString(11, coop.getCidade());
                 pstmt.setString(12, coop.getEstado());
-                usuarioDAO.preencherCadastro(pstmt, 13, idUsuario, usuario);
+                usuarioDAO.preencherCadastro(pstmt, 13, idUsuario, gestor);
                 pstmt.setLong(20, idCooperado);
                 pstmt.setString(21, gestor.getCodigoCooperado());
-                pstmt.setString(22, gestor.getCargo().name());
+                pstmt.setString(22, gestor.getCargoEnum().name());
                 try (ResultSet rs = pstmt.executeQuery()) {
                     if (!rs.next()) {
                         return null;
                     }
-                    usuario.setIdUsuario(rs.getLong("id_usuario"));
+                    gestor.setIdUsuario(rs.getLong("id_usuario"));
                     gestor.setIdCooperado(rs.getLong("id_cooperado"));
                 }
             }
-            gestor.setIdUsuario(usuario.getIdUsuario());
             gestor.setIdCooperativa(coop.getIdCooperativa());
-            gestor.setUsuario(usuario);
             coop.setCanalContatoPreferencial("WHATSAPP");
             coop.setStatus(StatusCooperativa.ATIVA);
             return coop;
@@ -201,12 +187,13 @@ public class CooperativaDAO {
     }
 
     // Lista as cooperativas da cidade informada.
-    public ArrayList<Cooperativa> filtrarCooperativasPorCidade(String cidadeBusca) {
+    public ArrayList<Cooperativa> filtrarCooperativasPorCidade(Cooperativa cooperativa) {
 
         // Declaração
 
-        Cooperativa cooperativa = new Cooperativa();
-        cooperativa.setCidade(cidadeBusca);
+        if (cooperativa == null || cooperativa.getCidade() == null) {
+            throw new IllegalArgumentException("cidade é obrigatória.");
+        }
 
         // Execução e retorno
 
@@ -215,12 +202,13 @@ public class CooperativaDAO {
     }
 
     // Lista as cooperativas do estado informado.
-    public ArrayList<Cooperativa> filtrarCooperativasPorEstado(String estadoBusca) {
+    public ArrayList<Cooperativa> filtrarCooperativasPorEstado(Cooperativa cooperativa) {
 
         // Declaração
 
-        Cooperativa cooperativa = new Cooperativa();
-        cooperativa.setEstado(estadoBusca);
+        if (cooperativa == null || cooperativa.getEstado() == null) {
+            throw new IllegalArgumentException("estado é obrigatório.");
+        }
 
         // Execução e retorno
 
@@ -229,12 +217,13 @@ public class CooperativaDAO {
     }
 
     // Lista as cooperativas com o status informado.
-    public ArrayList<Cooperativa> filtrarCooperativasPorStatus(String statusBusca) {
+    public ArrayList<Cooperativa> filtrarCooperativasPorStatus(Cooperativa cooperativa) {
 
         // Declaração
 
-        Cooperativa cooperativa = new Cooperativa();
-        cooperativa.setStatus(StatusCooperativa.valueOf(statusBusca.strip().toUpperCase()));
+        if (cooperativa == null || cooperativa.getStatus() == null) {
+            throw new IllegalArgumentException("status é obrigatório.");
+        }
 
         // Execução e retorno
 
@@ -276,34 +265,16 @@ public class CooperativaDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza os dados informados da cooperativa identificada.
-    public Cooperativa atualizarCooperativa(Long idCooperativa, String nome, String cnpj,
-                                           String nomePublico, String descricaoInstitucional,
-                                           String logoUrl, String emailInstitucional,
-                                           String telefoneWhatsapp, String cep, String endereco,
-                                           String cidade, String estado, LocalDate dataFundacao,
-                                           String canalContatoPreferencial, String linkWhatsapp,
-                                           StatusCooperativa status) {
+    public Cooperativa atualizarCooperativa(Cooperativa coop) {
 
         // Declaração
 
-        Cooperativa coop = new Cooperativa();
-        coop.setIdCooperativa(idCooperativa);
-        coop.setNome(nome);
-        coop.setCnpj(cnpj);
-        coop.setNomePublico(nomePublico);
-        coop.setDescricaoInstitucional(descricaoInstitucional);
-        coop.setLogoUrl(logoUrl);
-        coop.setEmailInstitucional(emailInstitucional);
-        coop.setTelefoneWhatsapp(telefoneWhatsapp);
-        coop.setCep(cep);
-        coop.setEndereco(endereco);
-        coop.setCidade(cidade);
-        coop.setEstado(estado);
-        coop.setDataFundacao(dataFundacao);
-        coop.setCanalContatoPreferencial(canalContatoPreferencial);
-        coop.setLinkWhatsapp(linkWhatsapp);
-        coop.setStatus(status);
-        if (coop.getIdCooperativa() == null) {
+        if (coop == null || coop.getIdCooperativa() == null || coop.getNome() == null
+                || coop.getCnpj() == null || coop.getNomePublico() == null
+                || coop.getEmailInstitucional() == null || coop.getTelefoneWhatsapp() == null
+                || coop.getCep() == null || coop.getEndereco() == null
+                || coop.getCidade() == null || coop.getEstado() == null
+                || coop.getCanalContatoPreferencial() == null || coop.getStatus() == null) {
             throw new IllegalArgumentException("idCooperativa é obrigatório.");
         }
         Connection conexao = conn.conectar();
@@ -353,13 +324,11 @@ public class CooperativaDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui a cooperativa identificada pelo ID.
-    public Cooperativa excluirCooperativa(Long idCooperativa) {
+    public Cooperativa excluirCooperativa(Cooperativa coop) {
 
         // Declaração
 
-        Cooperativa coop = new Cooperativa();
-        coop.setIdCooperativa(idCooperativa);
-        if (coop.getIdCooperativa() == null) {
+        if (coop == null || coop.getIdCooperativa() == null) {
             throw new IllegalArgumentException("idCooperativa é obrigatório.");
         }
         Connection conexao = conn.conectar();

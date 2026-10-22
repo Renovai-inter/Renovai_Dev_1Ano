@@ -3,7 +3,7 @@ package controller;
 import dao.ColetaDAO;
 import dao.DashboardDAO;
 import model.relatorio.AtividadeRecenteDashboard;
-import model.Coleta;
+import model.principais.Coleta;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -103,7 +102,7 @@ public class DashboardServlet extends HttpServlet {
         for (int i = 0; i < Math.min(5, coletas.size()); i++) {
             Coleta c = coletas.get(i);
             String destaque = "Coleta CO-" + c.getIdColeta();
-            String status = c.getStatus() == null ? "" : c.getStatus();
+            String status = c.getStatus() == null ? "" : c.getStatus().name();
 
             LocalDateTime quando = null;
             boolean temHora = true;
@@ -116,18 +115,18 @@ public class DashboardServlet extends HttpServlet {
                     break;
                 case "EM_ANDAMENTO":
                     texto = "iniciada";
-                    quando = c.getDataInicio() == null ? null : paraDataHora(c.getDataInicio());
+                    quando = c.getDataInicio();
                     break;
                 case "CANCELADA":
                     texto = "cancelada";
                     temHora = false;
-                    quando = c.getDataAgendada() == null ? null : paraDataHora(c.getDataAgendada());
+                    quando = c.getDataAgendada() == null ? null : c.getDataAgendada().atStartOfDay();
                     break;
                 default:
                     texto = "agendada";
                     temHora = false;
                     if (c.getDataAgendada() != null) {
-                        quando = paraDataHora(c.getDataAgendada());
+                        quando = c.getDataAgendada().atStartOfDay();
                         texto += " para " + FORMATO_DATA.format(quando);
                     }
             }
@@ -136,11 +135,6 @@ public class DashboardServlet extends HttpServlet {
         }
 
         return atividades;
-    }
-
-    private LocalDateTime paraDataHora(java.util.Date data) {
-        // new Timestamp funciona tanto com java.util.Date quanto com java.sql.Date
-        return new Timestamp(data.getTime()).toLocalDateTime();
     }
 
     private String horario(LocalDateTime quando, boolean temHora, LocalDate hoje) {

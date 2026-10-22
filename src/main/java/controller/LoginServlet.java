@@ -1,7 +1,7 @@
 package controller;
 
 import dao.UsuarioDAO;
-import model.relatorio.Usuario;
+import model.auxiliares.Usuario;
 import util.SenhaAPI;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -46,7 +46,13 @@ public class LoginServlet extends HttpServlet {
 
         Usuario usuario;
         try {
-            usuario = email.isEmpty() ? null : usuarioDAO.buscarPorEmail(email);
+            if (email.isEmpty()) {
+                usuario = null;
+            } else {
+                Usuario filtro = new Usuario();
+                filtro.setEmail(email);
+                usuario = usuarioDAO.buscarPorEmail(filtro);
+            }
         } catch (RuntimeException e) {
             throw new ServletException("Erro ao consultar o usuário.", e);
         }
@@ -71,7 +77,7 @@ public class LoginServlet extends HttpServlet {
 
         sessao.setAttribute("usuarioLogado", usuario.getIdUsuario());
         sessao.setAttribute("tipoUsuario", usuario.getTipoUsuario());
-        sessao.setAttribute("nomeUsuario", primeiroNome(usuario.getNome()));
+        sessao.setAttribute("nomeUsuario", primeiroNome(usuario.getNomeCompleto()));
         sessao.setMaxInactiveInterval(8 * 60 * 60);
 
         response.sendRedirect(request.getContextPath() + "/dashboard");

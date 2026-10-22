@@ -33,6 +33,26 @@ public class Cooperativa {
     private StatusCooperativa status; // NOT NULL - CHECK COM DEFAULT
     private LocalDateTime dataCadastro; // NOT NULL - TIMESTAMP COM DEFAULT
 
+    public Cooperativa() {
+    }
+
+    public Cooperativa(String nome, String cnpj, String nomePublico,
+                       String descricaoInstitucional, String logoUrl,
+                       String emailInstitucional, String telefoneWhatsapp,
+                       String cep, String endereco, String cidade, String estado) {
+        setNome(nome);
+        setCnpj(cnpj);
+        setNomePublico(nomePublico);
+        setDescricaoInstitucional(descricaoInstitucional);
+        setLogoUrl(logoUrl);
+        setEmailInstitucional(emailInstitucional);
+        setTelefoneWhatsapp(telefoneWhatsapp);
+        setCep(cep);
+        setEndereco(endereco);
+        setCidade(cidade);
+        setEstado(estado);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o valor de idCooperativa.

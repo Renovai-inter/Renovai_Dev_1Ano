@@ -19,6 +19,18 @@ public class PropostaNegociacao {
     private String observacoes;
     private LocalDateTime dataProposta;
 
+    public PropostaNegociacao() {
+    }
+
+    public PropostaNegociacao(Long idNegociacao, String autor, BigDecimal valorKg,
+                             BigDecimal quantidadeKg, String observacoes) {
+        setIdNegociacao(idNegociacao);
+        setAutor(autor);
+        setValorKg(valorKg);
+        setQuantidadeKg(quantidadeKg);
+        setObservacoes(observacoes);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o ID da proposta.

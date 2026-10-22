@@ -26,20 +26,15 @@ public class NegociacaoDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Registra uma proposta da cooperativa para a negociação informada.
-    public PropostaNegociacao fazerContraproposta(Long idNegociacao, BigDecimal valorKg,
-                                                  BigDecimal quantidadeKg, String observacoes) {
+    public PropostaNegociacao fazerContraproposta(PropostaNegociacao proposta) {
 
         // Declaração
 
-        PropostaNegociacao proposta = new PropostaNegociacao();
-        proposta.setIdNegociacao(idNegociacao);
-        proposta.setAutor("COOPERATIVA");
-        proposta.setValorKg(valorKg);
-        proposta.setQuantidadeKg(quantidadeKg);
-        proposta.setObservacoes(observacoes);
-        if (proposta.getIdNegociacao() == null) {
+        if (proposta == null || proposta.getIdNegociacao() == null
+                || proposta.getValorKg() == null) {
             throw new IllegalArgumentException("ID da negociação e valor por quilo são obrigatórios.");
         }
+        proposta.setAutor("COOPERATIVA");
         long ultimoId = utilitario.selecionarUltimoId("proposta");
         long idProposta;
         if (ultimoId == -1) {
@@ -174,13 +169,9 @@ public class NegociacaoDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Aceita a proposta identificada e registra sua conclusão.
-    public Negociacao aceitarProposta(Long idNegociacao, LocalDateTime dataConclusao) {
+    public Negociacao aceitarProposta(Negociacao negociacao) {
 
         // Declaração
-
-        Negociacao negociacao = new Negociacao();
-        negociacao.setIdNegociacao(idNegociacao);
-        negociacao.setDataConclusao(dataConclusao);
 
         // Execução e retorno
 
@@ -191,14 +182,12 @@ public class NegociacaoDAO {
     }
 
     // Atualiza o valor de uma negociação em andamento.
-    public Negociacao enviarContraProposta(Long idNegociacao, BigDecimal valorKgAtual) {
+    public Negociacao enviarContraProposta(Negociacao negociacao) {
 
         // Declaração
 
-        Negociacao negociacao = new Negociacao();
-        negociacao.setIdNegociacao(idNegociacao);
-        negociacao.setValorKgAtual(valorKgAtual);
-        if (negociacao.getIdNegociacao() == null || negociacao.getValorKgAtual() == null) {
+        if (negociacao == null || negociacao.getIdNegociacao() == null
+                || negociacao.getValorKgAtual() == null) {
             throw new IllegalArgumentException("ID e valor por quilo são obrigatórios.");
         }
         Connection conexao = conn.conectar();
@@ -225,16 +214,11 @@ public class NegociacaoDAO {
     }
 
     // Registra a decisão sobre uma oferta em negociação.
-    public Negociacao decisaoDeOferta(Long idNegociacao, StatusNegociacao status,
-                                     LocalDateTime dataConclusao) {
+    public Negociacao decisaoDeOferta(Negociacao negociacao) {
 
         // Declaração
 
-        Negociacao negociacao = new Negociacao();
-        negociacao.setIdNegociacao(idNegociacao);
-        negociacao.setStatus(status);
-        negociacao.setDataConclusao(dataConclusao);
-        if (negociacao.getStatus() == null) {
+        if (negociacao == null || negociacao.getStatus() == null) {
             throw new IllegalArgumentException("Status é obrigatório.");
         }
         if (negociacao.getStatus() == StatusNegociacao.ACEITA ||
@@ -273,13 +257,9 @@ public class NegociacaoDAO {
     }
 
     // Recusa a proposta preservando seu histórico.
-    public Negociacao recusarProposta(Long idNegociacao, LocalDateTime dataConclusao) {
+    public Negociacao recusarProposta(Negociacao negociacao) {
 
         // Declaração
-
-        Negociacao negociacao = new Negociacao();
-        negociacao.setIdNegociacao(idNegociacao);
-        negociacao.setDataConclusao(dataConclusao);
 
         // Execução e retorno
 
@@ -290,13 +270,9 @@ public class NegociacaoDAO {
     }
 
     // Cancela a negociação preservando seu histórico.
-    public Negociacao cancelarNegociacao(Long idNegociacao, LocalDateTime dataConclusao) {
+    public Negociacao cancelarNegociacao(Negociacao negociacao) {
 
         // Declaração
-
-        Negociacao negociacao = new Negociacao();
-        negociacao.setIdNegociacao(idNegociacao);
-        negociacao.setDataConclusao(dataConclusao);
 
         // Execução e retorno
 
@@ -311,7 +287,8 @@ public class NegociacaoDAO {
 
         // Declaração
 
-        if (negociacao.getIdNegociacao() == null || negociacao.getDataConclusao() == null) {
+        if (negociacao == null || negociacao.getIdNegociacao() == null
+                || negociacao.getDataConclusao() == null) {
             throw new IllegalArgumentException("ID e data de conclusão são obrigatórios.");
         }
         Connection conexao = conn.conectar();

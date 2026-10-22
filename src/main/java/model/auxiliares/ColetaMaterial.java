@@ -14,6 +14,15 @@ public class ColetaMaterial {
     private Long idMaterial; // PK para relacionamento com Material
     private BigDecimal quantidadeKg; // NUMERIC(12,2) [not null]
 
+    public ColetaMaterial() {
+    }
+
+    public ColetaMaterial(Long idColeta, Long idMaterial, BigDecimal quantidadeKg) {
+        setIdColeta(idColeta);
+        setIdMaterial(idMaterial);
+        setQuantidadeKg(quantidadeKg);
+    }
+
     // GETTERS E SETTERS
 
     public Long getIdColeta() {

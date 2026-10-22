@@ -29,6 +29,30 @@ public class Coleta {
     private BigDecimal pesoTotalKg; // NUMERIC(12,2)
     private String observacoes; // TEXT
 
+    public Coleta() {
+    }
+
+    public Coleta(Long idCooperativa, TipoColeta tipo, StatusColeta status,
+                  Long idRota, Long idEnderecoRota, Long idCooperadoResponsavel,
+                  String origemEntrega, String nomeLocalOrigem, LocalDate dataAgendada,
+                  LocalDateTime dataInicio, LocalDateTime dataFim, BigDecimal pesoTotalKg,
+                  String observacoes) {
+        getRelacionamentos().setIdCooperativa(idCooperativa);
+        setTipo(tipo);
+        setStatus(status);
+        getRelacionamentos().setIdRota(idRota);
+        getRelacionamentos().setIdEnderecoRota(idEnderecoRota);
+        getRelacionamentos().setIdCooperadoResponsavel(idCooperadoResponsavel);
+        setOrigemEntrega(origemEntrega);
+        setNomeLocalOrigem(nomeLocalOrigem);
+        setDataAgendada(dataAgendada);
+        setDataInicio(dataInicio);
+        setDataFim(dataFim);
+        setPesoTotalKg(pesoTotalKg);
+        setObservacoes(observacoes);
+        validarTipoEVinculos();
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o valor de idColeta.

@@ -24,6 +24,16 @@ public class Negociacao {
     private LocalDateTime dataCriacao; // NOT NULL - TIMESTAMP COM DEFAULT
     private LocalDateTime dataConclusao; // TIMESTAMP
 
+    public Negociacao() {
+    }
+
+    public Negociacao(Long idNegociacao, StatusNegociacao status,
+                      LocalDateTime dataConclusao) {
+        setIdNegociacao(idNegociacao);
+        setStatus(status);
+        setDataConclusao(dataConclusao);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o valor de idNegociacao.

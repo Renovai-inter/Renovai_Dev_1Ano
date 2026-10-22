@@ -17,6 +17,19 @@ public class Usuario {
     private boolean senhaTemporaria; // BOOLEAN COM DEFAULT
     private String email; // NOT NULL - VARCHAR(150)
 
+    public Usuario() {
+    }
+
+    public Usuario(String nomeCompleto, String nomeUsuario, String email,
+                   String senhaHash, boolean senhaTemporaria, TipoUsuario tipoUsuario) {
+        setNomeCompleto(nomeCompleto);
+        setNomeUsuario(nomeUsuario);
+        setEmail(email);
+        setSenhaHash(senhaHash);
+        setSenhaTemporaria(senhaTemporaria);
+        setTipoUsuario(tipoUsuario);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o valor de nomeCompleto.

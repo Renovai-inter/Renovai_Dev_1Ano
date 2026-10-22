@@ -28,7 +28,7 @@ public class Main {
 
         //int resultado = rotaDAO.cadastrarRota(rota);
 
-        Rota resultado = rotaDAO.excluirRota(rota.getIdRota());
+        Rota resultado = rotaDAO.excluirRota(rota);
 
         System.out.println("Resultado: "+ resultado);
 

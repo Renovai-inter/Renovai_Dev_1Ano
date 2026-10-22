@@ -1,12 +1,12 @@
 package controller;
 
 import dao.MaterialDAO;
-import model.principais.Material;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.principais.Material;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,62 +14,92 @@ import java.util.List;
 @WebServlet("/material")
 public class MaterialServlet extends HttpServlet {
 
-    private MaterialDAO materialDAO = new MaterialDAO();
+    private final MaterialDAO materialDAO = new MaterialDAO();
 
+    // Processa o cadastro, a edição ou a exclusão de um material.
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        request.setCharacterEncoding("UTF-8");
+
+        // Leitura da requisição
 
         String acao = request.getParameter("acao");
-
         String nome = request.getParameter("Nome");
         String categoria = request.getParameter("Categoria");
 
-        System.out.println("Nome: " + nome);
-        System.out.println("Categoria: " + categoria);
+        try {
+            // Processamento da ação
 
-        if ("editar".equals(acao)) {
+            Material material;
+            if ("cadastrar".equals(acao)) {
+                String origem = request.getParameter("origem");
+                if (origem == null || origem.isBlank()) {
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
+                            "Informe a origem do material.");
+                    return;
+                }
+                material = materialDAO.cadastrarMaterial(new Material(nome, categoria, origem));
+            } else if ("editar".equals(acao)) {
+                Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
+                Material alteracao = new Material();
+                alteracao.setIdMaterial(idMaterial);
+                alteracao.setNome(nome);
+                alteracao.setCategoria(categoria);
+                material = materialDAO.atualizarMaterial(alteracao);
+            } else if ("excluir".equals(acao)) {
+                Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
+                Material exclusao = new Material();
+                exclusao.setIdMaterial(idMaterial);
+                material = materialDAO.excluirMaterial(exclusao);
+            } else {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Ação inválida.");
+                return;
+            }
 
-            Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
+            // Preparação da resposta
 
-            Material material = new Material();
-            material.setIdMaterial(idMaterial);
-            material.setNome(nome);
-            material.setCategoria(categoria);
+            if (material == null) {
+                if ("cadastrar".equals(acao)) {
+                    response.sendError(HttpServletResponse.SC_CONFLICT,
+                            "Não foi possível cadastrar este material.");
+                } else {
+                    response.sendError(HttpServletResponse.SC_NOT_FOUND,
+                            "Material não encontrado.");
+                }
+                return;
+            }
 
-            materialDAO.atualizarMaterial(material);
+            // Encaminhamento
 
-        } else if ("excluir".equals(acao)) {
-
-            Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
-
-            Material material = new Material();
-            material.setIdMaterial(idMaterial);
-
-            materialDAO.excluirMaterial(material);
-        } else {
-
-            Material material = new Material();
-            material.setNome(nome);
-            material.setCategoria(categoria);
-
+            response.sendRedirect(request.getContextPath() + "/material");
+        } catch (IllegalArgumentException e) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        } catch (RuntimeException e) {
+            throw new ServletException("Erro ao processar o material.", e);
         }
-
-        response.sendRedirect(request.getContextPath() + "/material");
     }
 
+    // Lista os materiais cadastrados e abre a página de materiais.
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        System.out.println("Acessou o MaterialServlet");
+        try {
+            // Processamento da ação
 
-        List<Material> materiais = materialDAO.listarMateriais();
+            List<Material> materiais = materialDAO.listarMateriais();
 
-        System.out.println("Quantidade de materiais: " + materiais.size());
+            // Preparação da resposta
 
-        request.setAttribute("materiais", materiais);
+            request.setAttribute("materiais", materiais);
 
-        request.getRequestDispatcher("/materiais.jsp").forward(request, response);
+            // Encaminhamento
+
+            request.getRequestDispatcher("/materiais.jsp").forward(request, response);
+        } catch (RuntimeException e) {
+            throw new ServletException("Erro ao consultar materiais.", e);
+        }
     }
 }

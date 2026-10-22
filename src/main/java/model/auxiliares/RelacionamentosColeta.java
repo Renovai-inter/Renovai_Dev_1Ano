@@ -13,6 +13,19 @@ public class RelacionamentosColeta {
     private Long idCooperadoResponsavel; // FK
     private List<ColetaMaterial> materiaisColetados = new ArrayList<>(); // Conjunto de materiais coletados
 
+    public RelacionamentosColeta() {
+    }
+
+    public RelacionamentosColeta(Long idCooperativa, Long idRota,
+                                Long idEnderecoRota, Long idCooperadoResponsavel,
+                                List<ColetaMaterial> materiaisColetados) {
+        setIdCooperativa(idCooperativa);
+        setIdRota(idRota);
+        setIdEnderecoRota(idEnderecoRota);
+        setIdCooperadoResponsavel(idCooperadoResponsavel);
+        setMateriaisColetados(materiaisColetados);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o valor de idCooperativa.

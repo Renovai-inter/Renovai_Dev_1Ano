@@ -26,14 +26,14 @@ public class MaterialDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra um material com os campos exigidos pelo esquema.
-    public Material cadastrarMaterial(String nome, String categoria, String origem) {
+    public Material cadastrarMaterial(Material material) {
 
         // Declaração
 
-        Material material = new Material();
-        material.setNome(nome);
-        material.setCategoria(categoria);
-        material.setOrigem(origem);
+        if (material == null || material.getNome() == null
+                || material.getCategoria() == null || material.getOrigem() == null) {
+            throw new IllegalArgumentException("Nome, categoria e origem são obrigatórios.");
+        }
         long ultimoId = utilitario.selecionarUltimoId("material");
         long novoId;
         if (ultimoId == -1) {
@@ -108,14 +108,13 @@ public class MaterialDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza os dados do material identificado pelo ID.
-    public Material atualizarMaterial(Long idMaterial, String nome, String categoria) {
+    public Material atualizarMaterial(Material material) {
 
         // Declaração
 
-        Material material = new Material();
-        material.setIdMaterial(idMaterial);
-        material.setNome(nome);
-        material.setCategoria(categoria);
+        if (material == null || material.getNome() == null || material.getCategoria() == null) {
+            throw new IllegalArgumentException("Nome e categoria são obrigatórios.");
+        }
         if (material.getIdMaterial() == null || material.getIdMaterial() <= 0) {
             throw new IllegalArgumentException("idMaterial deve ser positivo.");
         }
@@ -148,13 +147,11 @@ public class MaterialDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui o material identificado pelo ID.
-    public Material excluirMaterial(Long idMaterial) {
+    public Material excluirMaterial(Material material) {
 
         // Declaração
 
-        Material material = new Material();
-        material.setIdMaterial(idMaterial);
-        if (material.getIdMaterial() == null || material.getIdMaterial() <= 0) {
+        if (material == null || material.getIdMaterial() == null || material.getIdMaterial() <= 0) {
             throw new IllegalArgumentException("idMaterial deve ser positivo.");
         }
         Connection conexao = conn.conectar();

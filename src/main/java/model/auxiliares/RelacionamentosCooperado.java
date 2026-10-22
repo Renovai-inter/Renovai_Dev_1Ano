@@ -14,6 +14,20 @@ public class RelacionamentosCooperado {
     private ArrayList<PermissaoCooperado> permissoesCooperado = new ArrayList<>(); // Lista de permissoes para Cooperado (ENUM)
     private ArrayList<CooperadoPermissao> vinculosPermissao = new ArrayList<>(); // Chaves dos vínculos gravados
 
+    public RelacionamentosCooperado() {
+    }
+
+    public RelacionamentosCooperado(Long idCooperado, String nomeCooperativa,
+                                   ArrayList<AtividadeCooperado> atividadesCooperado,
+                                   ArrayList<PermissaoCooperado> permissoesCooperado,
+                                   ArrayList<CooperadoPermissao> vinculosPermissao) {
+        setIdCooperado(idCooperado);
+        setNomeCooperativa(nomeCooperativa);
+        setAtividadesCooperado(atividadesCooperado);
+        setPermissoesCooperado(permissoesCooperado);
+        setVinculosPermissao(vinculosPermissao);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o cooperado associado aos vínculos.

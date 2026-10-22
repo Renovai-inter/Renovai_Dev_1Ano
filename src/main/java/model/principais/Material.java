@@ -15,6 +15,15 @@ public class Material {
     private CategoriaMaterial categoria; // NOT NULL - VARCHAR(20) - CHECK
     private String origem; // NOT NULL - VARCHAR(10)
 
+    public Material() {
+    }
+
+    public Material(String nome, String categoria, String origem) {
+        setNome(nome);
+        setCategoria(categoria);
+        setOrigem(origem);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o valor de idMaterial.

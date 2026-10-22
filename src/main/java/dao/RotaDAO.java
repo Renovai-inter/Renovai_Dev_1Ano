@@ -26,14 +26,12 @@ public class RotaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma rota vinculada à cooperativa.
-    public Rota cadastrarRota(Long idCooperativa, String nomeRota) {
+    public Rota cadastrarRota(Rota rota) {
 
         // Declaração
 
-        Rota rota = new Rota();
-        rota.setIdCooperativa(idCooperativa);
-        rota.setNomeRota(nomeRota);
-        if (rota.getIdCooperativa() == null || rota.getIdCooperativa() <= 0) {
+        if (rota == null || rota.getIdCooperativa() == null || rota.getIdCooperativa() <= 0
+                || rota.getNomeRota() == null) {
             throw new IllegalArgumentException("idCooperativa deve ser positivo.");
         }
         long ultimoIdRota = utilitario.selecionarUltimoId("rota");
@@ -108,14 +106,14 @@ public class RotaDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza os dados da rota identificada pelo ID.
-    public Rota atualizarRota(Long idRota, Long idCooperativa, String nomeRota) {
+    public Rota atualizarRota(Rota rota) {
 
         // Declaração
 
-        Rota rota = new Rota();
-        rota.setIdRota(idRota);
-        rota.setIdCooperativa(idCooperativa);
-        rota.setNomeRota(nomeRota);
+        if (rota == null || rota.getIdRota() == null || rota.getIdCooperativa() == null
+                || rota.getNomeRota() == null) {
+            throw new IllegalArgumentException("ID, cooperativa e nome da rota são obrigatórios.");
+        }
 
         Connection conexao = conn.conectar();
 
@@ -145,12 +143,13 @@ public class RotaDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui a rota identificada pelo ID.
-    public Rota excluirRota(Long idRota) {
+    public Rota excluirRota(Rota rota) {
 
         // Declaração
 
-        Rota rota = new Rota();
-        rota.setIdRota(idRota);
+        if (rota == null || rota.getIdRota() == null) {
+            throw new IllegalArgumentException("idRota é obrigatório.");
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL

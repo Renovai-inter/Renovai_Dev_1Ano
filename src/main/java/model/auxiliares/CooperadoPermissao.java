@@ -5,6 +5,14 @@ public class CooperadoPermissao {
     private Long idCooperado;
     private Long idPermissao;
 
+    public CooperadoPermissao() {
+    }
+
+    public CooperadoPermissao(Long idCooperado, Long idPermissao) {
+        setIdCooperado(idCooperado);
+        setIdPermissao(idPermissao);
+    }
+
     // Retorna o cooperado do vínculo.
     public Long getIdCooperado() { return idCooperado; }
 

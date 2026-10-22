@@ -18,44 +18,36 @@ public class UsuarioDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma conta de usuário com os valores informados.
-    public Usuario cadastrarUsuario(String nomeCompleto, String nomeUsuario, String email,
-                                    String senhaHash, boolean senhaTemporaria, TipoUsuario tipoUsuario) {
-        Usuario usuario = new Usuario();
-        usuario.setNomeCompleto(nomeCompleto);
-        usuario.setNomeUsuario(nomeUsuario);
-        usuario.setEmail(email);
-        usuario.setSenhaHash(senhaHash);
-        usuario.setSenhaTemporaria(senhaTemporaria);
-        usuario.setTipoUsuario(tipoUsuario);
+    public Usuario cadastrarUsuario(Usuario usuario) {
+        if (usuario == null || usuario.getNomeCompleto() == null
+                || usuario.getNomeUsuario() == null || usuario.getEmail() == null
+                || usuario.getSenhaHash() == null || usuario.getTipoUsuario() == null) {
+            throw new IllegalArgumentException("Dados de cadastro do usuário são obrigatórios.");
+        }
         Connection conexao = conn.conectar();
         try {
-            return gravarUsuario(conexao, usuario);
+            long ultimoId = utilitario.selecionarUltimoId("usuario");
+            long idUsuario;
+            if (ultimoId == -1) {
+                idUsuario = 1;
+            } else {
+                idUsuario = ultimoId + 1;
+            }
+            String sql = sqlInserirUsuario();
+            try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+                preencherCadastro(pstmt, 1, idUsuario, usuario);
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    if (!rs.next()) {
+                        return null;
+                    }
+                    usuario.setIdUsuario(rs.getLong("id_usuario"));
+                }
+                return usuario;
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar usuário.", e);
         } finally {
             conn.desconectar(conexao);
-        }
-    }
-
-    // Grava uma conta na conexão da operação chamadora.
-    Usuario gravarUsuario(Connection conexao, Usuario usuario) throws SQLException {
-        long ultimoId = utilitario.selecionarUltimoId("usuario");
-        long idUsuario;
-        if (ultimoId == -1) {
-            idUsuario = 1;
-        } else {
-            idUsuario = ultimoId + 1;
-        }
-        String sql = sqlInserirUsuario();
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            preencherCadastro(pstmt, 1, idUsuario, usuario);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (!rs.next()) {
-                    return null;
-                }
-                usuario.setIdUsuario(rs.getLong("id_usuario"));
-            }
-            return usuario;
         }
     }
 
@@ -81,12 +73,14 @@ public class UsuarioDAO {
     // === METODOS READ ================================================================================================
 
     // Informa se o e-mail já está cadastrado.
-    public boolean emailExiste(String email) {
-        String emailNormalizado = utilitario.filtrarEmailInstitucional(email);
+    public boolean emailExiste(Usuario usuario) {
+        if (usuario == null || usuario.getEmail() == null) {
+            throw new IllegalArgumentException("email é obrigatório.");
+        }
         String sql = "SELECT 1 FROM usuario WHERE LOWER(email) = ?";
         try (Connection conexao = conn.conectar();
              PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setString(1, emailNormalizado);
+            pstmt.setString(1, usuario.getEmail());
             try (ResultSet rs = pstmt.executeQuery()) {
                 return rs.next();
             }
@@ -96,13 +90,15 @@ public class UsuarioDAO {
     }
 
     // Busca a conta pelo e-mail informado.
-    public Usuario buscarPorEmail(String email) {
-        String emailNormalizado = utilitario.filtrarEmailInstitucional(email);
+    public Usuario buscarPorEmail(Usuario filtro) {
+        if (filtro == null || filtro.getEmail() == null) {
+            throw new IllegalArgumentException("email é obrigatório.");
+        }
         String sql = "SELECT id_usuario, nome_completo, nome_usuario, email, senha_hash, " +
                 "senha_temporaria, tipo_usuario FROM usuario WHERE LOWER(email) = ?";
         try (Connection conexao = conn.conectar();
              PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setString(1, emailNormalizado);
+            pstmt.setString(1, filtro.getEmail());
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     Usuario usuario = new Usuario();
@@ -125,13 +121,10 @@ public class UsuarioDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza o nome de acesso de uma conta.
-    public Usuario alterarNomeUsuario(Long idUsuario, String nomeUsuario) {
-        if (idUsuario == null) {
+    public Usuario alterarNomeUsuario(Usuario usuario) {
+        if (usuario == null || usuario.getIdUsuario() <= 0 || usuario.getNomeUsuario() == null) {
             throw new IllegalArgumentException("idUsuario é obrigatório.");
         }
-        Usuario usuario = new Usuario();
-        usuario.setIdUsuario(idUsuario);
-        usuario.setNomeUsuario(nomeUsuario);
         String sql = "UPDATE usuario SET nome_usuario = ? WHERE id_usuario = ?";
         try (Connection conexao = conn.conectar();
              PreparedStatement pstmt = conexao.prepareStatement(sql)) {
@@ -147,14 +140,10 @@ public class UsuarioDAO {
     }
 
     // Atualiza o hash e o indicador de senha temporária.
-    public Usuario alterarSenha(Long idUsuario, String senhaHash, boolean senhaTemporaria) {
-        if (idUsuario == null) {
+    public Usuario alterarSenha(Usuario usuario) {
+        if (usuario == null || usuario.getIdUsuario() <= 0 || usuario.getSenhaHash() == null) {
             throw new IllegalArgumentException("idUsuario é obrigatório.");
         }
-        Usuario usuario = new Usuario();
-        usuario.setIdUsuario(idUsuario);
-        usuario.setSenhaHash(senhaHash);
-        usuario.setSenhaTemporaria(senhaTemporaria);
         String sql = "UPDATE usuario SET senha_hash = ?, senha_temporaria = ? WHERE id_usuario = ?";
         try (Connection conexao = conn.conectar();
              PreparedStatement pstmt = conexao.prepareStatement(sql)) {
@@ -173,13 +162,13 @@ public class UsuarioDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui somente a conta de usuário identificada.
-    public Usuario excluirUsuario(Long idUsuario) {
-        if (idUsuario == null) {
+    public Usuario excluirUsuario(Usuario usuario) {
+        if (usuario == null || usuario.getIdUsuario() <= 0) {
             throw new IllegalArgumentException("idUsuario é obrigatório.");
         }
         Connection conexao = conn.conectar();
         try {
-            return excluirUsuario(conexao, idUsuario);
+            return excluirUsuario(conexao, usuario.getIdUsuario());
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir usuário.", e);
         } finally {

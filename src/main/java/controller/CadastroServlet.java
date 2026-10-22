@@ -1,7 +1,8 @@
 package controller;
 
 import dao.UsuarioDAO;
-import model.relatorio.Usuario;
+import model.auxiliares.Usuario;
+import model.enums.TipoUsuario;
 import util.SenhaAPI;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -43,19 +44,23 @@ public class CadastroServlet extends HttpServlet {
         String erro = validar(nome, email, senha, confirmacao, termos);
 
         try {
-            if (erro == null && usuarioDAO.emailExiste(email)) {
-                erro = "Este e-mail já está cadastrado.";
-            }
-
             if (erro == null) {
                 Usuario usuario = new Usuario();
-                usuario.setNome(nome);
                 usuario.setEmail(email);
-                usuario.setSenhaHash(SenhaAPI.gerarHash(senha));
-                usuario.setTipoUsuario("COOPERADO"); // fixo: o cadastro público nunca cria administrador
-
-                if (!usuarioDAO.cadastrar(usuario)) {
+                if (usuarioDAO.emailExiste(usuario)) {
                     erro = "Este e-mail já está cadastrado.";
+                }
+
+                if (erro == null) {
+                    usuario.setNomeCompleto(nome);
+                    usuario.setNomeUsuario(nome);
+                    usuario.setSenhaHash(SenhaAPI.gerarHash(senha));
+                    usuario.setTipoUsuario(TipoUsuario.COOPERADO); // fixo: o cadastro público nunca cria administrador
+
+                    Usuario cadastrado = usuarioDAO.cadastrarUsuario(usuario);
+                    if (cadastrado == null) {
+                        erro = "Não foi possível concluir o cadastro.";
+                    }
                 }
             }
         } catch (RuntimeException e) {

@@ -13,6 +13,14 @@ public class Rota {
     private Long idCooperativa; // FK
     private String nomeRota; // NOT NULL - VARCHAR(100)
 
+    public Rota() {
+    }
+
+    public Rota(Long idCooperativa, String nomeRota) {
+        setIdCooperativa(idCooperativa);
+        setNomeRota(nomeRota);
+    }
+
     // GETTERS E SETTERS
 
     // Retorna o valor de idRota.
