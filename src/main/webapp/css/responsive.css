@@ -1,0 +1,1598 @@
+
+/* =========================================
+   RENOVAÍ — RESPONSIVIDADE GLOBAL
+   Arquivo: css/responsive.css
+========================================= */
+
+/* Ajustes gerais para todas as telas */
+* {
+    box-sizing: border-box;
+}
+
+html {
+    width: 100%;
+    max-width: 100%;
+    scroll-behavior: smooth;
+}
+
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+
+img,
+svg {
+    max-width: 100%;
+}
+
+button,
+input,
+textarea,
+select {
+    max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+p,
+li,
+a {
+    overflow-wrap: break-word;
+}
+
+section {
+    min-width: 0;
+}
+
+main {
+    width: 100%;
+    min-width: 0;
+}
+
+button,
+a {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================
+   NOTEBOOKS E TELAS MÉDIAS
+========================================= */
+
+@media (max-width: 1200px) {
+
+    /* Navegação */
+    .navbar {
+        width: 94%;
+        padding: 0 22px;
+    }
+
+    #logo {
+        width: 125px;
+        flex-shrink: 0;
+    }
+
+    .nav-links {
+        gap: 18px;
+    }
+
+    .cta1 {
+        width: auto;
+        margin-left: 0;
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    /* Hero */
+    .hero {
+        min-height: 650px;
+    }
+
+    .hero-texto {
+        width: 52%;
+        margin-left: 5%;
+    }
+
+    .title1,
+    .title2 {
+        font-size: clamp(40px, 4.5vw, 58px);
+        line-height: 1.08;
+    }
+
+    .hero-celular {
+        width: clamp(280px, 34vw, 400px);
+        right: 5%;
+    }
+
+    .hero-texto p {
+        max-width: 460px;
+    }
+
+    /* Benefícios */
+    .titulo-beneficios {
+        font-size: clamp(30px, 3.8vw, 42px);
+        flex-wrap: wrap;
+        text-align: center;
+    }
+
+    .beneficios-conteudo {
+        max-width: 1000px;
+        gap: 28px;
+        padding: 0 4%;
+    }
+
+    .card-beneficio {
+        min-width: 0;
+        flex: 1 1 0;
+    }
+
+    /* Cooperativas e recicladoras */
+    .beneficios_coop_reci {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+        min-height: auto;
+        padding: 30px 4%;
+    }
+
+    .bloco_coop,
+    .bloco_recicladora {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        min-width: 0;
+        min-height: 520px;
+        border-radius: 28px;
+    }
+
+    .primeira_linha_coop,
+    .segunda_linha_coop,
+    .primeira_linha_reci,
+    .segunda_linha_reci {
+        left: 24px;
+        right: 18px;
+        font-size: clamp(24px, 2.5vw, 34px);
+        line-height: 1.2;
+    }
+
+    .texto1_card_coop,
+    .texto2_card_coop,
+    .texto3_card_coop,
+    .texto4_card_coop,
+    .texto1_card_reci,
+    .texto2_card_reci,
+    .texto3_card_reci,
+    .texto4_card_reci {
+        margin-left: 28px;
+        margin-right: 24px;
+        font-size: 17px;
+    }
+
+    .linhas-1_card,
+    .linhas-2_card,
+    .linhas-3_card,
+    .linhas-4_card,
+    .linhas1_card,
+    .linhas2_card,
+    .linhas3_card,
+    .linhas4_card {
+        width: calc(100% - 56px);
+        margin-left: 28px;
+        margin-right: 28px;
+    }
+
+    /* Planos */
+    .div_planos {
+        width: 100%;
+        max-width: 1100px;
+        margin-inline: auto;
+        padding-inline: 24px;
+    }
+
+    .planos-destaque-conteudo {
+        gap: 28px;
+    }
+
+    .planos-pagos-cards {
+        gap: 24px;
+    }
+
+    /* CTA */
+    .experimente-card {
+        width: 92%;
+        max-width: 1100px;
+        margin-inline: auto;
+        gap: 24px;
+    }
+
+    .experimente-titulo {
+        font-size: clamp(28px, 3vw, 40px);
+    }
+
+    /* Rodapé */
+    .footer-conteudo {
+        gap: 36px;
+        padding-inline: 5%;
+    }
+}
+
+/* =========================================
+   TABLETS
+========================================= */
+
+@media (max-width: 900px) {
+
+    /* Navbar sem criar dependência de menu JavaScript */
+    .header {
+        padding-top: 10px;
+    }
+
+    .navbar {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: calc(100% - 32px);
+        height: auto;
+        min-height: 68px;
+        margin: 0 auto;
+        padding: 14px 20px;
+        border-radius: 24px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 14px;
+    }
+
+    #logo {
+        width: 125px;
+    }
+
+    .nav-links {
+        width: 100%;
+        margin-left: 0;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px 22px;
+    }
+
+    .nav-links a {
+        font-size: 14px;
+    }
+
+    .nav-links li {
+        display: flex;
+        align-items: center;
+    }
+
+    .cta1 {
+        min-height: 42px;
+    }
+
+    main {
+        padding-top: 20px;
+    }
+
+    /* Hero: imagem e texto em coluna */
+    .hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: auto;
+        top: 0;
+        padding: 35px 24px 50px;
+        gap: 20px;
+    }
+
+    .hero-texto {
+        order: 1;
+        width: 100%;
+        max-width: 650px;
+        margin: 0;
+        text-align: center;
+    }
+
+    .titulo1 {
+        position: static;
+        right: auto;
+        top: auto;
+    }
+
+    .title1,
+    .title2 {
+        font-size: clamp(38px, 6vw, 58px);
+        line-height: 1.12;
+    }
+
+    .hero-texto p {
+        width: 100%;
+        max-width: 560px;
+        margin: 20px auto;
+        font-size: 16px;
+    }
+
+    .hero-botoes {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .images-hero {
+        order: 2;
+        position: relative;
+        width: 100%;
+        max-width: 500px;
+        height: 360px;
+        flex-shrink: 0;
+    }
+
+    .hero-celular {
+        width: min(78%, 350px);
+        top: 10px;
+        right: 50%;
+        transform: translateX(50%);
+    }
+
+    .hero-folhas {
+        width: 65%;
+        max-width: 260px;
+        top: 0;
+        right: 0;
+    }
+
+    .hero-predios {
+        width: 75%;
+        left: 0;
+        top: 150px;
+    }
+
+    .hero-fundo {
+        width: 100%;
+        top: 0;
+    }
+
+    .hero-img-1,
+    .hero-img-2,
+    .hero-img-3,
+    .hero-img-4,
+    .hero-img-5 {
+        max-width: 40%;
+        opacity: 0.6;
+    }
+
+    /* Título da seção de benefícios */
+    .beneficios {
+        min-height: auto;
+        padding: 35px 0 50px;
+    }
+
+    .hero-frase {
+        justify-content: center;
+        padding: 0 20px;
+    }
+
+    .titulo-beneficios {
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        font-size: clamp(28px, 4.5vw, 38px);
+    }
+
+    .image-titulo {
+        width: clamp(110px, 20vw, 175px);
+        height: auto;
+    }
+
+    .retangulos {
+        min-height: 0;
+    }
+
+    .beneficios-conteudo {
+        width: 100%;
+        padding: 0 24px;
+        gap: 20px;
+        align-items: center;
+    }
+
+    /* Duas colunas para os cards de público */
+    .beneficios_coop_reci {
+        gap: 18px;
+        padding: 20px 24px;
+        margin-top: 40px;
+    }
+
+    .bloco_coop,
+    .bloco_recicladora {
+        min-height: 500px;
+        border-radius: 24px;
+    }
+
+    .ctacoop,
+    .ctareci {
+        max-width: calc(100% - 40px);
+    }
+
+    /* Planos */
+    .planos {
+        padding: 45px 0;
+    }
+
+    .planos-destaque-conteudo {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .planos-destaque-texto {
+        width: 100%;
+    }
+
+    .plano-card {
+        width: 100%;
+        max-width: 480px;
+        min-width: 0;
+        margin-inline: auto;
+    }
+
+    .planos-pagos-cards {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: stretch;
+    }
+
+    .planos-destaque-titulo {
+        font-size: clamp(28px, 4.5vw, 40px);
+    }
+
+    /* CTA final */
+    .experimente {
+        padding: 35px 0;
+    }
+
+    .experimente-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 32px 24px;
+    }
+
+    .experimente-img {
+        width: 100%;
+        max-width: 360px;
+    }
+
+    .experimente-texto {
+        width: 100%;
+        text-align: center;
+    }
+
+    .experimente-titulo {
+        font-size: clamp(28px, 4.5vw, 38px);
+    }
+
+    .experimente-botoes {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Footer */
+    .footer-conteudo {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 30px;
+        padding: 35px 6%;
+    }
+
+    .footer-marca {
+        grid-column: 1 / -1;
+    }
+
+    .footer-copy {
+        padding: 20px;
+        text-align: center;
+    }
+}
+
+/* =========================================
+   CELULARES
+========================================= */
+
+@media (max-width: 600px) {
+
+    /* Navbar */
+    .navbar {
+        width: calc(100% - 24px);
+        padding: 14px;
+        gap: 12px;
+        border-radius: 20px;
+    }
+
+    #logo {
+        width: 115px;
+    }
+
+    .nav-links {
+        gap: 12px 16px;
+    }
+
+    .nav-links a {
+        font-size: 12px;
+    }
+
+    .cta1 {
+        width: auto;
+        min-height: 38px;
+        padding: 7px 13px;
+        font-size: 12px;
+    }
+
+    main {
+        padding-top: 10px;
+    }
+
+    /* Hero */
+    .hero {
+        padding: 30px 18px 35px;
+        gap: 12px;
+    }
+
+    .title1,
+    .title2 {
+        font-size: clamp(32px, 9vw, 46px);
+        line-height: 1.12;
+    }
+
+    .hero-texto p {
+        font-size: 14px;
+        line-height: 1.7;
+        margin: 18px auto 22px;
+    }
+
+    .hero-botoes {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .conhecaRenovai,
+    .sobreNos {
+        width: 100%;
+        min-height: 46px;
+        height: auto;
+        font-size: 14px;
+    }
+
+    .images-hero {
+        height: 290px;
+    }
+
+    .hero-celular {
+        width: min(78%, 270px);
+    }
+
+    .hero-folhas {
+        max-width: 180px;
+    }
+
+    .hero-predios {
+        top: 120px;
+    }
+
+    .hero-img-1,
+    .hero-img-2,
+    .hero-img-3,
+    .hero-img-4,
+    .hero-img-5 {
+        max-width: 30%;
+    }
+
+    /* Benefícios */
+    .beneficios {
+        padding: 30px 0 40px;
+    }
+
+    .titulo-beneficios {
+        font-size: clamp(23px, 6vw, 30px);
+        gap: 5px;
+        line-height: 1.3;
+        flex-wrap: wrap;
+    }
+
+    .image-titulo {
+        width: clamp(95px, 27vw, 140px);
+    }
+
+    .retangulos .section2-1,
+    .retangulos .section2-2,
+    .retangulos .section2-3,
+    .retangulos .section2-4 {
+        display: none;
+    }
+
+    .beneficios-conteudo {
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+        padding: 0 16px;
+        margin-top: 20px;
+    }
+
+    /*
+      Mantém o SVG e as posições originais dos ícones.
+      Reduzir o conjunto inteiro evita deslocar cada pétala
+      individualmente.
+    */
+    .wheel-svg {
+        max-width: none;
+    }
+
+    .icone-trilha {
+        transform: scale(0.72);
+        transform-origin: top center;
+        margin-bottom: -130px;
+    }
+
+    .card-beneficio {
+        width: 100%;
+        max-width: 480px;
+        min-width: 0;
+        margin: 0 auto;
+        padding: 22px 18px;
+        border-radius: 20px;
+    }
+
+    .card-beneficio-topo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .card-beneficio-icone {
+        flex: 0 0 50px;
+        width: 50px;
+        height: 50px;
+    }
+
+    .card-beneficio-topo h3 {
+        font-size: 21px;
+        line-height: 1.3;
+    }
+
+    .card-beneficio-topo p {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .card-beneficio-lista li {
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 0;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+
+    /* Cooperativa e recicladora: uma abaixo da outra */
+    .beneficios_coop_reci {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        min-height: auto;
+        margin-top: 30px;
+        padding: 20px 16px;
+    }
+
+    .section3-1,
+    .section3-2,
+    .section3-3,
+    .section3-4 {
+        max-width: 45%;
+    }
+
+    .bloco_coop,
+    .bloco_recicladora {
+        position: relative;
+        inset: auto;
+        width: 100%;
+        min-height: 460px;
+        border-radius: 22px;
+        padding-bottom: 24px;
+    }
+
+    .primeira_linha_coop,
+    .segunda_linha_coop,
+    .primeira_linha_reci,
+    .segunda_linha_reci {
+        position: relative;
+        inset: auto;
+        display: block;
+        padding: 0 20px;
+        font-size: clamp(25px, 7vw, 32px);
+        line-height: 1.2;
+    }
+
+    .primeira_linha_coop,
+    .primeira_linha_reci {
+        margin-top: 32px;
+    }
+
+    .texto1_card_coop,
+    .texto2_card_coop,
+    .texto3_card_coop,
+    .texto4_card_coop,
+    .texto1_card_reci,
+    .texto2_card_reci,
+    .texto3_card_reci,
+    .texto4_card_reci {
+        margin: 18px 22px;
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .linhas-1_card,
+    .linhas-2_card,
+    .linhas-3_card,
+    .linhas-4_card,
+    .linhas1_card,
+    .linhas2_card,
+    .linhas3_card,
+    .linhas4_card {
+        width: calc(100% - 44px);
+        margin: 8px 22px;
+    }
+
+    /* Planos */
+    .planos {
+        padding: 35px 0;
+    }
+
+    .div_planos {
+        padding: 0 16px;
+    }
+
+    .coop_reci {
+        width: 100%;
+    }
+
+    .planosReciCoop {
+        display: flex;
+        width: 100%;
+        gap: 8px;
+    }
+
+    .planosReciCoop button {
+        flex: 1 1 0;
+        min-width: 0;
+        padding: 10px 8px;
+        font-size: 13px;
+    }
+
+    .planosReciCoop button img {
+        max-width: 22px;
+        height: auto;
+    }
+
+    .planos-destaque-conteudo {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
+
+    .planos-destaque-titulo {
+        font-size: clamp(27px, 7vw, 34px);
+        line-height: 1.2;
+    }
+
+    .planos-destaque-titulo br {
+        display: none;
+    }
+
+    .planos-destaque-descricao {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .planos-pagos-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .plano-card {
+        width: 100%;
+        max-width: 440px;
+        padding: 24px 20px;
+        border-radius: 22px;
+    }
+
+    .plano-card-preco-grande {
+        font-size: clamp(28px, 8vw, 38px);
+    }
+
+    .plano-card-lista li {
+        font-size: 14px;
+        line-height: 1.5;
+    }
+
+    .plano-card-btn {
+        width: 100%;
+        min-height: 44px;
+        padding: 10px 14px;
+        font-size: 14px;
+    }
+
+    .plano-preco {
+        font-size: 27px;
+    }
+
+    .section4-1,
+    .section4-2,
+    .section4-3 {
+        max-width: 35%;
+    }
+
+    /* CTA */
+    .experimente {
+        padding: 25px 0;
+    }
+
+    .experimente-card {
+        width: calc(100% - 32px);
+        padding: 25px 18px;
+        border-radius: 24px;
+        gap: 18px;
+    }
+
+    .experimente-img {
+        max-width: 270px;
+    }
+
+    .experimente-titulo {
+        font-size: clamp(25px, 7vw, 32px);
+        line-height: 1.25;
+    }
+
+    .experimente-titulo br {
+        display: none;
+    }
+
+    .experimente-descricao {
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .experimente-botoes {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .btn-sou-cooperativa,
+    .btn-sou-recicladora {
+        width: 100%;
+        min-height: 46px;
+        justify-content: center;
+    }
+
+    /* Footer */
+    .footer_sobrenos {
+        padding-top: 20px;
+    }
+
+    .footer-conteudo {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 26px;
+        padding: 28px 24px;
+    }
+
+    .footer-conteudo ul {
+        width: 100%;
+        min-width: 0;
+        list-style: none;
+    }
+
+    .footer-marca img {
+        max-width: 180px;
+        height: auto;
+    }
+
+    .footer-marca p {
+        max-width: 360px;
+        font-size: 14px;
+        line-height: 1.7;
+    }
+
+    .footer-social {
+        display: flex;
+        gap: 16px;
+    }
+
+    .footer-titulo {
+        margin-bottom: 12px;
+        font-size: 16px;
+        font-weight: 700;
+    }
+
+    .footer-conteudo li,
+    .footer-conteudo a {
+        font-size: 13px;
+        line-height: 1.8;
+        overflow-wrap: anywhere;
+    }
+
+    .footer-copy {
+        padding: 18px 20px;
+        font-size: 12px;
+        line-height: 1.6;
+        text-align: center;
+    }
+}
+
+/* =========================================
+   CELULARES MUITO ESTREITOS
+========================================= */
+
+@media (max-width: 380px) {
+
+    .navbar {
+        width: calc(100% - 16px);
+        padding: 12px 10px;
+    }
+
+    .nav-links {
+        gap: 10px 12px;
+    }
+
+    .nav-links a {
+        font-size: 11px;
+    }
+
+    .title1,
+    .title2 {
+        font-size: 31px;
+    }
+
+    .images-hero {
+        height: 250px;
+    }
+
+    .titulo-beneficios {
+        font-size: 22px;
+    }
+
+    .beneficios-conteudo {
+        padding: 0 12px;
+    }
+
+    .icone-trilha {
+        transform: scale(0.64);
+        margin-bottom: -155px;
+    }
+
+    .card-beneficio {
+        padding: 20px 15px;
+    }
+
+    .card-beneficio-topo h3 {
+        font-size: 19px;
+    }
+
+    .bloco_coop,
+    .bloco_recicladora {
+        min-height: 430px;
+    }
+
+    .planosReciCoop button {
+        font-size: 11px;
+    }
+
+    .experimente-card {
+        width: calc(100% - 24px);
+        padding: 22px 15px;
+    }
+
+    .footer-conteudo {
+        padding-inline: 18px;
+    }
+}
+
+/* =========================================
+   ACESSIBILIDADE: MOVIMENTO REDUZIDO
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* =========================================
+   PÁGINAS INTERNAS: RENOVAÍ E QUEM SOMOS
+========================================= */
+
+@media (max-width: 1200px) {
+    .solucoes-celular-laptop {
+        width: min(640px, 55vw);
+    }
+
+    .solucoes-folhas {
+        width: min(760px, 65vw);
+        left: -120px;
+    }
+
+    .solucoes-fundo-logo {
+        width: 1100px;
+    }
+
+    .caminho-passo {
+        min-width: 0;
+        flex: 1 1 100%;
+    }
+
+    .caminho-ilustracao,
+    .caminho-ilustracao-verde {
+        width: 100%;
+        height: auto;
+        max-width: 600px;
+    }
+
+    .caminho-passo-verde,
+    .caminho-passo-rosa {
+        width: fit-content;
+        padding: 4px 22px;
+    }
+
+    .simbolo-ods {
+        left: 10%;
+    }
+}
+
+@media (max-width: 900px) {
+    /* Soluções (hero da página Renovaí) */
+    .solucoes-hero {
+        flex-direction: column;
+        min-height: auto;
+        padding: 40px 6% 60px;
+        gap: 24px;
+        text-align: center;
+    }
+
+    .solucoes-texto {
+        order: 1;
+    }
+
+    .solucoes-hero-images {
+        order: 2;
+        width: 100%;
+        max-width: 520px;
+        aspect-ratio: 4 / 3;
+    }
+
+    .solucoes-celular-laptop {
+        width: 100%;
+        left: 0;
+        bottom: 0;
+    }
+
+    .solucoes-folhas {
+        width: 120%;
+        left: -10%;
+        top: -20px;
+    }
+
+    .solucoes-fundo-logo {
+        width: 800px;
+        left: -40px;
+    }
+
+    .solucoes-titulo {
+        font-size: clamp(28px, 5.5vw, 38px);
+    }
+
+    .solucoes-mascote {
+        width: 64px;
+    }
+
+    /* Como funciona */
+    .funciona-titulo {
+        font-size: clamp(26px, 5vw, 34px);
+        flex-wrap: wrap;
+    }
+
+    .funciona-logo {
+        height: 42px;
+    }
+
+    .funciona-numero {
+        font-size: 120px;
+    }
+
+    .funciona-numero-direita {
+        left: -20px;
+    }
+
+    .funciona-numero-esquerda {
+        right: -10px;
+    }
+
+    /* Funcionalidades */
+    .funcionalidades-tabs {
+        flex-wrap: wrap;
+    }
+
+    .tab-cooperativa,
+    .tab-recicladora {
+        width: min(300px, 100%);
+    }
+
+    .carrossel-seta {
+        width: 48px;
+        height: 48px;
+    }
+
+    .carrossel-seta img {
+        width: 20px;
+    }
+
+    /* FAQ */
+    .faq {
+        padding: 40px 5% 70px;
+    }
+
+    /* Quem somos */
+    .pesquisa-titulo {
+        font-size: clamp(28px, 6vw, 38px);
+    }
+
+    .pesquisa-mascote {
+        right: 16px;
+        width: 72px;
+        height: 72px;
+    }
+
+    .pesquisa-mascote img {
+        width: 62px;
+    }
+
+    .caminho-passos {
+        gap: 40px;
+    }
+
+    .caminho-passo-3-topo {
+        margin-left: 0;
+    }
+
+    .caminho-feature-verde h4,
+    .caminho-feature-rosa h4 {
+        width: 100%;
+        max-width: 280px;
+        height: auto;
+        padding: 2px 8px;
+    }
+
+    .caminho-passo-3-celular img {
+        width: min(220px, 60%);
+    }
+
+    .simbolo-ods {
+        left: 0;
+        width: 100%;
+        opacity: 0.5;
+    }
+
+    .ods12-grid {
+        gap: 20px;
+    }
+
+    .equipe-cabecalho {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .valores-grid {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 30px 24px;
+        gap: 20px;
+    }
+
+    .valores-letras {
+        flex-direction: row;
+        gap: 12px;
+        line-height: 1;
+    }
+
+    .valores-letras span {
+        font-size: 64px;
+    }
+
+    .valores-pin {
+        position: static;
+    }
+}
+
+@media (max-width: 600px) {
+    .solucoes-hero {
+        padding: 30px 5% 50px;
+    }
+
+    .solucoes-descricao {
+        font-size: 14px;
+    }
+
+    .solucoes-fundo-logo {
+        display: none;
+    }
+
+    /* Timeline vira coluna única, linha à esquerda */
+    .funciona {
+        padding: 40px 5% 60px;
+    }
+
+    .funciona-linha {
+        left: 28px;
+    }
+
+    .funciona-linha-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: 70px;
+        min-height: 0;
+        margin-bottom: 24px;
+    }
+
+    .funciona-conteudo {
+        width: 100%;
+        margin: 0;
+    }
+
+    .funciona-icone-central {
+        left: 28px;
+        top: 40px;
+        width: 46px;
+        height: 46px;
+    }
+
+    .funciona-numero {
+        display: none;
+    }
+
+    /* Funcionalidades */
+    .funcionalidades {
+        padding: 40px 5% 30px;
+    }
+
+    .funcionalidades-titulo {
+        font-size: 30px;
+    }
+
+    .funcionalidade-heading {
+        font-size: 21px;
+    }
+
+    .carrossel {
+        gap: 6px;
+    }
+
+    .carrossel-seta {
+        width: 36px;
+        height: 36px;
+    }
+
+    .funcionalidade-card {
+        flex-basis: 85%;
+        min-width: 0;
+        padding: 20px;
+    }
+
+    .funcionalidade-ilustracao {
+        height: 190px;
+    }
+
+    .faq-titulo {
+        font-size: 26px;
+    }
+
+    .faq-pergunta {
+        padding: 16px 18px;
+        font-size: 14px;
+        gap: 12px;
+    }
+
+    /* Quem somos */
+    .pesquisa-hero,
+    .porque-importa,
+    .caminho,
+    .ods12,
+    .equipe,
+    .valores {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+    .importa-titulo {
+        font-size: 25px;
+    }
+
+    .importa-numero {
+        font-size: 36px;
+        flex-wrap: wrap;
+    }
+
+    .caminho-titulo,
+    .ods12-titulo,
+    .equipe-titulo {
+        font-size: 24px;
+    }
+
+    .caminho-titulo br,
+    .ods12-titulo br {
+        display: none;
+    }
+
+    .equipe-titulo {
+        flex-wrap: wrap;
+    }
+
+    .equipe-logo {
+        height: 26px;
+    }
+
+    .ods12-destaque {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .ods12-coluna {
+        min-width: 0;
+        padding: 20px;
+    }
+
+    .equipe-carrossel {
+        gap: 0;
+    }
+
+    .valores-grid {
+        padding: 24px 16px;
+        border-radius: 24px;
+    }
+
+    .valores-letras span {
+        font-size: 48px;
+    }
+
+    .valores-item h4 {
+        width: auto;
+        max-width: 100%;
+    }
+}
+
+/* =========================================
+   INDEX: RODA DE BENEFÍCIOS EM TELAS MÉDIAS
+   O deslocamento fixo de -180px só funciona com o container de 1100px
+   centralizado (telas largas). Abaixo disso a roda encosta na borda
+   esquerda da tela e o card ocupa o restante.
+========================================= */
+
+@media (min-width: 601px) and (max-width: 1360px) {
+    .beneficios-conteudo {
+        max-width: none;
+        padding: 0 4% 0 0;
+        gap: 24px;
+    }
+
+    .icone-trilha {
+        transform: none;
+    }
+
+    .card-beneficio {
+        max-width: none;
+    }
+}
+
+/* =========================================
+   INDEX: HERO EM TABLET/CELULAR
+   O celular passa a ocupar espaço no fluxo, assim a área das imagens
+   cresce com ele e não invade a seção seguinte.
+========================================= */
+
+@media (max-width: 900px) {
+    .images-hero {
+        display: flex;
+        justify-content: center;
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+    }
+
+    .hero-celular {
+        position: relative;
+        top: auto;
+        right: auto;
+        transform: none;
+        width: min(62%, 280px);
+        height: auto;
+        margin-bottom: 30px;
+    }
+
+    .hero-botoes {
+        width: 100%;
+    }
+
+    .conhecaRenovai,
+    .sobreNos {
+        box-sizing: border-box;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .sobreNos img {
+        width: 18px;
+        height: auto;
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-celular {
+        width: min(66%, 250px);
+    }
+}
+
+/* =========================================
+   INDEX: CORREÇÕES DE SOBREPOSIÇÃO (TABLET/CELULAR)
+========================================= */
+
+@media (max-width: 1200px) {
+    /* Ícones centrais cobriam o texto dos dois cards */
+    .section3-2,
+    .section3-3 {
+        display: none;
+    }
+
+    /* Decorações ficam atrás dos cards, só aparecendo nas bordas */
+    .bloco_coop,
+    .bloco_recicladora {
+        z-index: 1;
+    }
+
+    .section3-1,
+    .section3-4 {
+        z-index: 0;
+        max-width: 160px;
+    }
+
+    .section3-1 {
+        top: auto;
+        bottom: 0;
+        left: -30px;
+    }
+
+    .section3-4 {
+        top: auto;
+        bottom: 0;
+        right: 0;
+    }
+}
+
+@media (max-width: 900px) {
+    .planos {
+        min-height: 0;
+    }
+
+    .beneficios_coop_reci {
+        min-height: 0;
+    }
+
+    /* CTA final: o celular não pode descer sobre o texto */
+    .experimente-img {
+        margin: 0 auto;
+    }
+
+    .experimente-celular {
+        top: 0;
+        left: 0;
+    }
+
+    .experimente-folhas {
+        left: 0;
+        bottom: -20px;
+        width: 60%;
+    }
+
+    .experimente-card {
+        overflow: hidden;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Em coluna, flex: 0 0 240px virava altura; a roda precisa dos 500px */
+    .icone-trilha {
+        flex: 0 0 auto;
+        width: 240px;
+        height: 500px;
+    }
+
+    /* Rótulos Cooperativa/Recicladora entram no fluxo, acima do título */
+    .ctacoop,
+    .ctareci {
+        position: static;
+        display: block;
+        width: auto;
+        min-width: 140px;
+        height: 32px;
+        margin: 24px 0 0 22px;
+        padding: 0 20px;
+    }
+
+    .primeira_linha_coop,
+    .primeira_linha_reci {
+        margin-top: 14px;
+    }
+}
+
+@media (max-width: 900px) {
+    .hero-mascote {
+        right: 16px;
+        bottom: 16px;
+        width: 64px;
+        height: 64px;
+    }
+
+    .hero-mascote img {
+        width: 54px;
+    }
+}
+
+@media (max-width: 900px) {
+    .hero-mascote,
+    .pesquisa-mascote,
+    .solucoes-mascote {
+        right: 16px;
+        bottom: 16px;
+        width: 64px;
+        height: 64px;
+    }
+
+    .hero-mascote img,
+    .pesquisa-mascote img {
+        width: 54px;
+    }
+}
+
+@media (max-width: 600px) {
+    .funciona-conteudo::after {
+        display: none;
+    }
+
+    .funciona-conteudo:hover {
+        transform: none;
+    }
+
+    .funciona-icone-central {
+        width: 46px;
+        height: 46px;
+    }
+
+    .funciona-linha {
+        width: 2px;
+    }
+}
+
+/* Quem somos: cartões vazios do mosaico só fazem sentido na grade de 3 colunas */
+@media (max-width: 900px) {
+    .importa-blank1,
+    .importa-blank2 {
+        display: none;
+    }
+}

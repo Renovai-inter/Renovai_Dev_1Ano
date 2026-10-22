@@ -1,0 +1,69 @@
+/* ===== Abertura da landing page: RENOVAÍ -> mergulho no "O" -> página =====
+   Tudo é um SVG: o fundo vinho tem um furo circular (máscara) com o MESMO
+   centro do anel do "O". Anel, letras e furo crescem juntos, então a página
+   aparece por dentro do O. As posições são calculadas (scripts/intro.js). */
+
+#intro {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  overflow: hidden;
+  /* segurança: se o script falhar, a abertura some sozinha */
+  animation: intro-seguranca 0.01s 8s forwards;
+}
+
+.sem-intro #intro {
+  display: none;
+}
+
+#intro svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#intro text {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  fill: #F8F6F2;
+}
+
+/* anel se desenha, depois REN e VAÍ chegam dos lados */
+#introAnel {
+  animation: intro-anel 0.9s ease-out 0.15s backwards;
+}
+
+#introEsq {
+  animation: intro-esq 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.7s backwards;
+}
+
+#introDir {
+  animation: intro-dir 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) 0.85s backwards;
+}
+
+@keyframes intro-anel {
+  from { stroke-dashoffset: var(--perimetro); }
+}
+
+@keyframes intro-esq {
+  from { opacity: 0; transform: translateX(-70px); }
+}
+
+@keyframes intro-dir {
+  from { opacity: 0; transform: translateX(70px); }
+}
+
+@keyframes intro-seguranca {
+  to { visibility: hidden; pointer-events: none; }
+}
+
+/* enquanto a abertura roda: sem rolagem e o resto da página fica "em espera"
+   (as animações de entrada da página só começam quando o O se abre) */
+html.intro-rodando {
+  overflow: hidden;
+}
+
+html.intro-rodando :not(#intro):not(#intro *) {
+  animation-play-state: paused !important;
+}
