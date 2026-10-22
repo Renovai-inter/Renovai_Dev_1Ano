@@ -1,0 +1,14 @@
+<%-- Cartoes da cooperativa e da recicladora (telas Ver e Editar).
+     Usa a variavel "negociacao" da pagina que inclui este arquivo. --%>
+<div class="partes">
+    <div class="parte">
+        <small>Cooperativa</small>
+        <b><%= esc(negociacao.getNomeCooperativa()) %></b>
+        <span><%= esc(negociacao.getCidadeCooperativa()) %>/<%= esc(negociacao.getEstadoCooperativa()) %> &bull; <%= esc(negociacao.getCnpjCooperativa()) %></span>
+    </div>
+    <div class="parte recicladora">
+        <small>Recicladora</small>
+        <b><%= esc(negociacao.getNomeEmpresa()) %></b>
+        <span><%= esc(negociacao.getCidadeEmpresa()) %>/<%= esc(negociacao.getEstadoEmpresa()) %> &bull; <%= esc(negociacao.getCnpjEmpresa()) %></span>
+    </div>
+</div>

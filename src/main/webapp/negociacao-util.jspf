@@ -1,0 +1,63 @@
+<%@ page import="java.math.BigDecimal, java.math.RoundingMode, java.text.Normalizer, java.text.NumberFormat, java.time.LocalDateTime, java.time.format.DateTimeFormatter, java.util.Locale" %>
+<%!
+    // ===== AUXILIARES DAS TELAS DE NEGOCIACAO =====
+    // So formatam texto para exibir. Nao mexem em dados e nao alteram o back.
+
+    private static final Locale PT_BR = Locale.forLanguageTag("pt-BR");
+    private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+    // 1200.5 -> "R$ 1.200,50"
+    private String moeda(BigDecimal valor) {
+        if (valor == null) {
+            return "-";
+        }
+        return NumberFormat.getCurrencyInstance(PT_BR).format(valor).replace('\u00a0', ' ');
+    }
+
+    // 256 -> "256kg"
+    private String kg(BigDecimal quantidade) {
+        if (quantidade == null) {
+            return "-";
+        }
+        NumberFormat nf = NumberFormat.getNumberInstance(PT_BR);
+        nf.setMaximumFractionDigits(2);
+        return nf.format(quantidade) + "kg";
+    }
+
+    // 1200.5 -> "1200,50" (para preencher campos de formulario; o servlet aceita virgula)
+    private String numero(BigDecimal valor) {
+        if (valor == null) {
+            return "";
+        }
+        return valor.setScale(2, RoundingMode.HALF_UP).toPlainString().replace('.', ',');
+    }
+
+    private String data(LocalDateTime d) {
+        return d == null ? "-" : d.format(DATA_BR);
+    }
+
+    // "AGUARDANDO_RESPOSTA" -> "Aguardando resposta"; textos que ja estao normais ficam como estao
+    private String legivel(String valor) {
+        if (valor == null) {
+            return "";
+        }
+        String texto = valor.replace('_', ' ').trim();
+        if (!texto.isEmpty() && texto.equals(texto.toUpperCase())) {
+            texto = texto.substring(0, 1) + texto.substring(1).toLowerCase();
+        }
+        return texto.replace("Concluida", "Conclu\u00edda");
+    }
+
+    // Nome da classe de cor do selo de status (selo-aceita, selo-recusada...)
+    private String classeStatus(String status) {
+        String s = Normalizer.normalize(status == null ? "" : status, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "").toUpperCase();
+
+        if (s.contains("ACEIT")) return "aceita";
+        if (s.contains("CONCLU")) return "concluida";
+        if (s.contains("RECUS")) return "recusada";
+        if (s.contains("CANCEL")) return "cancelada";
+        if (s.contains("AGUARD")) return "aguardando";
+        return "outro";
+    }
+%>

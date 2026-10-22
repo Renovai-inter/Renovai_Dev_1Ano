@@ -1,0 +1,52 @@
+<%-- Modal "Excluir negociacao" (telas Ver e Editar). Abre pelo link href="#excluir".
+     Usa as variaveis "negociacao" e "movimentacoes" da pagina. --%>
+<%
+    // "temVenda" so e enviado pelo servlet na tela Ver; na tela Editar vem vazio
+    Boolean temVendaModal = (Boolean) request.getAttribute("temVenda");
+%>
+<div class="modal-fundo" id="excluir">
+    <div class="modal">
+        <h3>Excluir negociação</h3>
+        <p class="sub">Revise o impacto antes de confirmar a ação sobre a negociação <%= esc(negociacao.getCodigo()) %>.</p>
+
+        <p class="mini">Registros relacionados afetados</p>
+        <div class="registros">
+            <div><span>Cooperativa</span> <b><%= esc(negociacao.getNomeCooperativa()) %></b></div>
+            <div><span>Empresa recicladora</span> <b><%= esc(negociacao.getNomeEmpresa()) %></b></div>
+            <div><span>Movimentos na linha do tempo</span> <b><%= movimentacoes.size() %></b></div>
+            <% if (temVendaModal != null) { %>
+                <div><span>Venda concluída</span> <b><%= temVendaModal ? "Sim" : "Não" %></b></div>
+            <% } %>
+        </div>
+
+        <form method="post" action="negociacao">
+            <input type="hidden" name="id" value="<%= negociacao.getIdNegociacao() %>">
+
+            <label class="opcao">
+                <input type="radio" name="acao" value="cancelar" checked>
+                <div>
+                    <b>Alterar status para "Cancelado"</b>
+                    O histórico é preservado e a negociação passa a ser considerada cancelada.
+                </div>
+            </label>
+
+            <label class="opcao perigo">
+                <input type="radio" name="acao" value="excluir">
+                <div>
+                    <b>Excluir permanentemente</b>
+                    Ação irreversível: remove a negociação e toda a linha do tempo.
+                </div>
+            </label>
+
+            <div class="campo" style="margin-top:12px">
+                <label for="confirmacao">Para excluir permanentemente, digite "<%= esc(negociacao.getCodigo()) %>" para confirmar</label>
+                <input type="text" id="confirmacao" name="confirmacao" autocomplete="off" placeholder="<%= esc(negociacao.getCodigo()) %>">
+            </div>
+
+            <div class="rodape">
+                <a href="#" class="botao claro">Cancelar</a>
+                <button type="submit" class="botao vinho">Confirmar</button>
+            </div>
+        </form>
+    </div>
+</div>
