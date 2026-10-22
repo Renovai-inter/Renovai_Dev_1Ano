@@ -18,7 +18,7 @@
         <div class="aviso sucesso" role="status">Cadastro concluído com sucesso.</div>
 
         <%-- Troque o # pelo link de download ou acesso do app --%>
-        <a href="http://127.0.0.1:5500/index.html" class="btn-principal"
+        <a href="${ctx}/" class="btn-principal"
            style="display:block;text-align:center;line-height:58px;text-decoration:none">Voltar para a Landing Page</a>
     </section>
 

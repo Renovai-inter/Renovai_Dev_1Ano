@@ -18,7 +18,11 @@ public class AutenticacaoFilter implements Filter {
 
     // Caminhos que não exigem login
     private static final List<String> PUBLICOS =
-            List.of("/login", "/cadastro", "/css/", "/img/", "/js/");
+            List.of("/login", "/cadastro", "/css/", "/img/", "/js/",
+                    "/images/", "/scripts/", "/pages/");
+
+    // Landing page na raiz do site
+    private static final List<String> PUBLICOS_EXATOS = List.of("/", "/index.html");
 
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
@@ -28,7 +32,8 @@ public class AutenticacaoFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) res;
 
         String caminho = request.getRequestURI().substring(request.getContextPath().length());
-        boolean publico = PUBLICOS.stream().anyMatch(caminho::startsWith);
+        boolean publico = PUBLICOS_EXATOS.contains(caminho)
+                || PUBLICOS.stream().anyMatch(caminho::startsWith);
 
         HttpSession sessao = request.getSession(false);
         boolean administrador = sessao != null
