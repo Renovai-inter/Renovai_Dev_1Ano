@@ -61,7 +61,7 @@ public class Cooperado {
         if (codigoCooperado == null || codigoCooperado.isBlank()) {
             throw new IllegalArgumentException("codigoCooperado é obrigatório.");
         }
-        if (codigoCooperado.codePointCount(0, codigoCooperado.length()) > 20) {
+        if (codigoCooperado.length() > 20) {
             throw new IllegalArgumentException("codigoCooperado deve ter no máximo 20 caracteres.");
         }
         this.codigoCooperado = codigoCooperado;

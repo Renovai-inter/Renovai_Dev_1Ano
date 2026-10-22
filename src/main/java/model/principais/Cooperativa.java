@@ -53,7 +53,7 @@ public class Cooperativa {
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("nome é obrigatório.");
         }
-        if (nome.codePointCount(0, nome.length()) > 150) {
+        if (nome.length() > 150) {
             throw new IllegalArgumentException("nome deve ter no máximo 150 caracteres.");
         }
         this.nome = nome;
@@ -65,7 +65,7 @@ public class Cooperativa {
     // Define o valor de cnpj.
     public void setCnpj(String cnpj) {
         cnpj = utilitario.filtrarCnpj(cnpj);
-        if (cnpj != null && cnpj.codePointCount(0, cnpj.length()) > 18) {
+        if (cnpj != null && cnpj.length() > 18) {
             throw new IllegalArgumentException("cnpj deve ter no máximo 18 caracteres.");
         }
         this.cnpj = cnpj;
@@ -80,7 +80,7 @@ public class Cooperativa {
         if (nomePublico == null || nomePublico.isBlank()) {
             throw new IllegalArgumentException("nomePublico é obrigatório.");
         }
-        if (nomePublico.codePointCount(0, nomePublico.length()) > 150) {
+        if (nomePublico.length() > 150) {
             throw new IllegalArgumentException("nomePublico deve ter no máximo 150 caracteres.");
         }
         this.nomePublico = nomePublico;
@@ -99,7 +99,7 @@ public class Cooperativa {
 
     // Define o valor de logoUrl.
     public void setLogoUrl(String logoUrl) {
-        if (logoUrl != null && logoUrl.codePointCount(0, logoUrl.length()) > 500) {
+        if (logoUrl != null && logoUrl.length() > 500) {
             throw new IllegalArgumentException("logoUrl deve ter no máximo 500 caracteres.");
         }
         this.logoUrl = logoUrl;
@@ -111,7 +111,7 @@ public class Cooperativa {
     // Define o valor de emailInstitucional.
     public void setEmailInstitucional(String emailInstitucional) {
         emailInstitucional = utilitario.filtrarEmailInstitucional(emailInstitucional);
-        if (emailInstitucional != null && emailInstitucional.codePointCount(0, emailInstitucional.length()) > 150) {
+        if (emailInstitucional != null && emailInstitucional.length() > 150) {
             throw new IllegalArgumentException("emailInstitucional deve ter no máximo 150 caracteres.");
         }
         this.emailInstitucional = emailInstitucional;
@@ -123,7 +123,7 @@ public class Cooperativa {
     // Define o valor de telefoneWhatsapp.
     public void setTelefoneWhatsapp(String telefoneWhatsapp) {
         telefoneWhatsapp = utilitario.filtrarTelefoneWhatsapp(telefoneWhatsapp);
-        if (telefoneWhatsapp != null && telefoneWhatsapp.codePointCount(0, telefoneWhatsapp.length()) > 20) {
+        if (telefoneWhatsapp != null && telefoneWhatsapp.length() > 20) {
             throw new IllegalArgumentException("telefoneWhatsapp deve ter no máximo 20 caracteres.");
         }
         this.telefoneWhatsapp = telefoneWhatsapp;
@@ -135,7 +135,7 @@ public class Cooperativa {
     // Define o valor de cep.
     public void setCep(String cep) {
         cep = utilitario.filtrarCep(cep);
-        if (cep != null && cep.codePointCount(0, cep.length()) > 9) {
+        if (cep != null && cep.length() > 9) {
             throw new IllegalArgumentException("cep deve ter no máximo 9 caracteres.");
         }
         this.cep = cep;
@@ -150,7 +150,7 @@ public class Cooperativa {
         if (endereco == null || endereco.isBlank()) {
             throw new IllegalArgumentException("endereco é obrigatório.");
         }
-        if (endereco.codePointCount(0, endereco.length()) > 255) {
+        if (endereco.length() > 255) {
             throw new IllegalArgumentException("endereco deve ter no máximo 255 caracteres.");
         }
         this.endereco = endereco;
@@ -165,7 +165,7 @@ public class Cooperativa {
         if (cidade == null || cidade.isBlank()) {
             throw new IllegalArgumentException("cidade é obrigatória.");
         }
-        if (cidade.codePointCount(0, cidade.length()) > 100) {
+        if (cidade.length() > 100) {
             throw new IllegalArgumentException("cidade deve ter no máximo 100 caracteres.");
         }
         this.cidade = cidade;
@@ -205,7 +205,7 @@ public class Cooperativa {
 
     // Define o valor de linkWhatsapp.
     public void setLinkWhatsapp(String linkWhatsapp) {
-        if (linkWhatsapp != null && linkWhatsapp.codePointCount(0, linkWhatsapp.length()) > 255) {
+        if (linkWhatsapp != null && linkWhatsapp.length() > 255) {
             throw new IllegalArgumentException("linkWhatsapp deve ter no máximo 255 caracteres.");
         }
         this.linkWhatsapp = linkWhatsapp;

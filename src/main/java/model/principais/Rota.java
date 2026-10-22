@@ -36,7 +36,7 @@ public class Rota {
         if (nomeRota == null || nomeRota.isBlank()) {
             throw new IllegalArgumentException("nomeRota é obrigatório.");
         }
-        if (nomeRota.codePointCount(0, nomeRota.length()) > 100) {
+        if (nomeRota.length() > 100) {
             throw new IllegalArgumentException("nomeRota deve ter no máximo 100 caracteres.");
         }
         this.nomeRota = nomeRota;

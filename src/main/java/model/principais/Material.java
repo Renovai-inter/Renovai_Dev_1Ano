@@ -32,7 +32,7 @@ public class Material {
         if (nome == null || nome.isBlank()) {
             throw new IllegalArgumentException("nome é obrigatório.");
         }
-        if (nome.codePointCount(0, nome.length()) > 100) {
+        if (nome.length() > 100) {
             throw new IllegalArgumentException("nome deve ter no máximo 100 caracteres.");
         }
         this.nome = nome;
@@ -64,7 +64,7 @@ public class Material {
         if (origem == null || origem.isBlank()) {
             throw new IllegalArgumentException("origem é obrigatória.");
         }
-        if (origem.codePointCount(0, origem.length()) > 10) {
+        if (origem.length() > 10) {
             throw new IllegalArgumentException("origem deve ter no máximo 10 caracteres.");
         }
         this.origem = origem;
