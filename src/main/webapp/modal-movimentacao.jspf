@@ -1,0 +1,56 @@
+<%-- Modal "Adicionar movimentacao" (tela Editar). Abre pelo link href="#movimentacao".
+     Usa a variavel "negociacao" da pagina. Se o servlet devolveu erro (atributo "abrirModal"),
+     ele ja abre sozinho e mantem o que foi digitado. --%>
+<%
+    boolean abrirModalMov = Boolean.TRUE.equals(request.getAttribute("abrirModal"));
+
+    List<String> autoresMov = (List<String>) request.getAttribute("autores");
+    if (autoresMov == null) autoresMov = new ArrayList<String>();
+
+    String autorMov = abrirModalMov ? request.getParameter("autor") : "";
+    String valorMov = abrirModalMov ? request.getParameter("valor") : numero(negociacao.getValorKgAtual());
+    String qtdMov = abrirModalMov ? request.getParameter("quantidade") : numero(negociacao.getQuantidadeKg());
+    String obsMov = abrirModalMov ? request.getParameter("observacoes") : "";
+%>
+<div class="modal-fundo" id="movimentacao" <%= abrirModalMov ? "style=\"display:flex\"" : "" %>>
+    <div class="modal">
+        <h3>Adicionar movimentação</h3>
+        <p class="sub">Lançamento manual de proposta ou nova proposta</p>
+
+        <form method="post" action="negociacao">
+            <input type="hidden" name="acao" value="movimentar">
+            <input type="hidden" name="id" value="<%= negociacao.getIdNegociacao() %>">
+
+            <div class="campo">
+                <label for="autorMov">Autor</label>
+                <select id="autorMov" name="autor">
+                    <option value="">Selecione o autor</option>
+                    <% for (String autorOpcao : autoresMov) { %>
+                        <option value="<%= esc(autorOpcao) %>" <%= autorOpcao.equals(autorMov) ? "selected" : "" %>><%= esc(legivel(autorOpcao)) %></option>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="grade" style="margin-top:14px">
+                <div class="campo">
+                    <label for="valorMov">Valor por kg (R$)</label>
+                    <input type="text" id="valorMov" name="valor" inputmode="decimal" placeholder="R$0,00" value="<%= esc(valorMov) %>">
+                </div>
+                <div class="campo">
+                    <label for="qtdMov">Quantidade (kg)</label>
+                    <input type="text" id="qtdMov" name="quantidade" inputmode="decimal" placeholder="0kg" value="<%= esc(qtdMov) %>">
+                </div>
+            </div>
+
+            <div class="campo" style="margin-top:14px">
+                <label for="obsMov">Observações</label>
+                <textarea id="obsMov" name="observacoes"><%= esc(obsMov) %></textarea>
+            </div>
+
+            <div class="rodape">
+                <a href="negociacao?acao=editar&id=<%= negociacao.getIdNegociacao() %>" class="botao claro">Cancelar</a>
+                <button type="submit" class="botao verde">Salvar</button>
+            </div>
+        </form>
+    </div>
+</div>
