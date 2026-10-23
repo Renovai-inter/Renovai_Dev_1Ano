@@ -1,5 +1,7 @@
 package model.auxiliares;
 
+import model.enums.AutorNegociacao;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -9,7 +11,7 @@ public class Proposta {
 
     private Long idProposta;
     private Long idNegociacao;
-    private String autor;
+    private AutorNegociacao autor;
     private BigDecimal valorKg;
     private BigDecimal quantidadeKg;
     private String observacoes;
@@ -29,13 +31,21 @@ public class Proposta {
 
     public void setIdNegociacao(Long idNegociacao) { this.idNegociacao = idNegociacao; }
 
-    public String getAutor() { return autor; }
+    public String getAutor() {
+        if (autor == null) {
+            return null;
+        }
+        return autor.name();
+    }
 
     public void setAutor(String autor) {
-        if (!"COOPERATIVA".equals(autor) && !"EMPRESA".equals(autor)) {
-            throw new IllegalArgumentException("autor da proposta inválido.");
+        for (AutorNegociacao opcao : AutorNegociacao.values()) {
+            if (opcao.name().equals(autor)) {
+                this.autor = opcao;
+                return;
+            }
         }
-        this.autor = autor;
+        throw new IllegalArgumentException("autor da proposta inválido.");
     }
 
     public BigDecimal getValorKg() { return valorKg; }
@@ -70,7 +80,7 @@ public class Proposta {
 
     // Indica se a proposta foi feita pela cooperativa.
     public boolean isCooperativa() {
-        return autor != null && autor.toUpperCase().startsWith("COOP");
+        return autor == AutorNegociacao.COOPERATIVA;
     }
 
 }

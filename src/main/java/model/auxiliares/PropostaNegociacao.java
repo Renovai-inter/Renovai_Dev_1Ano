@@ -1,5 +1,6 @@
 package model.auxiliares;
 
+import model.enums.AutorNegociacao;
 import util.Utilitario;
 
 import java.math.BigDecimal;
@@ -13,7 +14,7 @@ public class PropostaNegociacao {
 
     private Long idProposta;
     private Long idNegociacao;
-    private String autor;
+    private AutorNegociacao autor;
     private BigDecimal valorKg;
     private BigDecimal quantidadeKg;
     private String observacoes;
@@ -46,15 +47,23 @@ public class PropostaNegociacao {
     public void setIdNegociacao(Long idNegociacao) { this.idNegociacao = idNegociacao; }
 
     // Retorna o autor da proposta.
-    public String getAutor() { return autor; }
+    public String getAutor() {
+        if (autor == null) {
+            return null;
+        }
+        return autor.name();
+    }
 
     // Aceita somente os autores documentados para proposta.
     public void setAutor(String autor) {
         autor = utilitario.normalizarTextoLivre(autor);
-        if (!"COOPERATIVA".equals(autor) && !"EMPRESA".equals(autor)) {
-            throw new IllegalArgumentException("autor da proposta inválido.");
+        for (AutorNegociacao opcao : AutorNegociacao.values()) {
+            if (opcao.name().equals(autor)) {
+                this.autor = opcao;
+                return;
+            }
         }
-        this.autor = autor;
+        throw new IllegalArgumentException("autor da proposta inválido.");
     }
 
     // Retorna o valor oferecido por quilograma.

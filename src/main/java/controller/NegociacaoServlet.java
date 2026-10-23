@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.auxiliares.Proposta;
+import model.enums.AutorNegociacao;
 import model.principais.Negociacao;
 
 import java.io.IOException;
@@ -21,7 +22,9 @@ public class NegociacaoServlet extends HttpServlet {
 
     // Usados so se o servlet nao conseguir ler as opcoes da regra CHECK do banco
     private static final String[] STATUS_PADRAO = {"AGUARDANDO_RESPOSTA", "EM_NEGOCIACAO", "ACEITA", "RECUSADA", "CANCELADA", "CONCLUIDA"};
-    private static final String[] AUTOR_PADRAO = {"COOPERATIVA", "EMPRESA"};
+    private static final String[] AUTOR_PADRAO = {
+            AutorNegociacao.COOPERATIVA.name(), AutorNegociacao.EMPRESA.name()
+    };
 
     private NegociacaoDAO dao = new NegociacaoDAO();
 
@@ -620,7 +623,7 @@ public class NegociacaoServlet extends HttpServlet {
     private String autorEncerramento(Long id, String acao) {
 
         String cooperativa = escolherAutor("COOP");
-        String recicladora = escolherAutor("EMPRESA");
+        String recicladora = escolherAutor(AutorNegociacao.EMPRESA.name());
         if (recicladora == null) {
             recicladora = escolherAutor("RECIC");
         }
