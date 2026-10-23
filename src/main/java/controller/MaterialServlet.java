@@ -32,7 +32,7 @@ public class MaterialServlet extends HttpServlet {
         try {
             // Processamento da ação
 
-            Material material;
+            int linhas;
             if ("cadastrar".equals(acao)) {
                 String origem = request.getParameter("origem");
                 if (origem == null || origem.isBlank()) {
@@ -40,19 +40,19 @@ public class MaterialServlet extends HttpServlet {
                             "Informe a origem do material.");
                     return;
                 }
-                material = materialDAO.cadastrarMaterial(new Material(nome, categoria, origem));
+                linhas = materialDAO.cadastrarMaterial(new Material(nome, categoria, origem));
             } else if ("editar".equals(acao)) {
                 Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
                 Material alteracao = new Material();
                 alteracao.setIdMaterial(idMaterial);
                 alteracao.setNome(nome);
                 alteracao.setCategoria(categoria);
-                material = materialDAO.atualizarMaterial(alteracao);
+                linhas = materialDAO.atualizarMaterial(alteracao);
             } else if ("excluir".equals(acao)) {
                 Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
                 Material exclusao = new Material();
                 exclusao.setIdMaterial(idMaterial);
-                material = materialDAO.excluirMaterial(exclusao);
+                linhas = materialDAO.excluirMaterial(exclusao);
             } else {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Ação inválida.");
                 return;
@@ -60,7 +60,7 @@ public class MaterialServlet extends HttpServlet {
 
             // Preparação da resposta
 
-            if (material == null) {
+            if (linhas == 0) {
                 if ("cadastrar".equals(acao)) {
                     response.sendError(HttpServletResponse.SC_CONFLICT,
                             "Não foi possível cadastrar este material.");

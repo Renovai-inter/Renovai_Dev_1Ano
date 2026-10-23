@@ -141,16 +141,16 @@ public class CooperadoServlet extends HttpServlet {
             ArrayList<Long> permissoes = lerPermissoes(request.getParameterValues("permissoes"));
             Cooperado entrada = new Cooperado(idCooperativa, nome, email, cargo,
                     atividades, permissoes);
-            Cooperado cooperado = dao.cadastrarCooperado(entrada);
-            if (cooperado == null) {
+            int linhas = dao.cadastrarCooperado(entrada);
+            if (linhas == 0) {
                 request.setAttribute("erro", "Não foi possível cadastrar o cooperado.");
                 abrirNovo(request, response);
                 return;
             }
             HttpSession sessao = request.getSession();
-            sessao.setAttribute("senhaInicialCooperadoId", cooperado.getIdCooperado());
-            sessao.setAttribute("senhaInicialCooperado", cooperado.getSenhaInicial());
-            response.sendRedirect("cooperado?acao=editar&id=" + cooperado.getIdCooperado());
+            sessao.setAttribute("senhaInicialCooperadoId", entrada.getIdCooperado());
+            sessao.setAttribute("senhaInicialCooperado", entrada.getSenhaInicial());
+            response.sendRedirect("cooperado?acao=editar&id=" + entrada.getIdCooperado());
         } catch (IllegalArgumentException e) {
             request.setAttribute("erro", e.getMessage());
             abrirNovo(request, response);
@@ -181,12 +181,11 @@ public class CooperadoServlet extends HttpServlet {
             alteracao.setCargo(cargo);
             alteracao.setStatus(status);
             alteracao.setAtividadesCooperado(atividades);
-            Cooperado editado = dao.editarCooperado(alteracao);
-            if (editado == null) {
+            int linhas = dao.editarCooperado(alteracao);
+            if (linhas == 0) {
                 response.sendRedirect("cooperado");
                 return;
             }
-            dao.alterarAtividadesDesempenhadas(alteracao);
             response.sendRedirect("cooperado?acao=ver&id=" + id);
         } catch (IllegalArgumentException e) {
             request.setAttribute("erro", e.getMessage());
@@ -204,12 +203,12 @@ public class CooperadoServlet extends HttpServlet {
         }
         Cooperado cooperado = new Cooperado();
         cooperado.setIdCooperado(id);
-        String senhaNova = dao.redefinirSenha(cooperado);
-        if (senhaNova == null) {
+        int linhas = dao.redefinirSenha(cooperado);
+        if (linhas == 0) {
             response.sendRedirect("cooperado");
             return;
         }
-        request.setAttribute("senhaNova", senhaNova);
+        request.setAttribute("senhaNova", cooperado.getSenhaInicial());
         abrirEditar(request, response, id);
     }
 

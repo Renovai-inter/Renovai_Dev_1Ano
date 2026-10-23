@@ -57,8 +57,8 @@ public class CadastroServlet extends HttpServlet {
                     usuario.setSenhaHash(SenhaAPI.gerarHash(senha));
                     usuario.setTipoUsuario(TipoUsuario.COOPERADO); // fixo: o cadastro público nunca cria administrador
 
-                    Usuario cadastrado = usuarioDAO.cadastrarUsuario(usuario);
-                    if (cadastrado == null) {
+                    int linhas = usuarioDAO.cadastrarUsuario(usuario);
+                    if (linhas == 0) {
                         erro = "Não foi possível concluir o cadastro.";
                     }
                 }

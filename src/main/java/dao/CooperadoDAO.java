@@ -1,6 +1,5 @@
 package dao;
 import model.principais.Cooperado;
-import model.principais.Cooperativa;
 import model.auxiliares.CooperadoPermissao;
 import model.enums.AtividadeCooperado;
 import model.enums.CargoCooperado;
@@ -32,10 +31,7 @@ public class CooperadoDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra um usuário gestor vinculado a uma cooperativa.
-    public Cooperado cadastrarGestor(Cooperado gestor) {
-
-        // Declaração
-
+    public int cadastrarGestor(Cooperado gestor) {
         if (gestor == null || gestor.getIdCooperativa() == null
                 || gestor.getNomeCompleto() == null || gestor.getEmail() == null
                 || gestor.getSenhaHash() == null) {
@@ -46,59 +42,49 @@ public class CooperadoDAO {
         }
         gestor.setSenhaTemporaria(true);
         gestor.setTipoUsuario(TipoUsuario.GESTOR_COOPERATIVA);
+        long ultimoIdCooperado = utilitario.selecionarUltimoId("cooperado");
+        long idCooperado;
+        if (ultimoIdCooperado == -1) {
+            idCooperado = 1;
+        } else {
+            idCooperado = ultimoIdCooperado + 1;
+        }
+        long ultimoIdUsuario = utilitario.selecionarUltimoId("usuario");
+        long idUsuario;
+        if (ultimoIdUsuario == -1) {
+            idUsuario = 1;
+        } else {
+            idUsuario = ultimoIdUsuario + 1;
+        }
+        gestor.setCodigoCooperado("CD-" + idCooperado);
+        gestor.setCargo(CargoCooperado.GESTOR);
+        gestor.setStatus(StatusCooperado.ATIVO);
         Connection conexao = conn.conectar();
-
-        // Executar PreparedStatement
-
-        try {
-            long ultimoIdCooperado = utilitario.selecionarUltimoId("cooperado");
-            long idCooperado;
-            if (ultimoIdCooperado == -1) {
-                idCooperado = 1;
-            } else {
-                idCooperado = ultimoIdCooperado + 1;
+        String sqlCooperado = "INSERT INTO cooperado " +
+                "(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo) " +
+                "VALUES (?, ?, ?, ?, ?)";
+        try (PreparedStatement inserirUsuario = conexao.prepareStatement(usuarioDAO.sqlInserirUsuario());
+             PreparedStatement inserirCooperado = conexao.prepareStatement(sqlCooperado)) {
+            usuarioDAO.preencherCadastro(inserirUsuario, 1, idUsuario, gestor);
+            int linhas = inserirUsuario.executeUpdate();
+            if (linhas == 0) {
+                return 0;
             }
-            long ultimoIdUsuario = utilitario.selecionarUltimoId("usuario");
-            long idUsuario;
-            if (ultimoIdUsuario == -1) {
-                idUsuario = 1;
-            } else {
-                idUsuario = ultimoIdUsuario + 1;
+            gestor.setIdUsuario(idUsuario);
+            inserirCooperado.setLong(1, idCooperado);
+            inserirCooperado.setLong(2, idUsuario);
+            inserirCooperado.setLong(3, gestor.getIdCooperativa());
+            inserirCooperado.setString(4, gestor.getCodigoCooperado());
+            inserirCooperado.setString(5, gestor.getCargoEnum().name());
+            int linhasCooperado = inserirCooperado.executeUpdate();
+            if (linhasCooperado == 0) {
+                throw new IllegalStateException("Gestor não foi registrado após a conta.");
             }
-            gestor.setCodigoCooperado("CD-" + idCooperado);
-            gestor.setCargo(CargoCooperado.GESTOR);
-            gestor.setStatus(StatusCooperado.ATIVO);
-
-            // Comando SQL
-
-            String sql = "WITH usuario_novo AS (" + usuarioDAO.sqlInserirUsuario() + "), " +
-                    "gestor_novo AS (INSERT INTO cooperado " +
-                    "(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo) " +
-                    "SELECT ?, u.id_usuario, ?, ?, ? FROM usuario_novo u " +
-                    "RETURNING id_cooperado, id_usuario), " +
-                    "permissoes_novas AS (INSERT INTO cooperado_permissao " +
-                    "(id_cooperado, id_permissao) SELECT g.id_cooperado, p.id_permissao " +
-                    "FROM gestor_novo g CROSS JOIN permissao p RETURNING id_cooperado) " +
-                    "SELECT g.id_usuario, (SELECT COUNT(*) FROM permissoes_novas) " +
-                    "AS total_permissoes FROM gestor_novo g";
-
-            // Executar PreparedStatement
-
-            try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-                usuarioDAO.preencherCadastro(pstmt, 1, idUsuario, gestor);
-                pstmt.setLong(8, idCooperado);
-                pstmt.setLong(9, gestor.getIdCooperativa());
-                pstmt.setString(10, gestor.getCodigoCooperado());
-                pstmt.setString(11, gestor.getCargoEnum().name());
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (!rs.next()) {
-                        return null;
-                    }
-                    gestor.setIdUsuario(rs.getLong("id_usuario"));
-                }
-            }
+            linhas += linhasCooperado;
             gestor.setIdCooperado(idCooperado);
-            return gestor;
+            gestor.setPermissoes(listarIdsPermissoes(conexao));
+            linhas += permissoesAcesso(gestor);
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar gestor.", e);
         } finally {
@@ -107,15 +93,16 @@ public class CooperadoDAO {
     }
 
     // Cadastra a conta, o cooperado, suas atividades e permissões.
-    public Cooperado cadastrarCooperado(Cooperado cooperado) {
-
-        // Declaração
-
+    public int cadastrarCooperado(Cooperado cooperado) {
         if (cooperado == null || cooperado.getIdCooperativa() == null
                 || cooperado.getNomeCompleto() == null || cooperado.getEmail() == null) {
             throw new IllegalArgumentException("Cooperativa, nome e e-mail são obrigatórios.");
         }
-        ArrayList<AtividadeCooperado> atividades = cooperado.getAtividadesCooperado();
+        for (AtividadeCooperado atividade : cooperado.getAtividadesCooperado()) {
+            if (atividade == null) {
+                throw new IllegalArgumentException("Atividade do cooperado é obrigatória.");
+            }
+        }
         ArrayList<Long> permissoes = cooperado.getPermissoes();
         String senhaInicial = Long.toUnsignedString(new SecureRandom().nextLong(), 36)
                 + Long.toUnsignedString(new SecureRandom().nextLong(), 36);
@@ -124,32 +111,16 @@ public class CooperadoDAO {
         cooperado.setTipoUsuario(TipoUsuario.COOPERADO);
         cooperado.setStatus(StatusCooperado.ATIVO);
         Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "WITH usuario_novo AS (" + usuarioDAO.sqlInserirUsuario() + "), " +
-                "cooperado_novo AS (INSERT INTO cooperado " +
+        String sqlCooperado = "INSERT INTO cooperado " +
                 "(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo, status) " +
-                "SELECT ?, u.id_usuario, ?, ?, ?, ? FROM usuario_novo u " +
-                "RETURNING id_cooperado, id_usuario), " +
-                "atividades_novas AS (INSERT INTO cooperado_atividade (id_cooperado, atividade) " +
-                "SELECT c.id_cooperado, a.atividade FROM cooperado_novo c " +
-                "CROSS JOIN unnest(?::varchar[]) AS a(atividade) RETURNING id_cooperado), " +
-                "permissoes_novas AS (INSERT INTO cooperado_permissao (id_cooperado, id_permissao) " +
-                "SELECT c.id_cooperado, p.id_permissao FROM cooperado_novo c " +
-                "CROSS JOIN permissao p WHERE ? OR p.id_permissao = ANY (?::bigint[]) " +
-                "RETURNING id_cooperado) " +
-                "SELECT c.id_usuario, (SELECT COUNT(*) FROM atividades_novas) AS total_atividades, " +
-                "(SELECT COUNT(*) FROM permissoes_novas) AS total_permissoes FROM cooperado_novo c";
-
-        // Executar PreparedStatement
-
-        try {
-            ArrayList<Long> catalogoPermissoes = listarIdsPermissoes(conexao);
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        try (PreparedStatement inserirUsuario = conexao.prepareStatement(usuarioDAO.sqlInserirUsuario());
+             PreparedStatement inserirCooperado = conexao.prepareStatement(sqlCooperado)) {
+            ArrayList<Long> catalogo = listarIdsPermissoes(conexao);
             if (cooperado.getCargoEnum() == CargoCooperado.GESTOR) {
-                cooperado.setPermissoes(catalogoPermissoes);
+                cooperado.setPermissoes(catalogo);
             } else if (new HashSet<>(permissoes).size() != permissoes.size()
-                    || !catalogoPermissoes.containsAll(permissoes)) {
+                    || !catalogo.containsAll(permissoes)) {
                 throw new IllegalArgumentException("Há permissões duplicadas ou inexistentes.");
             }
             long ultimoIdCooperado = utilitario.selecionarUltimoId("cooperado");
@@ -168,35 +139,32 @@ public class CooperadoDAO {
             }
             cooperado.setNomeUsuario(gerarNomeUsuario(conexao, cooperado.getNomeCompleto(), idUsuario));
             cooperado.setCodigoCooperado("CD-" + idCooperado);
-            try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-                usuarioDAO.preencherCadastro(pstmt, 1, idUsuario, cooperado);
-                pstmt.setLong(8, idCooperado);
-                pstmt.setLong(9, cooperado.getIdCooperativa());
-                pstmt.setString(10, cooperado.getCodigoCooperado());
-                if (cooperado.getCargoEnum() == null) {
-                    pstmt.setNull(11, Types.VARCHAR);
-                } else {
-                    pstmt.setString(11, cooperado.getCargoEnum().name());
-                }
-                pstmt.setString(12, cooperado.getStatusEnum().name());
-                ArrayList<String> nomesAtividades = new ArrayList<>();
-                for (AtividadeCooperado atividade : cooperado.getAtividadesCooperado()) {
-                    nomesAtividades.add(atividade.name());
-                }
-                pstmt.setArray(13, conexao.createArrayOf("varchar", nomesAtividades.toArray()));
-                boolean todasPermissoes = cooperado.getCargoEnum() == CargoCooperado.GESTOR;
-                pstmt.setBoolean(14, todasPermissoes);
-                pstmt.setArray(15, conexao.createArrayOf("bigint", permissoes.toArray()));
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (!rs.next()) {
-                        return null;
-                    }
-                    cooperado.setIdUsuario(rs.getLong("id_usuario"));
-                }
-                cooperado.setIdCooperado(idCooperado);
-                cooperado.setSenhaInicial(senhaInicial);
-                return cooperado;
+            usuarioDAO.preencherCadastro(inserirUsuario, 1, idUsuario, cooperado);
+            int linhas = inserirUsuario.executeUpdate();
+            if (linhas == 0) {
+                return 0;
             }
+            cooperado.setIdUsuario(idUsuario);
+            inserirCooperado.setLong(1, idCooperado);
+            inserirCooperado.setLong(2, idUsuario);
+            inserirCooperado.setLong(3, cooperado.getIdCooperativa());
+            inserirCooperado.setString(4, cooperado.getCodigoCooperado());
+            if (cooperado.getCargoEnum() == null) {
+                inserirCooperado.setNull(5, Types.VARCHAR);
+            } else {
+                inserirCooperado.setString(5, cooperado.getCargoEnum().name());
+            }
+            inserirCooperado.setString(6, cooperado.getStatusEnum().name());
+            int linhasCooperado = inserirCooperado.executeUpdate();
+            if (linhasCooperado == 0) {
+                throw new IllegalStateException("Cooperado não foi registrado após a conta.");
+            }
+            linhas += linhasCooperado;
+            cooperado.setIdCooperado(idCooperado);
+            linhas += selecionarAtividades(cooperado).size();
+            linhas += permissoesAcesso(cooperado);
+            cooperado.setSenhaInicial(senhaInicial);
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar cooperado.", e);
         } finally {
@@ -205,43 +173,30 @@ public class CooperadoDAO {
     }
 
     // Registra as atividades informadas para um cooperado existente.
-    public Cooperado selecionarAtividades(Cooperado cooperado) {
-
-        // Declaração
-
+    public ArrayList<AtividadeCooperado> selecionarAtividades(Cooperado cooperado) {
         if (cooperado == null || cooperado.getIdCooperado() == null) {
             throw new IllegalArgumentException("idCooperado é obrigatório.");
         }
-        if (cooperado.getAtividadesCooperado().isEmpty()) {
-            return null;
+        ArrayList<AtividadeCooperado> atividades = cooperado.getAtividadesCooperado();
+        if (atividades.isEmpty()) {
+            return atividades;
+        }
+        for (AtividadeCooperado atividade : atividades) {
+            if (atividade == null) {
+                throw new IllegalArgumentException("Atividade do cooperado é obrigatória.");
+            }
         }
         Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        StringBuilder sql = new StringBuilder("INSERT INTO cooperado_atividade " +
-                "(id_cooperado, atividade) VALUES ");
-        for (int i = 0; i < cooperado.getAtividadesCooperado().size(); i++) {
-            if (i > 0) {
-                sql.append(", ");
+        String sql = "INSERT INTO cooperado_atividade (id_cooperado, atividade) VALUES (?, ?)";
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            for (AtividadeCooperado atividade : atividades) {
+                pstmt.setLong(1, cooperado.getIdCooperado());
+                pstmt.setString(2, atividade.name());
+                if (pstmt.executeUpdate() == 0) {
+                    throw new IllegalStateException("Atividade do cooperado não foi registrada.");
+                }
             }
-            sql.append("(?, ?)");
-        }
-
-        // Executar PreparedStatement
-
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql.toString())) {
-            int indice = 1;
-            for (AtividadeCooperado atividade : cooperado.getAtividadesCooperado()) {
-                pstmt.setLong(indice, cooperado.getIdCooperado());
-                indice++;
-                pstmt.setString(indice, atividade.name());
-                indice++;
-            }
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return cooperado;
+            return atividades;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar atividades do cooperado.", e);
         } finally {
@@ -250,55 +205,33 @@ public class CooperadoDAO {
     }
 
     // Registra as permissões selecionadas para um cooperado.
-    public Cooperado permissoesAcesso(Cooperado cooperado) {
-
-        // Declaração
-
+    public int permissoesAcesso(Cooperado cooperado) {
         if (cooperado == null || cooperado.getIdCooperado() == null) {
             throw new IllegalArgumentException("idCooperado é obrigatório.");
         }
-        ArrayList<Long> idsPermissoes = cooperado.getPermissoes();
-        ArrayList<Long> vinculos = new ArrayList<>();
-        for (Long idPermissao : idsPermissoes) {
+        ArrayList<Long> permissoes = cooperado.getPermissoes();
+        if (permissoes.isEmpty()) {
+            return 0;
+        }
+        for (Long idPermissao : permissoes) {
             if (idPermissao == null) {
                 throw new IllegalArgumentException("idPermissao é obrigatório.");
             }
-            vinculos.add(idPermissao);
-        }
-        if (vinculos.isEmpty()) {
-            return null;
         }
         Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        StringBuilder sql = new StringBuilder("INSERT INTO cooperado_permissao " +
-                "(id_cooperado, id_permissao) VALUES ");
-        for (int i = 0; i < vinculos.size(); i++) {
-            if (i > 0) {
-                sql.append(", ");
+        String sql = "INSERT INTO cooperado_permissao (id_cooperado, id_permissao) VALUES (?, ?)";
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            int linhas = 0;
+            for (Long idPermissao : permissoes) {
+                pstmt.setLong(1, cooperado.getIdCooperado());
+                pstmt.setLong(2, idPermissao);
+                int alteradas = pstmt.executeUpdate();
+                if (alteradas == 0) {
+                    throw new IllegalStateException("Permissão do cooperado não foi registrada.");
+                }
+                linhas += alteradas;
             }
-            sql.append("(?, ?)");
-        }
-
-        // Executar PreparedStatement
-
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql.toString())) {
-            int indice = 1;
-            for (Long idPermissao : vinculos) {
-                pstmt.setLong(indice, cooperado.getIdCooperado());
-                indice++;
-                pstmt.setLong(indice, idPermissao);
-                indice++;
-            }
-            int linhas = pstmt.executeUpdate();
-            if (linhas == 0) {
-                return null;
-            }
-            if (linhas != vinculos.size()) {
-                throw new IllegalStateException("Nem todas as permissões foram registradas.");
-            }
-            return cooperado;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar permissões do cooperado.", e);
         } finally {
@@ -519,53 +452,69 @@ public class CooperadoDAO {
 
     // === METODOS UPDATE ==============================================================================================
 
-    // Atualiza os dados de um cooperado identificado.
-    public Cooperado editarCooperado(Cooperado cooperado) {
-
-        // Declaração
-
+    // Atualiza dados, permissões de gestor e atividades do cooperado em um comando.
+    public int editarCooperado(Cooperado cooperado) {
         if (cooperado == null || cooperado.getIdCooperado() == null
                 || cooperado.getIdCooperativa() == null || cooperado.getStatusEnum() == null
                 || cooperado.getNomeCompleto() == null || cooperado.getEmail() == null) {
             throw new IllegalArgumentException("ID, cooperativa e status são obrigatórios.");
         }
-        Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "WITH cooperado_atualizado AS (" +
-                "UPDATE cooperado SET id_cooperativa = ?, cargo = ?, status = ? " +
-                "WHERE id_cooperado = ? RETURNING id_cooperado, id_usuario), " +
-                "usuario_atualizado AS (UPDATE usuario SET nome_completo = ?, email = ? " +
-                "WHERE id_usuario IN (SELECT id_usuario FROM cooperado_atualizado) " +
-                "RETURNING id_usuario), " +
-                "permissoes_gestor AS (INSERT INTO cooperado_permissao (id_cooperado, id_permissao) " +
-                "SELECT c.id_cooperado, p.id_permissao FROM cooperado_atualizado c " +
-                "CROSS JOIN permissao p WHERE ? ON CONFLICT DO NOTHING RETURNING id_cooperado) " +
-                "SELECT c.id_usuario, (SELECT COUNT(*) FROM permissoes_gestor) AS permissoes_novas " +
-                "FROM cooperado_atualizado c JOIN usuario_atualizado u ON c.id_usuario = u.id_usuario";
-
-        // Executar PreparedStatement
-
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1, cooperado.getIdCooperativa());
-            if (cooperado.getCargoEnum() == null) {
-                pstmt.setNull(2, Types.VARCHAR);
-            } else {
-                pstmt.setString(2, cooperado.getCargoEnum().name());
+        for (AtividadeCooperado atividade : cooperado.getAtividadesCooperado()) {
+            if (atividade == null) {
+                throw new IllegalArgumentException("Atividade do cooperado é obrigatória.");
             }
-            pstmt.setString(3, cooperado.getStatusEnum().name());
-            pstmt.setLong(4, cooperado.getIdCooperado());
-            pstmt.setString(5, cooperado.getNomeCompleto());
-            pstmt.setString(6, cooperado.getEmail());
-            pstmt.setBoolean(7, cooperado.getCargoEnum() == CargoCooperado.GESTOR);
-            try (ResultSet rs = pstmt.executeQuery()) {
+        }
+        Connection conexao = conn.conectar();
+        String sqlUsuario = "SELECT id_usuario FROM cooperado WHERE id_cooperado = ?";
+        String sqlCooperado = "UPDATE cooperado SET id_cooperativa = ?, cargo = ?, status = ? " +
+                "WHERE id_cooperado = ?";
+        String sqlAlterarUsuario = "UPDATE usuario SET nome_completo = ?, email = ? " +
+                "WHERE id_usuario = ?";
+        String sqlExcluirAtividades = "DELETE FROM cooperado_atividade WHERE id_cooperado = ?";
+        try (PreparedStatement buscar = conexao.prepareStatement(sqlUsuario);
+             PreparedStatement alterar = conexao.prepareStatement(sqlCooperado);
+             PreparedStatement alterarUsuario = conexao.prepareStatement(sqlAlterarUsuario);
+             PreparedStatement excluirAtividades = conexao.prepareStatement(sqlExcluirAtividades)) {
+            buscar.setLong(1, cooperado.getIdCooperado());
+            try (ResultSet rs = buscar.executeQuery()) {
                 if (!rs.next()) {
-                    return null;
+                    return 0;
                 }
                 cooperado.setIdUsuario(rs.getLong("id_usuario"));
             }
-            return cooperado;
+            alterar.setLong(1, cooperado.getIdCooperativa());
+            if (cooperado.getCargoEnum() == null) {
+                alterar.setNull(2, Types.VARCHAR);
+            } else {
+                alterar.setString(2, cooperado.getCargoEnum().name());
+            }
+            alterar.setString(3, cooperado.getStatusEnum().name());
+            alterar.setLong(4, cooperado.getIdCooperado());
+            int linhas = alterar.executeUpdate();
+            if (linhas == 0) {
+                return 0;
+            }
+            alterarUsuario.setString(1, cooperado.getNomeCompleto());
+            alterarUsuario.setString(2, cooperado.getEmail());
+            alterarUsuario.setLong(3, cooperado.getIdUsuario());
+            int linhasUsuario = alterarUsuario.executeUpdate();
+            if (linhasUsuario == 0) {
+                throw new IllegalStateException("Usuário do cooperado não foi atualizado.");
+            }
+            linhas += linhasUsuario;
+            if (cooperado.getCargoEnum() == CargoCooperado.GESTOR) {
+                ArrayList<Long> catalogo = listarIdsPermissoes(conexao);
+                ArrayList<Long> atuais = listarPermissoes(conexao, cooperado.getIdCooperado());
+                catalogo.removeAll(atuais);
+                Cooperado vinculos = new Cooperado();
+                vinculos.setIdCooperado(cooperado.getIdCooperado());
+                vinculos.setPermissoes(catalogo);
+                linhas += permissoesAcesso(vinculos);
+            }
+            excluirAtividades.setLong(1, cooperado.getIdCooperado());
+            linhas += excluirAtividades.executeUpdate();
+            linhas += selecionarAtividades(cooperado).size();
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao editar cooperado.", e);
         } finally {
@@ -574,29 +523,12 @@ public class CooperadoDAO {
     }
 
     // Altera o cargo de um cooperado existente.
-    public Cooperado alterarCargoCooperado(Cooperado cooperado) {
-
-        // Declaração
-
+    public int alterarCargoCooperado(Cooperado cooperado) {
         if (cooperado == null || cooperado.getIdCooperado() == null) {
             throw new IllegalArgumentException("idCooperado é obrigatório.");
         }
         Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "WITH cargo_atualizado AS (" +
-                "UPDATE cooperado SET cargo = ? WHERE id_cooperado = ? " +
-                "RETURNING id_cooperado), permissoes_novas AS (" +
-                "INSERT INTO cooperado_permissao (id_cooperado, id_permissao) " +
-                "SELECT c.id_cooperado, p.id_permissao FROM cargo_atualizado c " +
-                "CROSS JOIN permissao p WHERE ? ON CONFLICT DO NOTHING " +
-                "RETURNING id_cooperado) SELECT c.id_cooperado, " +
-                "(SELECT COUNT(*) FROM permissoes_novas) AS total_permissoes " +
-                "FROM cargo_atualizado c";
-
-        // Executar PreparedStatement
-
+        String sql = "UPDATE cooperado SET cargo = ? WHERE id_cooperado = ?";
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             if (cooperado.getCargoEnum() == null) {
                 pstmt.setNull(1, Types.VARCHAR);
@@ -604,13 +536,17 @@ public class CooperadoDAO {
                 pstmt.setString(1, cooperado.getCargoEnum().name());
             }
             pstmt.setLong(2, cooperado.getIdCooperado());
-            pstmt.setBoolean(3, cooperado.getCargoEnum() == CargoCooperado.GESTOR);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (!rs.next()) {
-                    return null;
-                }
+            int linhas = pstmt.executeUpdate();
+            if (linhas > 0 && cooperado.getCargoEnum() == CargoCooperado.GESTOR) {
+                ArrayList<Long> catalogo = listarIdsPermissoes(conexao);
+                ArrayList<Long> atuais = listarPermissoes(conexao, cooperado.getIdCooperado());
+                catalogo.removeAll(atuais);
+                Cooperado vinculos = new Cooperado();
+                vinculos.setIdCooperado(cooperado.getIdCooperado());
+                vinculos.setPermissoes(catalogo);
+                linhas += permissoesAcesso(vinculos);
             }
-            return cooperado;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao alterar cargo do cooperado.", e);
         } finally {
@@ -618,42 +554,8 @@ public class CooperadoDAO {
         }
     }
 
-    // Substitui a seleção de atividades do cooperado.
-    public Cooperado alterarAtividadesDesempenhadas(Cooperado cooperado) {
-
-        // Declaração
-
-        if (cooperado == null || cooperado.getIdCooperado() == null) {
-            throw new IllegalArgumentException("idCooperado é obrigatório.");
-        }
-        Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sqlExcluir = "DELETE FROM cooperado_atividade WHERE id_cooperado = ?";
-        String sqlInserir = "INSERT INTO cooperado_atividade (id_cooperado, atividade) VALUES (?, ?)";
-
-        // Executar PreparedStatement
-
-        try (PreparedStatement excluir = conexao.prepareStatement(sqlExcluir);
-             PreparedStatement inserir = conexao.prepareStatement(sqlInserir)) {
-            excluir.setLong(1, cooperado.getIdCooperado());
-            excluir.executeUpdate();
-            for (AtividadeCooperado atividade : cooperado.getAtividadesCooperado()) {
-                inserir.setLong(1, cooperado.getIdCooperado());
-                inserir.setString(2, atividade.name());
-                inserir.executeUpdate();
-            }
-            return cooperado;
-        } catch (SQLException e) {
-            throw new RuntimeException("Falha ao alterar atividade do cooperado.", e);
-        } finally {
-            conn.desconectar(conexao);
-        }
-    }
-
     // Altera o status de um cooperado existente.
-    public Cooperado alterarStatusCooperado(Cooperado cooperado) {
+    public int alterarStatusCooperado(Cooperado cooperado) {
 
         // Declaração
 
@@ -672,10 +574,7 @@ public class CooperadoDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, cooperado.getStatusEnum().name());
             pstmt.setLong(2, cooperado.getIdCooperado());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return cooperado;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao alterar status do cooperado.", e);
         } finally {
@@ -684,7 +583,7 @@ public class CooperadoDAO {
     }
 
     // Altera a permissão vinculada ao cooperado identificado.
-    public Cooperado alterarPermissoesAcesso(CooperadoPermissao anterior,
+    public int alterarPermissoesAcesso(CooperadoPermissao anterior,
                                              CooperadoPermissao nova) {
 
         // Declaração
@@ -695,11 +594,6 @@ public class CooperadoDAO {
                 || !anterior.getIdCooperado().equals(nova.getIdCooperado())) {
             throw new IllegalArgumentException("Vínculos de permissão são obrigatórios.");
         }
-        Cooperado cooperado = new Cooperado();
-        cooperado.setIdCooperado(nova.getIdCooperado());
-        ArrayList<Long> vinculos = new ArrayList<>();
-        vinculos.add(nova.getIdPermissao());
-        cooperado.setPermissoes(vinculos);
         Connection conexao = conn.conectar();
 
         // Comando SQL
@@ -716,10 +610,7 @@ public class CooperadoDAO {
             pstmt.setLong(2, nova.getIdCooperado());
             pstmt.setLong(3, anterior.getIdPermissao());
             pstmt.setLong(4, nova.getIdCooperado());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return cooperado;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao alterar permissão do cooperado.", e);
         } finally {
@@ -728,34 +619,17 @@ public class CooperadoDAO {
     }
 
     // Altera o nome de usuário de uma conta existente.
-    public Cooperado alterarNomeUsuario(Cooperado cooperado) {
-
-        // Execução e retorno
-
-        model.auxiliares.Usuario usuario = usuarioDAO.alterarNomeUsuario(cooperado);
-        if (usuario == null) {
-            return null;
-        }
-        cooperado.setNomeUsuario(usuario.getNomeUsuario());
-        return cooperado;
+    public int alterarNomeUsuario(Cooperado cooperado) {
+        return usuarioDAO.alterarNomeUsuario(cooperado);
     }
 
     // Atualiza senha e indicador de senha temporária.
-    public Cooperado alterarSenha(Cooperado cooperado) {
-
-        // Execução e retorno
-
-        model.auxiliares.Usuario usuario = usuarioDAO.alterarSenha(cooperado);
-        if (usuario == null) {
-            return null;
-        }
-        cooperado.setSenhaHash(usuario.getSenhaHash());
-        cooperado.setSenhaTemporaria(usuario.isSenhaTemporaria());
-        return cooperado;
+    public int alterarSenha(Cooperado cooperado) {
+        return usuarioDAO.alterarSenha(cooperado);
     }
 
     // Gera uma nova senha temporária para a conta vinculada ao cooperado.
-    public String redefinirSenha(Cooperado cooperado) {
+    public int redefinirSenha(Cooperado cooperado) {
         if (cooperado == null || cooperado.getIdCooperado() == null) {
             throw new IllegalArgumentException("idCooperado é obrigatório.");
         }
@@ -768,10 +642,13 @@ public class CooperadoDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, hash);
             pstmt.setLong(2, cooperado.getIdCooperado());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
+            int linhas = pstmt.executeUpdate();
+            if (linhas > 0) {
+                cooperado.setSenhaHash(hash);
+                cooperado.setSenhaTemporaria(true);
+                cooperado.setSenhaInicial(senha);
             }
-            return senha;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao redefinir senha do cooperado.", e);
         } finally {
@@ -780,7 +657,7 @@ public class CooperadoDAO {
     }
 
     // Marca o cooperado como inativo sem apagar seu histórico.
-    public Cooperado inativarCooperado(Cooperado cooperado) {
+    public int inativarCooperado(Cooperado cooperado) {
         if (cooperado == null) {
             throw new IllegalArgumentException("cooperado é obrigatório.");
         }
@@ -790,40 +667,33 @@ public class CooperadoDAO {
 
     // === METODOS DELETE ==============================================================================================
 
-    // Exclui cooperado e conta associada em um único comando SQL.
-    public Cooperado excluirCooperado(Cooperado cooperado) {
-
-        // Declaração
-
+    // Exclui cooperado e conta associada em comandos separados.
+    public int excluirCooperado(Cooperado cooperado) {
         if (cooperado == null || cooperado.getIdCooperado() == null) {
             throw new IllegalArgumentException("idCooperado é obrigatório.");
         }
         Connection conexao = conn.conectar();
-
-        // Comando SQL
-
-        String sql = "WITH alvo AS (" +
-                "SELECT c.id_cooperado, c.id_usuario FROM cooperado c " +
-                "JOIN usuario u ON u.id_usuario = c.id_usuario WHERE c.id_cooperado = ?), " +
-                "cooperado_apagado AS (" +
-                "DELETE FROM cooperado WHERE id_cooperado IN " +
-                "(SELECT id_cooperado FROM alvo) RETURNING id_usuario), " +
-                "usuario_apagado AS (" +
-                "DELETE FROM usuario WHERE id_usuario IN " +
-                "(SELECT id_usuario FROM cooperado_apagado) RETURNING id_usuario) " +
-                "SELECT id_usuario FROM usuario_apagado";
-
-        // Executar PreparedStatement
-
-        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1, cooperado.getIdCooperado());
-            try (ResultSet rs = pstmt.executeQuery()) {
+        String sqlBuscar = "SELECT id_usuario FROM cooperado WHERE id_cooperado = ?";
+        String sqlExcluir = "DELETE FROM cooperado WHERE id_cooperado = ?";
+        try (PreparedStatement buscar = conexao.prepareStatement(sqlBuscar);
+             PreparedStatement excluir = conexao.prepareStatement(sqlExcluir)) {
+            buscar.setLong(1, cooperado.getIdCooperado());
+            try (ResultSet rs = buscar.executeQuery()) {
                 if (!rs.next()) {
-                    return null;
+                    return 0;
                 }
                 cooperado.setIdUsuario(rs.getLong("id_usuario"));
             }
-            return cooperado;
+            excluir.setLong(1, cooperado.getIdCooperado());
+            int linhas = excluir.executeUpdate();
+            if (linhas == 0) {
+                return 0;
+            }
+            int linhasUsuario = usuarioDAO.excluirUsuario(conexao, cooperado.getIdUsuario());
+            if (linhasUsuario == 0) {
+                throw new IllegalStateException("Conta do cooperado não foi excluída.");
+            }
+            return linhas + linhasUsuario;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir cooperado.", e);
         } finally {
@@ -832,7 +702,7 @@ public class CooperadoDAO {
     }
 
     // Remove uma permissão específica de um cooperado.
-    public Cooperado removerAcessoModulo(CooperadoPermissao vinculo) {
+    public int removerAcessoModulo(CooperadoPermissao vinculo) {
 
         // Declaração
 
@@ -840,8 +710,6 @@ public class CooperadoDAO {
                 || vinculo.getIdPermissao() == null) {
             throw new IllegalArgumentException("Vínculo de permissão é obrigatório.");
         }
-        Cooperado cooperado = new Cooperado();
-        cooperado.setIdCooperado(vinculo.getIdCooperado());
         Connection conexao = conn.conectar();
 
         // Comando SQL
@@ -853,13 +721,10 @@ public class CooperadoDAO {
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1, cooperado.getIdCooperado());
+            pstmt.setLong(1, vinculo.getIdCooperado());
             pstmt.setLong(2, vinculo.getIdPermissao());
-            pstmt.setLong(3, cooperado.getIdCooperado());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return cooperado;
+            pstmt.setLong(3, vinculo.getIdCooperado());
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao remover acesso do cooperado.", e);
         } finally {

@@ -26,7 +26,7 @@ public class NegociacaoDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Registra uma proposta da cooperativa para a negociação informada.
-    public PropostaNegociacao fazerContraproposta(PropostaNegociacao proposta) {
+    public int fazerContraproposta(PropostaNegociacao proposta) {
 
         // Declaração
 
@@ -59,10 +59,7 @@ public class NegociacaoDAO {
             pstmt.setBigDecimal(4, proposta.getValorKg());
             pstmt.setBigDecimal(5, proposta.getQuantidadeKg());
             pstmt.setString(6, proposta.getObservacoes());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return proposta;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar contraproposta da cooperativa.", e);
         } finally {
@@ -169,20 +166,12 @@ public class NegociacaoDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Aceita a proposta identificada e registra sua conclusão.
-    public Negociacao aceitarProposta(Negociacao negociacao) {
-
-        // Declaração
-
-        // Execução e retorno
-
-        if (atualizarStatusFinal(negociacao, StatusNegociacao.ACEITA) == 0) {
-            return null;
-        }
-        return negociacao;
+    public int aceitarProposta(Negociacao negociacao) {
+        return atualizarStatusFinal(negociacao, StatusNegociacao.ACEITA);
     }
 
     // Atualiza o valor de uma negociação em andamento.
-    public Negociacao enviarContraProposta(Negociacao negociacao) {
+    public int enviarContraProposta(Negociacao negociacao) {
 
         // Declaração
 
@@ -202,10 +191,7 @@ public class NegociacaoDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setBigDecimal(1, negociacao.getValorKgAtual());
             pstmt.setLong(2, negociacao.getIdNegociacao());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return negociacao;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar contraproposta.", e);
         } finally {
@@ -214,7 +200,7 @@ public class NegociacaoDAO {
     }
 
     // Registra a decisão sobre uma oferta em negociação.
-    public Negociacao decisaoDeOferta(Negociacao negociacao) {
+    public int decisaoDeOferta(Negociacao negociacao) {
 
         // Declaração
 
@@ -225,10 +211,7 @@ public class NegociacaoDAO {
                 negociacao.getStatus() == StatusNegociacao.RECUSADA ||
                 negociacao.getStatus() == StatusNegociacao.CANCELADA ||
                 negociacao.getStatus() == StatusNegociacao.CONCLUIDA) {
-            if (atualizarStatusFinal(negociacao, negociacao.getStatus()) == 0) {
-                return null;
-            }
-            return negociacao;
+            return atualizarStatusFinal(negociacao, negociacao.getStatus());
         }
         if (negociacao.getIdNegociacao() == null) {
             throw new IllegalArgumentException("idNegociacao é obrigatório.");
@@ -245,10 +228,7 @@ public class NegociacaoDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, negociacao.getStatus().name());
             pstmt.setLong(2, negociacao.getIdNegociacao());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return negociacao;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar decisão da oferta.", e);
         } finally {
@@ -257,29 +237,13 @@ public class NegociacaoDAO {
     }
 
     // Recusa a proposta preservando seu histórico.
-    public Negociacao recusarProposta(Negociacao negociacao) {
-
-        // Declaração
-
-        // Execução e retorno
-
-        if (atualizarStatusFinal(negociacao, StatusNegociacao.RECUSADA) == 0) {
-            return null;
-        }
-        return negociacao;
+    public int recusarProposta(Negociacao negociacao) {
+        return atualizarStatusFinal(negociacao, StatusNegociacao.RECUSADA);
     }
 
     // Cancela a negociação preservando seu histórico.
-    public Negociacao cancelarNegociacao(Negociacao negociacao) {
-
-        // Declaração
-
-        // Execução e retorno
-
-        if (atualizarStatusFinal(negociacao, StatusNegociacao.CANCELADA) == 0) {
-            return null;
-        }
-        return negociacao;
+    public int cancelarNegociacao(Negociacao negociacao) {
+        return atualizarStatusFinal(negociacao, StatusNegociacao.CANCELADA);
     }
 
     // Atualiza um status final e sua data obrigatória de conclusão.

@@ -156,7 +156,7 @@ public class ColetaServlet extends HttpServlet {
                 Coleta alteracao = new Coleta();
                 alteracao.setIdColeta(id);
                 alteracao.setStatus(StatusColeta.EM_ANDAMENTO);
-                if (coletaDAO.atualizarStatus(alteracao) == null) {
+                if (coletaDAO.atualizarStatus(alteracao) == 0) {
                     response.sendError(HttpServletResponse.SC_CONFLICT,
                             "Não foi possível iniciar esta coleta.");
                     return;
@@ -169,7 +169,7 @@ public class ColetaServlet extends HttpServlet {
                 Coleta alteracao = new Coleta();
                 alteracao.setIdColeta(id);
                 alteracao.setStatus(StatusColeta.CONCLUIDA);
-                if (coletaDAO.atualizarStatus(alteracao) == null) {
+                if (coletaDAO.atualizarStatus(alteracao) == 0) {
                     response.sendError(HttpServletResponse.SC_CONFLICT,
                             "Não foi possível finalizar esta coleta.");
                     return;
@@ -181,7 +181,7 @@ public class ColetaServlet extends HttpServlet {
                 Long id = Long.parseLong(request.getParameter("id"));
                 Coleta cancelamento = new Coleta();
                 cancelamento.setIdColeta(id);
-                if (coletaDAO.excluirColeta(cancelamento) == null) {
+                if (coletaDAO.excluirColeta(cancelamento) == 0) {
                     response.sendError(HttpServletResponse.SC_CONFLICT,
                             "Não foi possível cancelar esta coleta.");
                     return;
@@ -201,7 +201,7 @@ public class ColetaServlet extends HttpServlet {
 
                 Coleta exclusao = new Coleta();
                 exclusao.setIdColeta(id);
-                if (coletaDAO.apagarColeta(exclusao) == null) {
+                if (coletaDAO.apagarColeta(exclusao) == 0) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND,
                             "Coleta não encontrada.");
                     return;
@@ -305,7 +305,7 @@ public class ColetaServlet extends HttpServlet {
             itens.add(item);
         }
         coleta.getRelacionamentos().setMateriaisColetados(itens);
-        if (coletaDAO.cadastrarColeta(coleta) == null) {
+        if (coletaDAO.cadastrarColeta(coleta) == 0) {
             throw new IllegalStateException("Não foi possível cadastrar a coleta.");
         }
     }

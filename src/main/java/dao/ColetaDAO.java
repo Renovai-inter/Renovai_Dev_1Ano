@@ -30,7 +30,7 @@ public class ColetaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma coleta com os dados informados na Model.
-    public Coleta cadastrarColeta(Coleta coleta) {
+    public int cadastrarColeta(Coleta coleta) {
 
         // Declaração
 
@@ -58,15 +58,12 @@ public class ColetaDAO {
 
         // Comando SQL
 
-        String sql = "WITH coleta_nova AS (INSERT INTO coleta (id_coleta, id_cooperativa, tipo, status, id_rota, " +
+        String sql = "INSERT INTO coleta (id_coleta, id_cooperativa, tipo, status, id_rota, " +
                 "id_endereco_rota, id_cooperado_responsavel, origem_entrega, nome_local_origem, " +
                 "data_agendada, data_inicio, data_fim, peso_total_kg, observacoes) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING id_coleta), " +
-                "materiais_novos AS (INSERT INTO coleta_material (id_coleta, id_material, quantidade_kg) " +
-                "SELECT c.id_coleta, m.id_material, m.quantidade_kg FROM coleta_nova c " +
-                "CROSS JOIN unnest(?::bigint[], ?::numeric[]) AS m(id_material, quantidade_kg) " +
-                "RETURNING id_coleta) SELECT c.id_coleta FROM coleta_nova c " +
-                "CROSS JOIN (SELECT COUNT(*) FROM materiais_novos) total";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sqlMaterial = "INSERT INTO coleta_material (id_coleta, id_material, quantidade_kg) " +
+                "VALUES (?, ?, ?)";
 
         // Executar PreparedStatement
 
@@ -100,24 +97,25 @@ public class ColetaDAO {
             }
             pstmt.setBigDecimal(13, coleta.getPesoTotalKg());
             pstmt.setString(14, coleta.getObservacoes());
-            Long[] idsMateriais = new Long[materiais.size()];
-            BigDecimal[] quantidades = new BigDecimal[materiais.size()];
-            for (int i = 0; i < materiais.size(); i++) {
-                idsMateriais[i] = materiais.get(i).getIdMaterial();
-                quantidades[i] = materiais.get(i).getQuantidadeKg();
+            int linhas = pstmt.executeUpdate();
+            if (linhas == 0) {
+                return 0;
             }
-            pstmt.setArray(15, conexao.createArrayOf("bigint", idsMateriais));
-            pstmt.setArray(16, conexao.createArrayOf("numeric", quantidades));
-            try (ResultSet rs = pstmt.executeQuery()) {
-                if (!rs.next()) {
-                    return null;
+            coleta.setIdColeta(idColeta);
+            try (PreparedStatement pstmtMaterial = conexao.prepareStatement(sqlMaterial)) {
+                for (ColetaMaterial item : materiais) {
+                    pstmtMaterial.setLong(1, idColeta);
+                    pstmtMaterial.setLong(2, item.getIdMaterial());
+                    pstmtMaterial.setBigDecimal(3, item.getQuantidadeKg());
+                    int linhasMaterial = pstmtMaterial.executeUpdate();
+                    if (linhasMaterial == 0) {
+                        throw new IllegalStateException("Material da coleta não foi registrado.");
+                    }
+                    item.setIdColeta(idColeta);
+                    linhas += linhasMaterial;
                 }
-                coleta.setIdColeta(rs.getLong("id_coleta"));
             }
-            for (ColetaMaterial item : materiais) {
-                item.setIdColeta(coleta.getIdColeta());
-            }
-            return coleta;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar coleta.", e);
         } finally {
@@ -126,7 +124,7 @@ public class ColetaDAO {
     }
 
     // Cadastra uma entrega recebida na cooperativa.
-    public Coleta registroNaCooperativa(Coleta coleta) {
+    public int registroNaCooperativa(Coleta coleta) {
 
         // Execução e retorno
 
@@ -138,7 +136,7 @@ public class ColetaDAO {
     }
 
     // Registra a quantidade de um material vinculado à coleta.
-    public Coleta quantidadeTipoMaterial(ColetaMaterial item) {
+    public int quantidadeTipoMaterial(ColetaMaterial item) {
 
         // Declaração
 
@@ -146,11 +144,6 @@ public class ColetaDAO {
                 || item.getQuantidadeKg() == null) {
             throw new IllegalArgumentException("Dados do material da coleta são obrigatórios.");
         }
-        Coleta coleta = new Coleta();
-        coleta.setIdColeta(item.getIdColeta());
-        ArrayList<ColetaMaterial> itens = new ArrayList<>();
-        itens.add(item);
-        coleta.getRelacionamentos().setMateriaisColetados(itens);
         Connection conexao = conn.conectar();
 
         // Comando SQL
@@ -164,10 +157,7 @@ public class ColetaDAO {
             pstmt.setLong(1, item.getIdColeta());
             pstmt.setLong(2, item.getIdMaterial());
             pstmt.setBigDecimal(3, item.getQuantidadeKg());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return coleta;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao registrar material da coleta.", e);
         } finally {
@@ -355,7 +345,7 @@ public class ColetaDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza somente o status da coleta identificada.
-    public Coleta atualizarStatus(Coleta coleta) {
+    public int atualizarStatus(Coleta coleta) {
         if (coleta == null || coleta.getIdColeta() == null || coleta.getStatus() == null) {
             throw new IllegalArgumentException("ID e status são obrigatórios.");
         }
@@ -364,10 +354,7 @@ public class ColetaDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, coleta.getStatus().name());
             pstmt.setLong(2, coleta.getIdColeta());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return coleta;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao alterar status da coleta.", e);
         } finally {
@@ -376,7 +363,7 @@ public class ColetaDAO {
     }
 
     // Atualiza a origem de uma coleta existente.
-    public Coleta cadastrarOrigem(Coleta coleta) {
+    public int cadastrarOrigem(Coleta coleta) {
 
         // Declaração
 
@@ -395,10 +382,7 @@ public class ColetaDAO {
             pstmt.setString(1, coleta.getOrigemEntrega());
             pstmt.setString(2, coleta.getNomeLocalOrigem());
             pstmt.setLong(3, coleta.getIdColeta());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return coleta;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar a origem da coleta.", e);
         } finally {
@@ -407,7 +391,7 @@ public class ColetaDAO {
     }
 
     // Atualiza o peso total de uma coleta existente.
-    public Coleta registrarPesoTotal(Coleta coleta) {
+    public int registrarPesoTotal(Coleta coleta) {
 
         // Declaração
 
@@ -425,10 +409,7 @@ public class ColetaDAO {
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setBigDecimal(1, coleta.getPesoTotalKg());
             pstmt.setLong(2, coleta.getIdColeta());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return coleta;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar o peso da coleta.", e);
         } finally {
@@ -437,7 +418,7 @@ public class ColetaDAO {
     }
 
     // Inicia a coleta e registra o horário de início.
-    public Coleta iniciarColeta(Coleta coleta) {
+    public int iniciarColeta(Coleta coleta) {
 
         // Declaração
 
@@ -461,10 +442,7 @@ public class ColetaDAO {
             if (linhas > 0) {
                 coleta.setStatus(StatusColeta.EM_ANDAMENTO);
             }
-            if (linhas == 0) {
-                return null;
-            }
-            return coleta;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao iniciar coleta.", e);
         } finally {
@@ -473,7 +451,7 @@ public class ColetaDAO {
     }
 
     // Atualiza os dados de uma coleta identificada.
-    public Coleta atualizarColeta(Coleta coleta) {
+    public int atualizarColeta(Coleta coleta) {
 
         // Declaração
 
@@ -517,10 +495,7 @@ public class ColetaDAO {
             pstmt.setBigDecimal(8, coleta.getPesoTotalKg());
             pstmt.setString(9, coleta.getObservacoes());
             pstmt.setLong(10, coleta.getIdColeta());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return coleta;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar coleta.", e);
         } finally {
@@ -529,7 +504,7 @@ public class ColetaDAO {
     }
 
     // Finaliza a coleta com peso e horário de término.
-    public Coleta finalizarColeta(Coleta coleta) {
+    public int finalizarColeta(Coleta coleta) {
 
         // Declaração
 
@@ -553,10 +528,7 @@ public class ColetaDAO {
             if (linhas > 0) {
                 coleta.setStatus(StatusColeta.CONCLUIDA);
             }
-            if (linhas == 0) {
-                return null;
-            }
-            return coleta;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao finalizar coleta.", e);
         } finally {
@@ -565,29 +537,13 @@ public class ColetaDAO {
     }
 
     // Finaliza uma entrega feita diretamente na cooperativa.
-    public Coleta finalizacaoAutomatica(Coleta coleta) {
-
-        // Declaração
-
-        // Execução e retorno
-
-        if (concluirColeta(coleta) == 0) {
-            return null;
-        }
-        return coleta;
+    public int finalizacaoAutomatica(Coleta coleta) {
+        return concluirColeta(coleta);
     }
 
     // Encerra o acompanhamento de uma coleta finalizada.
-    public Coleta encerramentoRastreamento(Coleta coleta) {
-
-        // Declaração
-
-        // Execução e retorno
-
-        if (concluirColeta(coleta) == 0) {
-            return null;
-        }
-        return coleta;
+    public int encerramentoRastreamento(Coleta coleta) {
+        return concluirColeta(coleta);
     }
 
     // Atualiza apenas o status e a data de término.
@@ -625,7 +581,7 @@ public class ColetaDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Cancela uma coleta preservando o registro para o histórico.
-    public Coleta excluirColeta(Coleta coleta) {
+    public int excluirColeta(Coleta coleta) {
 
         // Declaração
 
@@ -647,10 +603,7 @@ public class ColetaDAO {
             if (linhas > 0) {
                 coleta.setStatus(StatusColeta.CANCELADA);
             }
-            if (linhas == 0) {
-                return null;
-            }
-            return coleta;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cancelar coleta.", e);
         } finally {
@@ -659,7 +612,7 @@ public class ColetaDAO {
     }
 
     // Apaga definitivamente a coleta identificada quando o banco permite.
-    public Coleta apagarColeta(Coleta coleta) {
+    public int apagarColeta(Coleta coleta) {
         if (coleta == null || coleta.getIdColeta() == null) {
             throw new IllegalArgumentException("idColeta é obrigatório.");
         }
@@ -667,10 +620,7 @@ public class ColetaDAO {
         String sql = "DELETE FROM coleta WHERE id_coleta = ?";
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, coleta.getIdColeta());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return coleta;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao apagar coleta.", e);
         } finally {

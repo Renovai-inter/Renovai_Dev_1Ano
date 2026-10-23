@@ -26,7 +26,7 @@ public class RotaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma rota vinculada à cooperativa.
-    public Rota cadastrarRota(Rota rota) {
+    public int cadastrarRota(Rota rota) {
 
         // Declaração
 
@@ -55,11 +55,10 @@ public class RotaDAO {
             pstmt.setLong(2, rota.getIdCooperativa());
             pstmt.setString(3, rota.getNomeRota());
             int linhas = pstmt.executeUpdate();
-            if (linhas == 0) {
-                return null;
+            if (linhas > 0) {
+                rota.setIdRota(novoIdRota);
             }
-            rota.setIdRota(novoIdRota);
-            return rota;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar rota.", e);
         } finally {
@@ -106,7 +105,7 @@ public class RotaDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza os dados da rota identificada pelo ID.
-    public Rota atualizarRota(Rota rota) {
+    public int atualizarRota(Rota rota) {
 
         // Declaração
 
@@ -127,10 +126,7 @@ public class RotaDAO {
             pstmt.setLong(1, rota.getIdCooperativa());
             pstmt.setString(2, rota.getNomeRota());
             pstmt.setLong(3, rota.getIdRota());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return rota;
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar rota.", e);
@@ -143,7 +139,7 @@ public class RotaDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui a rota identificada pelo ID.
-    public Rota excluirRota(Rota rota) {
+    public int excluirRota(Rota rota) {
 
         // Declaração
 
@@ -160,10 +156,7 @@ public class RotaDAO {
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, rota.getIdRota());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return rota;
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir rota.", e);

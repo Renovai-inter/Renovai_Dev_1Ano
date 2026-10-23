@@ -126,7 +126,7 @@ public class Cooperado extends Usuario {
         this.permissoes = new ArrayList<>(permissoes);
     }
 
-    // A senha gerada só acompanha o resultado do cadastro; não é persistida neste campo.
+    // A senha gerada fica no objeto recebido pela DAO; não é persistida neste campo.
     public String getSenhaInicial() { return senhaInicial; }
 
     public void setSenhaInicial(String senhaInicial) { this.senhaInicial = senhaInicial; }

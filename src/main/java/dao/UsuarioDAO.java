@@ -18,7 +18,7 @@ public class UsuarioDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma conta de usuário com os valores informados.
-    public Usuario cadastrarUsuario(Usuario usuario) {
+    public int cadastrarUsuario(Usuario usuario) {
         if (usuario == null || usuario.getNomeCompleto() == null
                 || usuario.getNomeUsuario() == null || usuario.getEmail() == null
                 || usuario.getSenhaHash() == null || usuario.getTipoUsuario() == null) {
@@ -36,13 +36,11 @@ public class UsuarioDAO {
             String sql = sqlInserirUsuario();
             try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
                 preencherCadastro(pstmt, 1, idUsuario, usuario);
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    if (!rs.next()) {
-                        return null;
-                    }
-                    usuario.setIdUsuario(rs.getLong("id_usuario"));
+                int linhas = pstmt.executeUpdate();
+                if (linhas > 0) {
+                    usuario.setIdUsuario(idUsuario);
                 }
-                return usuario;
+                return linhas;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar usuário.", e);
@@ -54,8 +52,7 @@ public class UsuarioDAO {
     // Fornece o mesmo cadastro de usuário às operações compostas.
     String sqlInserirUsuario() {
         return "INSERT INTO usuario (id_usuario, nome_completo, nome_usuario, senha_hash, " +
-                "senha_temporaria, email, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?, ?) " +
-                "RETURNING id_usuario";
+                "senha_temporaria, email, tipo_usuario) VALUES (?, ?, ?, ?, ?, ?, ?)";
     }
 
     // Preenche os campos do cadastro de usuário a partir do índice informado.
@@ -121,7 +118,7 @@ public class UsuarioDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza o nome de acesso de uma conta.
-    public Usuario alterarNomeUsuario(Usuario usuario) {
+    public int alterarNomeUsuario(Usuario usuario) {
         if (usuario == null || usuario.getIdUsuario() <= 0 || usuario.getNomeUsuario() == null) {
             throw new IllegalArgumentException("idUsuario é obrigatório.");
         }
@@ -130,17 +127,14 @@ public class UsuarioDAO {
              PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setString(1, usuario.getNomeUsuario());
             pstmt.setLong(2, usuario.getIdUsuario());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return usuario;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao alterar nome de usuário.", e);
         }
     }
 
     // Atualiza o hash e o indicador de senha temporária.
-    public Usuario alterarSenha(Usuario usuario) {
+    public int alterarSenha(Usuario usuario) {
         if (usuario == null || usuario.getIdUsuario() <= 0 || usuario.getSenhaHash() == null) {
             throw new IllegalArgumentException("idUsuario é obrigatório.");
         }
@@ -150,10 +144,7 @@ public class UsuarioDAO {
             pstmt.setString(1, usuario.getSenhaHash());
             pstmt.setBoolean(2, usuario.isSenhaTemporaria());
             pstmt.setLong(3, usuario.getIdUsuario());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return usuario;
+            return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao alterar senha.", e);
         }
@@ -162,7 +153,7 @@ public class UsuarioDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui somente a conta de usuário identificada.
-    public Usuario excluirUsuario(Usuario usuario) {
+    public int excluirUsuario(Usuario usuario) {
         if (usuario == null || usuario.getIdUsuario() <= 0) {
             throw new IllegalArgumentException("idUsuario é obrigatório.");
         }
@@ -177,16 +168,11 @@ public class UsuarioDAO {
     }
 
     // Exclui a conta na conexão da operação chamadora.
-    Usuario excluirUsuario(Connection conexao, Long idUsuario) throws SQLException {
-        Usuario usuario = new Usuario();
-        usuario.setIdUsuario(idUsuario);
+    int excluirUsuario(Connection conexao, Long idUsuario) throws SQLException {
         String sql = "DELETE FROM usuario WHERE id_usuario = ?";
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1, usuario.getIdUsuario());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return usuario;
+            pstmt.setLong(1, idUsuario);
+            return pstmt.executeUpdate();
         }
     }
 }

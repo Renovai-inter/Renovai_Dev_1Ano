@@ -26,7 +26,7 @@ public class MaterialDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra um material com os campos exigidos pelo esquema.
-    public Material cadastrarMaterial(Material material) {
+    public int cadastrarMaterial(Material material) {
 
         // Declaração
 
@@ -56,11 +56,10 @@ public class MaterialDAO {
             pstmt.setString(3, material.getCategoria());
             pstmt.setString(4, material.getOrigem());
             int linhas = pstmt.executeUpdate();
-            if (linhas == 0) {
-                return null;
+            if (linhas > 0) {
+                material.setIdMaterial(novoId);
             }
-            material.setIdMaterial(novoId);
-            return material;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar material.", e);
         } finally {
@@ -108,7 +107,7 @@ public class MaterialDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza os dados do material identificado pelo ID.
-    public Material atualizarMaterial(Material material) {
+    public int atualizarMaterial(Material material) {
 
         // Declaração
 
@@ -131,10 +130,7 @@ public class MaterialDAO {
             pstmt.setString(1, material.getNome());
             pstmt.setString(2, material.getCategoria());
             pstmt.setLong(3, material.getIdMaterial());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return material;
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar material.", e);
@@ -147,7 +143,7 @@ public class MaterialDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui o material identificado pelo ID.
-    public Material excluirMaterial(Material material) {
+    public int excluirMaterial(Material material) {
 
         // Declaração
 
@@ -164,10 +160,7 @@ public class MaterialDAO {
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, material.getIdMaterial());
-            if (pstmt.executeUpdate() == 0) {
-                return null;
-            }
-            return material;
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir material.", e);
