@@ -2,6 +2,7 @@ package controller;
 
 import dao.UsuarioDAO;
 import model.auxiliares.Usuario;
+import model.enums.TipoUsuario;
 import util.SenhaAPI;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -65,7 +66,7 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        if (!"ADMINISTRADOR".equals(usuario.getTipoUsuario())) {
+        if (usuario.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
             request.setAttribute("erro", "Esta área é restrita a administradores. Use o app do Renovaí.");
             request.setAttribute("email", email);
             request.getRequestDispatcher("/login.jsp").forward(request, response);
