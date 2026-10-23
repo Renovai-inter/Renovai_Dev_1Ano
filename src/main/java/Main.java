@@ -1,49 +1,39 @@
-import dao.CooperativaDAO;
-import dao.RotaDAO;
-import model.Rota;
+import util.ConexaoBD;
 
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.SQLException;
 
-// Classe MAIN para testar métodos
+// Classe Main para verificar a conexão com o banco sem usar Servlets.
 public class Main {
 
+    // Abre a conexão configurada e informa se ela está disponível.
     public static void main(String[] args) {
-
-        String PASSWORD = System.getenv("AVNS_boJSmYDug3Qhb3iq6XT");
-
-        System.out.println();
-
-        CooperativaDAO c = new CooperativaDAO();
-
-        Rota rota = new Rota();
-        rota.setIdCooperativa(4L);
-        rota.setNomeRota("Jordanésia - Santo André");
-        rota.setIdRota(8L);
-
-        RotaDAO rotaDAO = new RotaDAO();
-
-        //int resultado = rotaDAO.atualizarRota(rota);
-
-        ArrayList<Rota> rotas = rotaDAO.listarRotas();
-
-        //int resultado = rotaDAO.cadastrarRota(rota);
-
-        Rota resultado = rotaDAO.excluirRota(rota.getIdRota());
-
-        System.out.println("Resultado: "+ resultado);
-
-
-        for (Rota route : rotas) {
-            System.out.println("ID: " + route.getIdRota());
-            System.out.println("Cooperativa: " + route.getIdCooperativa());
-            System.out.println("Nome: " + route.getNomeRota());
+        if (System.getenv("DB_URL") == null || System.getenv("DB_USER") == null || System.getenv("DB_PASSWORD") == null) {
+            System.out.println("Teste de conexão indisponível: configure DB_URL, DB_USER e DB_PASSWORD.");
+            return;
         }
 
-        //System.out.println("Resultado: "+ resultado);
-
-        //System.out.println(c.getUltimoId());
-
-
+        try (Connection conexao = ConexaoBD.conectar()) {
+            if (conexao.isClosed()) {
+                System.out.println("Falha no teste de conexão: a conexão está fechada.");
+            } else {
+                System.out.println("Conexão com o banco estabelecida com sucesso.");
+            }
+        } catch (SQLException | RuntimeException e) {
+            System.out.println("Falha no teste de conexão com o banco.");
+            Throwable causa = e;
+            if (e.getCause() != null) {
+                causa = e.getCause();
+            }
+            Throwable origem = causa;
+            while (origem.getCause() != null) {
+                origem = origem.getCause();
+            }
+            if (causa instanceof SQLException) {
+                SQLException erroSql = (SQLException) causa;
+                System.out.println("Código SQLSTATE: " + erroSql.getSQLState());
+            }
+            System.out.println("Tipo de falha: " + origem.getClass().getSimpleName());
+        }
     }
-
 }

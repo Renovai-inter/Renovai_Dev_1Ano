@@ -1,12 +1,12 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.Negociacao, model.Movimentacao" %>
+<%@ page import="java.util.*, model.principais.Negociacao, model.auxiliares.Proposta" %>
 <%@ include file="negociacao-util.jspf" %>
 <%
     Negociacao negociacao = (Negociacao) request.getAttribute("negociacao");
-    ArrayList<Movimentacao> movimentacoes = (ArrayList<Movimentacao>) request.getAttribute("movimentacoes");
+    ArrayList<Proposta> movimentacoes = (ArrayList<Proposta>) request.getAttribute("movimentacoes");
     String erro = (String) request.getAttribute("erro");
 
-    if (movimentacoes == null) movimentacoes = new ArrayList<Movimentacao>();
+    if (movimentacoes == null) movimentacoes = new ArrayList<Proposta>();
 
     // destaca "Negociações" no menu
     request.setAttribute("menuAtivo", "negociacoes");

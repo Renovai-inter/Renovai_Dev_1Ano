@@ -6,8 +6,9 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.Movimentacao;
-import model.Negociacao;
+import model.auxiliares.Proposta;
+import model.enums.AutorNegociacao;
+import model.principais.Negociacao;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -20,8 +21,10 @@ import java.util.ArrayList;
 public class NegociacaoServlet extends HttpServlet {
 
     // Usados so se o servlet nao conseguir ler as opcoes da regra CHECK do banco
-    private static final String[] STATUS_PADRAO = {"Aguardando resposta", "Aceita", "Concluída", "Recusada", "Cancelada"};
-    private static final String[] AUTOR_PADRAO = {"Cooperativa", "Recicladora"};
+    private static final String[] STATUS_PADRAO = {"AGUARDANDO_RESPOSTA", "EM_NEGOCIACAO", "ACEITA", "RECUSADA", "CANCELADA", "CONCLUIDA"};
+    private static final String[] AUTOR_PADRAO = {
+            AutorNegociacao.COOPERATIVA.name(), AutorNegociacao.EMPRESA.name()
+    };
 
     private NegociacaoDAO dao = new NegociacaoDAO();
 
@@ -100,7 +103,11 @@ public class NegociacaoServlet extends HttpServlet {
 
         request.setAttribute("lista", dao.listarNegociacoes(statusFiltro));
         request.setAttribute("statusOpcoes", statusOpcoes());
-        request.setAttribute("statusFiltro", statusFiltro == null ? "" : statusFiltro);
+        String statusExibido = "";
+        if (statusFiltro != null) {
+            statusExibido = statusFiltro;
+        }
+        request.setAttribute("statusFiltro", statusExibido);
 
         request.getRequestDispatcher("/negociacao-lista.jsp").forward(request, response);
     }
@@ -113,20 +120,22 @@ public class NegociacaoServlet extends HttpServlet {
             return;
         }
 
-        Negociacao negociacao = dao.buscarNegociacaoPorId(id);
+        Negociacao filtro = new Negociacao();
+        filtro.setIdNegociacao(id);
+        Negociacao negociacao = dao.buscarNegociacaoPorId(filtro);
 
         if (negociacao == null) {
             response.sendRedirect("negociacao");
             return;
         }
 
-        ArrayList<Movimentacao> movimentacoes = dao.listarMovimentacoes(id);
+        ArrayList<Proposta> movimentacoes = dao.listarMovimentacoes(negociacao);
         marcarTipoFinal(movimentacoes, negociacao);
 
         request.setAttribute("negociacao", negociacao);
         request.setAttribute("movimentacoes", movimentacoes);
         request.setAttribute("totalMovimentacoes", movimentacoes.size());
-        request.setAttribute("temVenda", dao.possuiVenda(id));
+        request.setAttribute("temVenda", dao.possuiVenda(negociacao));
 
         request.getRequestDispatcher("/negociacao-ver.jsp").forward(request, response);
     }
@@ -151,14 +160,16 @@ public class NegociacaoServlet extends HttpServlet {
             return;
         }
 
-        Negociacao negociacao = dao.buscarNegociacaoPorId(id);
+        Negociacao filtro = new Negociacao();
+        filtro.setIdNegociacao(id);
+        Negociacao negociacao = dao.buscarNegociacaoPorId(filtro);
 
         if (negociacao == null) {
             response.sendRedirect("negociacao");
             return;
         }
 
-        ArrayList<Movimentacao> movimentacoes = dao.listarMovimentacoes(id);
+        ArrayList<Proposta> movimentacoes = dao.listarMovimentacoes(negociacao);
         marcarTipoFinal(movimentacoes, negociacao);
 
         request.setAttribute("negociacao", negociacao);
@@ -203,13 +214,26 @@ public class NegociacaoServlet extends HttpServlet {
         negociacao.setIdMaterial(idMaterial);
         negociacao.setValorKgAtual(valor);
         negociacao.setQuantidadeKg(quantidade);
-        negociacao.setStatus(status);
-        negociacao.setDataConclusao(ehFinal(status) ? LocalDateTime.now() : null);
+        if (ehFinal(status)) {
+            negociacao.setDataConclusao(LocalDateTime.now());
+        } else {
+            negociacao.setDataConclusao(null);
+        }
+        Proposta proposta = new Proposta();
+        proposta.setValorKg(valor);
+        proposta.setQuantidadeKg(quantidade);
+        proposta.setObservacoes(observacoes);
 
         try {
-            long idNovo = dao.criarNegociacao(negociacao, autor, observacoes);
-
-            response.sendRedirect("negociacao?acao=ver&id=" + idNovo);
+            negociacao.setStatus(status);
+            proposta.setAutor(autor);
+            int linhas = dao.criarNegociacao(negociacao, proposta);
+            if (linhas == 0) {
+                request.setAttribute("erro", "Não foi possível criar a negociação.");
+                abrirNovo(request, response);
+                return;
+            }
+            response.sendRedirect("negociacao?acao=ver&id=" + negociacao.getIdNegociacao());
 
         } catch (RuntimeException e) {
             request.setAttribute("erro", "Não foi possível criar a negociação. " + mensagemDoBanco(e));
@@ -245,7 +269,9 @@ public class NegociacaoServlet extends HttpServlet {
             return;
         }
 
-        Negociacao atual = dao.buscarNegociacaoPorId(id);
+        Negociacao filtro = new Negociacao();
+        filtro.setIdNegociacao(id);
+        Negociacao atual = dao.buscarNegociacaoPorId(filtro);
 
         if (atual == null) {
             response.sendRedirect("negociacao");
@@ -257,19 +283,45 @@ public class NegociacaoServlet extends HttpServlet {
         negociacao.setIdMaterial(idMaterial);
         negociacao.setValorKgAtual(valor);
         negociacao.setQuantidadeKg(quantidade);
-        negociacao.setStatus(status);
+        if (ehFinal(status)) {
+            negociacao.setDataConclusao(LocalDateTime.now());
+        } else {
+            negociacao.setDataConclusao(null);
+        }
 
         // se o status mudou para um status final (aceita, recusada...), isso tambem entra na linha do tempo
         String autor = null;
         String observacao = null;
 
         if (ehFinal(status) && !status.equals(atual.getStatus())) {
-            autor = autorEncerramento(id, normalizar(status).contains("CANCEL") ? "cancelar" : "aceitar");
+            if (normalizar(status).contains("CANCEL")) {
+                autor = autorEncerramento(id, "cancelar");
+            } else {
+                autor = autorEncerramento(id, "aceitar");
+            }
             observacao = observacaoPadrao(status);
         }
 
+        Proposta proposta = null;
+        if (autor != null) {
+            proposta = new Proposta();
+            proposta.setIdNegociacao(id);
+            proposta.setValorKg(valor);
+            proposta.setQuantidadeKg(quantidade);
+            proposta.setObservacoes(observacao);
+        }
+
         try {
-            dao.atualizarResumo(negociacao, ehFinal(status), autor, observacao);
+            negociacao.setStatus(status);
+            if (proposta != null) {
+                proposta.setAutor(autor);
+            }
+            int linhas = dao.atualizarResumo(negociacao, proposta);
+            if (linhas == 0) {
+                request.setAttribute("erro", "Negociação não encontrada.");
+                abrirEditar(request, response, id);
+                return;
+            }
 
             response.sendRedirect("negociacao?acao=ver&id=" + id);
 
@@ -302,8 +354,15 @@ public class NegociacaoServlet extends HttpServlet {
             return;
         }
 
+        Proposta proposta = new Proposta();
+        proposta.setIdNegociacao(id);
+        proposta.setValorKg(valor);
+        proposta.setQuantidadeKg(quantidade);
+        proposta.setObservacoes(observacoes);
+
         try {
-            dao.adicionarMovimentacao(id, autor, valor, quantidade, observacoes);
+            proposta.setAutor(autor);
+            dao.adicionarMovimentacao(proposta);
 
             response.sendRedirect("negociacao?acao=editar&id=" + id);
 
@@ -344,15 +403,37 @@ public class NegociacaoServlet extends HttpServlet {
             return;
         }
 
-        // texto da movimentacao: o que o usuario digitou (campo "observacoes", opcional) ou um texto padrao
+        // texto da proposta: o que o usuario digitou (campo "observacoes", opcional) ou um texto padrao
         String observacao = request.getParameter("observacoes");
 
         if (vazio(observacao)) {
             observacao = observacaoPadrao(status);
         }
 
+        Negociacao filtro = new Negociacao();
+        filtro.setIdNegociacao(id);
+        Negociacao negociacao = dao.buscarNegociacaoPorId(filtro);
+        if (negociacao == null) {
+            response.sendRedirect("negociacao");
+            return;
+        }
+        negociacao.setDataConclusao(LocalDateTime.now());
+        String autor = autorEncerramento(id, acao);
+        Proposta proposta = null;
+        if (autor != null) {
+            proposta = new Proposta();
+            proposta.setIdNegociacao(id);
+            proposta.setValorKg(negociacao.getValorKgAtual());
+            proposta.setQuantidadeKg(negociacao.getQuantidadeKg());
+            proposta.setObservacoes(observacao);
+        }
+
         try {
-            dao.alterarStatus(id, status, true, autorEncerramento(id, acao), observacao);
+            negociacao.setStatus(status);
+            if (proposta != null) {
+                proposta.setAutor(autor);
+            }
+            dao.alterarStatus(negociacao, proposta);
 
             response.sendRedirect("negociacao?acao=ver&id=" + id);
 
@@ -376,7 +457,9 @@ public class NegociacaoServlet extends HttpServlet {
             return;
         }
 
-        Negociacao negociacao = dao.buscarNegociacaoPorId(id);
+        Negociacao filtro = new Negociacao();
+        filtro.setIdNegociacao(id);
+        Negociacao negociacao = dao.buscarNegociacaoPorId(filtro);
 
         if (negociacao == null) {
             response.sendRedirect("negociacao");
@@ -392,7 +475,7 @@ public class NegociacaoServlet extends HttpServlet {
         }
 
         try {
-            dao.excluirNegociacao(id);
+            dao.excluirNegociacao(negociacao);
 
         } catch (RuntimeException e) {
             request.setAttribute("erro", "Não foi possível excluir. " + mensagemDoBanco(e));
@@ -524,7 +607,7 @@ public class NegociacaoServlet extends HttpServlet {
 
     // A tabela nao guarda o tipo. A primeira movimentacao e a Proposta, as outras sao Contrapropostas
     // (a DAO ja marca isso). Se a negociacao esta encerrada, a ultima movimentacao mostra o status final.
-    private void marcarTipoFinal(ArrayList<Movimentacao> movimentacoes, Negociacao negociacao) {
+    private void marcarTipoFinal(ArrayList<Proposta> movimentacoes, Negociacao negociacao) {
 
         String tipo = tipoFinal(negociacao.getStatus());
 
@@ -540,20 +623,32 @@ public class NegociacaoServlet extends HttpServlet {
     private String autorEncerramento(Long id, String acao) {
 
         String cooperativa = escolherAutor("COOP");
-        String recicladora = escolherAutor("RECIC");
+        String recicladora = escolherAutor(AutorNegociacao.EMPRESA.name());
+        if (recicladora == null) {
+            recicladora = escolherAutor("RECIC");
+        }
 
         if (cooperativa == null || recicladora == null) {
             return null;
         }
 
-        ArrayList<Movimentacao> movimentacoes = dao.listarMovimentacoes(id);
+        Negociacao filtro = new Negociacao();
+        filtro.setIdNegociacao(id);
+        ArrayList<Proposta> movimentacoes = dao.listarMovimentacoes(filtro);
 
         boolean ultimaFoiDaCooperativa = movimentacoes.isEmpty()
                 || movimentacoes.get(movimentacoes.size() - 1).isCooperativa();
 
-        boolean cooperativaAge = acao.equals("cancelar") ? ultimaFoiDaCooperativa : !ultimaFoiDaCooperativa;
-
-        return cooperativaAge ? cooperativa : recicladora;
+        boolean cooperativaAge;
+        if (acao.equals("cancelar")) {
+            cooperativaAge = ultimaFoiDaCooperativa;
+        } else {
+            cooperativaAge = !ultimaFoiDaCooperativa;
+        }
+        if (cooperativaAge) {
+            return cooperativa;
+        }
+        return recicladora;
     }
 
     // Acha, entre os autores que o banco aceita, o que combina com a palavra-chave (COOP ou RECIC)

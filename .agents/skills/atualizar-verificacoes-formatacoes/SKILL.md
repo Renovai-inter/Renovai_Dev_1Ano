@@ -5,7 +5,7 @@ description: Revisar filtros nos setters e formatações nos getters das models 
 
 # Atualizar verificações e formatações
 
-Leia `AGENTS.md`, `PADRAO_CODIGO_BACKEND.md` e `CONFERENCIA_DAO_BANCO.md`. Comece pelas models do escopo: revise filtros e validações nos setters e formatações de saída nos getters. Reutilize métodos existentes da `Utilitario` quando corresponderem ao dado, sem copiar regex. `selecionarUltimoId` fica fora desta revisão. Depois identifique DAOs e servlets afetados pelas mudanças de contrato. Os métodos públicos das DAOs recebem valores preenchidos, montam Models pelos setters e retornam Model ou `ArrayList` de Models. O PDF do banco é a referência de estrutura escolhida pelo grupo; não peça DDL original para esta revisão.
+Leia `AGENTS.md`, `PADRAO_CODIGO_BACKEND.md` e `CONFERENCIA_DAO_BANCO.md`. Comece pelas models do escopo: revise filtros e validações nos setters e formatações de saída nos getters. Reutilize métodos existentes da `Utilitario` quando corresponderem ao dado, sem copiar regex. `selecionarUltimoId` fica fora desta revisão. Depois identifique DAOs e servlets afetados pelas mudanças de contrato. Os métodos públicos de operação das DAOs recebem um objeto da Model correspondente, preenchido pelo chamador por construtor que usa setters ou pelos próprios setters, e retornam Model ou `ArrayList` de Models. O PDF do banco é a referência de estrutura escolhida pelo grupo; não peça DDL original para esta revisão.
 
 ## Diagnóstico e relatório
 
@@ -19,4 +19,4 @@ Entregue um novo `NN-Validacao-Dados.md` em `../Relatórios/` antes de mudar có
 - **Completa:** executar todos os itens de código definidos no relatório, desde que os regex e formatos necessários tenham sido fornecidos.
 - **Etapas escolhidas:** executar somente os números indicados, deixando os demais pendentes.
 
-Em qualquer modalidade, registre o que foi feito e como foi verificado. Na execução de código aprovada, atualize as chamadas dos servlets afetadas para passar os valores à DAO e lidar com a validação dos setters; confira a resposta exibida pela JSP apenas na integração necessária.
+Em qualquer modalidade, registre o que foi feito e como foi verificado. Na execução de código aprovada, atualize as chamadas dos servlets afetadas para passar a Model à DAO e lidar com a validação dos setters; leia a JSP apenas para conferir o contrato de resposta necessário. Para a área administrativa, anote se o backend prepara valor formatado, validação e mensagem compatíveis com `../Área ADM.pdf` e encaminhe a conferência detalhada a `$conferir-telas-admin`. Não altere o frontend.

@@ -1,7 +1,6 @@
 package util;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -10,7 +9,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.Formatter;
 import java.util.Locale;
 
 public class Utilitario {
@@ -24,7 +22,10 @@ public class Utilitario {
 
     // Prepara textos livres sem remover os espaços internos.
     public String normalizarTextoLivre(String texto) {
-        return texto == null ? null : texto.strip().toUpperCase(Locale.ROOT);
+        if (texto == null) {
+            return null;
+        }
+        return texto.strip().toUpperCase(Locale.ROOT);
     }
 
     // === METODOS DE FILTRO DE ENTRADA ================================================================================
@@ -134,11 +135,15 @@ public class Utilitario {
         if (numero == null) {
             throw new IllegalArgumentException("número é obrigatório");
         }
-        if (valor < 0 || decimal < 0) {
-            throw new IllegalArgumentException("valores devem ser positivos.");
+        if (valor <= 0 || decimal < 0) {
+            throw new IllegalArgumentException("O limite inteiro deve ser positivo e o decimal não pode ser negativo.");
         }
         numero = numero.strip().replace(",", ".");
-        if (numero.matches("^-?[0-9]{1," + valor + "}(\\.[0-9]{1," + decimal + "})?$")) {
+        String formato = "^-?[0-9]{1," + valor + "}$";
+        if (decimal > 0) {
+            formato = "^-?[0-9]{1," + valor + "}(\\.[0-9]{1," + decimal + "})?$";
+        }
+        if (numero.matches(formato)) {
             return new BigDecimal(numero);
         }
         throw new IllegalArgumentException("formato de numero invalido.");
@@ -218,7 +223,7 @@ public class Utilitario {
 
         // INICIALIZA CONEXÃO COM BD
 
-        Conexao conn = new Conexao();
+        ConexaoBD conn = new ConexaoBD();
         Connection conexao = conn.conectar();
 
         // SELECIONA PARA TABELA DADA
@@ -227,20 +232,18 @@ public class Utilitario {
                 " FROM " + tabela +
                 " ORDER BY 1 DESC LIMIT 1";
 
-        try {
-            PreparedStatement pstmt = conexao.prepareStatement(sql);
-
-            ResultSet rs = pstmt.executeQuery();
-
-            if (rs.next()){
-                return rs.getLong("id_"+tabela);
-            }
-            else {
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            if (rs.next()) {
+                return rs.getLong("id_" + tabela);
+            } else {
                 return -1;
             }
+        } catch (SQLException e) {
+            throw new IllegalStateException("Falha ao consultar o último ID de " + tabela + ".", e);
+        } finally {
+            conn.desconectar(conexao);
         }
-        catch (SQLException e) {
-            return -1;
-        } finally { conn.desconectar(conexao); } }
+    }
 
 }

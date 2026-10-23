@@ -1,7 +1,7 @@
 package dao;
 
-import model.Rota;
-import util.Conexao;
+import model.principais.Rota;
+import util.ConexaoBD;
 import util.Utilitario;
 
 import java.sql.Connection;
@@ -14,7 +14,7 @@ public class RotaDAO {
 
     // ATRIBUTOS
 
-    private Conexao conn = new Conexao();
+    private ConexaoBD conn = new ConexaoBD();
     private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR
@@ -26,48 +26,39 @@ public class RotaDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra uma rota vinculada à cooperativa.
-    public Rota cadastrarRota(Long idCooperativa, String nomeRota) {
-
-        Rota rota = new Rota();
-        rota.setIdCooperativa(idCooperativa);
-        rota.setNomeRota(nomeRota);
-        long ultimoIdRota = utilitario.selecionarUltimoId("rota");
-        long novoIdRota = ultimoIdRota == -1 ? 1 : ultimoIdRota + 1;
+    public int cadastrarRota(Rota rota) {
 
         // Declaração
 
+        if (rota == null || rota.getIdCooperativa() == null || rota.getIdCooperativa() <= 0
+                || rota.getNomeRota() == null) {
+            throw new IllegalArgumentException("idCooperativa deve ser positivo.");
+        }
+        long ultimoIdRota = utilitario.selecionarUltimoId("rota");
+        long novoIdRota;
+        if (ultimoIdRota == -1) {
+            novoIdRota = 1;
+        } else {
+            novoIdRota = ultimoIdRota + 1;
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "INSERT INTO rota " +
-                "(id_rota," +
-                "id_cooperativa,nome_rota)" +
+        String sql = "INSERT INTO rota (id_rota, id_cooperativa, nome_rota) " +
                 "VALUES (?, ?, ?)";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, novoIdRota);
-
-            Long IdCooperativa = rota.getIdCooperativa();
-
-            // Verifica se o ultimoIdRota foi encontrado (-1) se não
-
-            if (IdCooperativa != null && IdCooperativa>0){
-                pstmt.setLong(2, IdCooperativa);
-            }else {
-                throw new IllegalArgumentException("idCooperativa deve ser positivo.");
-            }
-
+            pstmt.setLong(2, rota.getIdCooperativa());
             pstmt.setString(3, rota.getNomeRota());
-
             int linhas = pstmt.executeUpdate();
-            if (linhas == 0) {
-                return null;
+            if (linhas > 0) {
+                rota.setIdRota(novoIdRota);
             }
-            rota.setIdRota(novoIdRota);
-            return rota;
+            return linhas;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao cadastrar rota.", e);
         } finally {
@@ -83,20 +74,17 @@ public class RotaDAO {
         // Declaração
 
         ArrayList<Rota> rotas = new ArrayList<>();
-
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "SELECT " +
-                "id_rota," +
-                "id_cooperativa,nome_rota FROM rota";
+        String sql = "SELECT id_rota, id_cooperativa, nome_rota FROM rota";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()){
+            while (rs.next()) {
                 Rota rota = new Rota();
                 Long idRota = rs.getLong("id_rota");
                 Long idCoop = rs.getLong("id_cooperativa");
@@ -107,7 +95,7 @@ public class RotaDAO {
                 rotas.add(rota);
             }
             return rotas;
-        }catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException("Falha ao listar rotas.", e);
         } finally {
             conn.desconectar(conexao);
@@ -117,31 +105,28 @@ public class RotaDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza os dados da rota identificada pelo ID.
-    public Rota atualizarRota(Long idRota, Long idCooperativa, String nomeRota) {
-
-        Rota rota = new Rota();
-        rota.setIdRota(idRota);
-        rota.setIdCooperativa(idCooperativa);
-        rota.setNomeRota(nomeRota);
+    public int atualizarRota(Rota rota) {
 
         // Declaração
+
+        if (rota == null || rota.getIdRota() == null || rota.getIdCooperativa() == null
+                || rota.getNomeRota() == null) {
+            throw new IllegalArgumentException("ID, cooperativa e nome da rota são obrigatórios.");
+        }
 
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "UPDATE rota\n" +
-                "SET id_cooperativa = ?, nome_rota = ?\n" +
-                "WHERE id_rota = ?";
+        String sql = "UPDATE rota SET id_cooperativa = ?, nome_rota = ? WHERE id_rota = ?";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1,rota.getIdCooperativa());
-            pstmt.setString(2,rota.getNomeRota());
-            pstmt.setLong(3,rota.getIdRota());
-
-            return pstmt.executeUpdate() == 0 ? null : rota;
+            pstmt.setLong(1, rota.getIdCooperativa());
+            pstmt.setString(2, rota.getNomeRota());
+            pstmt.setLong(3, rota.getIdRota());
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar rota.", e);
@@ -154,26 +139,24 @@ public class RotaDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui a rota identificada pelo ID.
-    public Rota excluirRota(Long idRota) {
-
-        Rota rota = new Rota();
-        rota.setIdRota(idRota);
+    public int excluirRota(Rota rota) {
 
         // Declaração
 
+        if (rota == null || rota.getIdRota() == null) {
+            throw new IllegalArgumentException("idRota é obrigatório.");
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "DELETE FROM rota\n" +
-                "WHERE id_rota = ?";
+        String sql = "DELETE FROM rota WHERE id_rota = ?";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1,rota.getIdRota());
-
-            return pstmt.executeUpdate() == 0 ? null : rota;
+            pstmt.setLong(1, rota.getIdRota());
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir rota.", e);

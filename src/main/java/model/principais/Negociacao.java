@@ -1,4 +1,6 @@
-package model;
+package model.principais;
+
+import model.enums.StatusNegociacao;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -51,11 +53,21 @@ public class Negociacao {
 
     public BigDecimal getQuantidadeKg() { return quantidadeKg; }
 
-    public void setQuantidadeKg(BigDecimal quantidadeKg) { this.quantidadeKg = quantidadeKg; }
+    public void setQuantidadeKg(BigDecimal quantidadeKg) {
+        if (quantidadeKg != null && quantidadeKg.signum() <= 0) {
+            throw new IllegalArgumentException("quantidadeKg deve ser positiva.");
+        }
+        this.quantidadeKg = quantidadeKg;
+    }
 
     public BigDecimal getValorKgAtual() { return valorKgAtual; }
 
-    public void setValorKgAtual(BigDecimal valorKgAtual) { this.valorKgAtual = valorKgAtual; }
+    public void setValorKgAtual(BigDecimal valorKgAtual) {
+        if (valorKgAtual == null || valorKgAtual.signum() <= 0) {
+            throw new IllegalArgumentException("valorKgAtual deve ser positivo.");
+        }
+        this.valorKgAtual = valorKgAtual;
+    }
 
     public BigDecimal getValorTotalAtual() { return valorTotalAtual; }
 
@@ -63,7 +75,19 @@ public class Negociacao {
 
     public String getStatus() { return status; }
 
-    public void setStatus(String status) { this.status = status; }
+    public void setStatus(String status) {
+        boolean permitido = false;
+        for (StatusNegociacao opcao : StatusNegociacao.values()) {
+            if (opcao.name().equals(status)) {
+                permitido = true;
+                break;
+            }
+        }
+        if (!permitido) {
+            throw new IllegalArgumentException("status da negociação inválido.");
+        }
+        this.status = status;
+    }
 
     public LocalDateTime getDataCriacao() { return dataCriacao; }
 

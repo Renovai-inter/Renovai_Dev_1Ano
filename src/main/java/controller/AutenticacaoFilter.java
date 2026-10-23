@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import model.enums.TipoUsuario;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,7 +39,7 @@ public class AutenticacaoFilter implements Filter {
         HttpSession sessao = request.getSession(false);
         boolean administrador = sessao != null
                 && sessao.getAttribute("usuarioLogado") != null
-                && "ADMINISTRADOR".equals(sessao.getAttribute("tipoUsuario"));
+                && TipoUsuario.ADMINISTRADOR.equals(sessao.getAttribute("tipoUsuario"));
 
         if (publico || administrador) {
             chain.doFilter(req, res);
