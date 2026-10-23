@@ -1,14 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.Negociacao, model.Movimentacao" %>
+<%@ page import="java.util.*, model.principais.Negociacao, model.auxiliares.Proposta" %>
 <%@ include file="negociacao-util.jspf" %>
 <%
     Negociacao negociacao = (Negociacao) request.getAttribute("negociacao");
-    ArrayList<Movimentacao> movimentacoes = (ArrayList<Movimentacao>) request.getAttribute("movimentacoes");
+    ArrayList<Proposta> movimentacoes = (ArrayList<Proposta>) request.getAttribute("movimentacoes");
     Map<Long, String> materiais = (Map<Long, String>) request.getAttribute("materiais");
     List<String> statusOpcoes = (List<String>) request.getAttribute("statusOpcoes");
     String erro = (String) request.getAttribute("erro");
 
-    if (movimentacoes == null) movimentacoes = new ArrayList<Movimentacao>();
+    if (movimentacoes == null) movimentacoes = new ArrayList<Proposta>();
     if (materiais == null) materiais = new LinkedHashMap<Long, String>();
     if (statusOpcoes == null) statusOpcoes = new ArrayList<String>();
 
@@ -97,11 +97,11 @@
             </div>
         </form>
 
-        <%-- fora do formulario acima: o botao abre o modal de movimentacao (que tem o proprio formulario) --%>
+        <%-- fora do formulario acima: o botao abre o modal de proposta (que tem o proprio formulario) --%>
         <div class="cartao">
             <h2 class="linha">Linha do tempo</h2>
             <div class="acoes acoes-direita">
-                <a href="#movimentacao" class="botao claro">+ Nova movimentação</a>
+                <a href="#proposta" class="botao claro">+ Nova movimentação</a>
             </div>
             <%@ include file="negociacao-linha-tempo.jspf" %>
         </div>
@@ -109,7 +109,7 @@
     </div>
 </div>
 
-<%@ include file="modal-movimentacao.jspf" %>
+<%@ include file="modal-proposta.jspf" %>
 <%@ include file="modal-excluir-negociacao.jspf" %>
 </body>
 </html>

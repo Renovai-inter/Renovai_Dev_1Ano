@@ -1,6 +1,6 @@
 package dao;
 
-import util.Conexao;
+import util.ConexaoBD;
 
 import java.math.BigDecimal;
 import java.sql.*;
@@ -42,7 +42,7 @@ public class DashboardDAO {
 
         Map<String, BigDecimal> distribuicao = new LinkedHashMap<>();
 
-        try (Connection conn = Conexao.conectar();
+        try (Connection conn = ConexaoBD.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
@@ -73,7 +73,7 @@ public class DashboardDAO {
         String sql = "SELECT data_conclusao FROM negociacao "
                 + "WHERE status = 'CONCLUIDA' AND data_conclusao >= ?";
 
-        try (Connection conn = Conexao.conectar();
+        try (Connection conn = ConexaoBD.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setDate(1, java.sql.Date.valueOf(inicio.atDay(1)));
@@ -96,7 +96,7 @@ public class DashboardDAO {
     }
 
     private int contar(String sql) {
-        try (Connection conn = Conexao.conectar();
+        try (Connection conn = ConexaoBD.conectar();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 

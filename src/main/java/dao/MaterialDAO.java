@@ -1,8 +1,8 @@
 package dao;
 
-import util.Conexao;
+import util.ConexaoBD;
 import util.Utilitario;
-import model.Material;
+import model.principais.Material;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -14,7 +14,7 @@ public class MaterialDAO {
 
     // ATRIBUTOS
 
-    private Conexao conn = new Conexao();
+    private ConexaoBD conn = new ConexaoBD();
     private Utilitario utilitario = new Utilitario();
 
     // CONSTRUTOR
@@ -26,46 +26,42 @@ public class MaterialDAO {
     // === METODOS CREATE ==============================================================================================
 
     // Cadastra um material com os campos exigidos pelo esquema.
-    public Material cadastrarMaterial(String nome, String categoria) {
-
-        Material material = new Material();
-        material.setNome(nome);
-        material.setCategoria(categoria);
-        long ultimoId = utilitario.selecionarUltimoId("material");
-        long novoId = ultimoId == -1 ? 1 : ultimoId + 1;
+    public int cadastrarMaterial(Material material) {
 
         // Declaração
 
+        if (material == null || material.getNome() == null
+                || material.getCategoria() == null || material.getOrigem() == null) {
+            throw new IllegalArgumentException("Nome, categoria e origem são obrigatórios.");
+        }
+        long ultimoId = utilitario.selecionarUltimoId("material");
+        long novoId;
+        if (ultimoId == -1) {
+            novoId = 1;
+        } else {
+            novoId = ultimoId + 1;
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "INSERT INTO material " + "(id_material,"
-                + "nome,categoria)" +
-                "VALUES (?, ?, ?)";
+        String sql = "INSERT INTO material (id_material, nome, categoria, \"Origem\") " +
+                "VALUES (?, ?, ?, ?)";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
             pstmt.setLong(1, novoId);
-
             pstmt.setString(2, material.getNome());
-
             pstmt.setString(3, material.getCategoria());
-
+            pstmt.setString(4, material.getOrigem());
             int linhas = pstmt.executeUpdate();
-            if (linhas == 0) {
-                return null;
+            if (linhas > 0) {
+                material.setIdMaterial(novoId);
             }
-            material.setIdMaterial(novoId);
-            return material;
-
+            return linhas;
         } catch (SQLException e) {
-<<<<<<< HEAD
-            return 0;
-=======
             throw new RuntimeException("Falha ao cadastrar material.", e);
->>>>>>> origin/master
         } finally {
             conn.desconectar(conexao);
         }
@@ -79,20 +75,17 @@ public class MaterialDAO {
         // Declaração
 
         ArrayList<Material> materiais = new ArrayList<>();
-
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "SELECT " +
-                "id_material," +
-                "nome,categoria FROM material";
+        String sql = "SELECT id_material, nome, categoria, \"Origem\" FROM material";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
-            while (rs.next()){
+            while (rs.next()) {
                 Material material = new Material();
                 Long idMaterial = rs.getLong("id_material");
                 String nomeMaterial = rs.getString("nome");
@@ -100,16 +93,12 @@ public class MaterialDAO {
                 material.setIdMaterial(idMaterial);
                 material.setNome(nomeMaterial);
                 material.setCategoria(categoria);
+                material.setOrigem(rs.getString("Origem"));
                 materiais.add(material);
             }
             return materiais;
-        }catch (SQLException e) {
-<<<<<<< HEAD
-            e.printStackTrace();
-            return new ArrayList<>();
-=======
+        } catch (SQLException e) {
             throw new RuntimeException("Falha ao listar materiais.", e);
->>>>>>> origin/master
         } finally {
             conn.desconectar(conexao);
         }
@@ -118,31 +107,30 @@ public class MaterialDAO {
     // === METODOS UPDATE ==============================================================================================
 
     // Atualiza os dados do material identificado pelo ID.
-    public Material atualizarMaterial(Long idMaterial, String nome, String categoria) {
-
-        Material material = new Material();
-        material.setIdMaterial(idMaterial);
-        material.setNome(nome);
-        material.setCategoria(categoria);
+    public int atualizarMaterial(Material material) {
 
         // Declaração
+
+        if (material == null || material.getNome() == null || material.getCategoria() == null) {
+            throw new IllegalArgumentException("Nome e categoria são obrigatórios.");
+        }
+        if (material.getIdMaterial() == null || material.getIdMaterial() <= 0) {
+            throw new IllegalArgumentException("idMaterial deve ser positivo.");
+        }
 
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "UPDATE material\n" +
-                "SET nome = ?, categoria = ?\n" +
-                "WHERE id_material = ?";
+        String sql = "UPDATE material SET nome = ?, categoria = ? WHERE id_material = ?";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setString(1,material.getNome());
-            pstmt.setString(2,material.getCategoria());
-            pstmt.setLong(3,material.getIdMaterial());
-
-            return pstmt.executeUpdate() == 0 ? null : material;
+            pstmt.setString(1, material.getNome());
+            pstmt.setString(2, material.getCategoria());
+            pstmt.setLong(3, material.getIdMaterial());
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar material.", e);
@@ -155,26 +143,24 @@ public class MaterialDAO {
     // === METODOS DELETE ==============================================================================================
 
     // Exclui o material identificado pelo ID.
-    public Material excluirMaterial(Long idMaterial) {
-
-        Material material = new Material();
-        material.setIdMaterial(idMaterial);
+    public int excluirMaterial(Material material) {
 
         // Declaração
 
+        if (material == null || material.getIdMaterial() == null || material.getIdMaterial() <= 0) {
+            throw new IllegalArgumentException("idMaterial deve ser positivo.");
+        }
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "DELETE FROM material\n" +
-                "WHERE id_material = ?";
+        String sql = "DELETE FROM material WHERE id_material = ?";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setLong(1,material.getIdMaterial());
-
-            return pstmt.executeUpdate() == 0 ? null : material;
+            pstmt.setLong(1, material.getIdMaterial());
+            return pstmt.executeUpdate();
 
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir material.", e);

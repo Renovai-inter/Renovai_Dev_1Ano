@@ -1,8 +1,9 @@
 package dao;
 
-import model.Movimentacao;
-import model.Negociacao;
-import util.Conexao;
+import model.auxiliares.Proposta;
+import model.principais.Negociacao;
+import util.ConexaoBD;
+import util.Utilitario;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,7 +23,8 @@ public class NegociacaoDAO {
 
     // ATRIBUTOS
 
-    private Conexao conn = new Conexao();
+    private ConexaoBD conn = new ConexaoBD();
+    private Utilitario utilitario = new Utilitario();
 
     // Consulta base: a negociacao + nome/cnpj/cidade da cooperativa e da empresa + nome do material.
     // E usada na lista e na tela Ver. "ultima_atualizacao" e a data mais recente entre criacao, conclusao e movimentacoes.
@@ -46,23 +48,17 @@ public class NegociacaoDAO {
 
     // === METODOS CREATE ==============================================================================================
 
-    /* Criar negociacao (tela Nova negociacao): grava a negociacao e a primeira movimentacao (a proposta inicial).
-       Devolve o id da negociacao criada. */
+    // Cria a negociacao e a primeira proposta; devolve o total de linhas gravadas.
 
-    public long criarNegociacao(Negociacao negociacao, String autor, String observacoes) {
+    public int criarNegociacao(Negociacao negociacao, Proposta proposta) {
 
         String sql = "INSERT INTO negociacao(id_negociacao, id_cooperativa, id_empresa, id_material, quantidade_kg, " +
                 "valor_kg_atual, valor_total_atual, status, data_criacao, data_conclusao) VALUES (?,?,?,?,?,?,?,?,?,?)";
 
+        long idNegociacao = proximoId("negociacao");
         Connection conexao = conn.conectar();
 
         try {
-            // os dois INSERTs valem juntos: se um falhar, nenhum e gravado
-            conexao.setAutoCommit(false);
-
-            // o banco nao gera o id sozinho, entao calculamos o proximo
-            long idNegociacao = proximoId(conexao, "negociacao", "id_negociacao");
-
             PreparedStatement pstm = conexao.prepareStatement(sql);
 
             pstm.setLong(1, idNegociacao);
@@ -80,28 +76,29 @@ public class NegociacaoDAO {
                 pstm.setNull(10, Types.TIMESTAMP);
             }
 
-            pstm.executeUpdate();
-
-            inserirMovimentacao(conexao, idNegociacao, autor, negociacao.getValorKgAtual(),
-                    negociacao.getQuantidadeKg(), observacoes);
-
-            conexao.commit();
-
-            return idNegociacao;
+            int linhas = pstm.executeUpdate();
+            if (linhas == 0) {
+                return 0;
+            }
+            negociacao.setIdNegociacao(idNegociacao);
+            proposta.setIdNegociacao(idNegociacao);
+            int propostas = inserirMovimentacao(conexao, proposta);
+            if (propostas == 0) {
+                throw new SQLException("Proposta inicial não gravada.");
+            }
+            linhas += propostas;
+            return linhas;
 
         } catch (SQLException e) {
-            desfazer(conexao);
             throw new RuntimeException(e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-    /* Adicionar movimentacao (contraproposta): grava a movimentacao na linha do tempo e atualiza
-       o valor e a quantidade atuais da negociacao. Devolve o id da movimentacao criada. */
+    // Adiciona uma proposta e atualiza o resumo da negociacao.
 
-    public long adicionarMovimentacao(long idNegociacao, String autor, BigDecimal valorKg,
-                                      BigDecimal quantidadeKg, String observacoes) {
+    public int adicionarMovimentacao(Proposta proposta) {
 
         String sql = "UPDATE negociacao SET valor_kg_atual = ?, quantidade_kg = ?, valor_total_atual = ? " +
                 "WHERE id_negociacao = ?";
@@ -109,27 +106,26 @@ public class NegociacaoDAO {
         Connection conexao = conn.conectar();
 
         try {
-            conexao.setAutoCommit(false);
-
-            long idProposta = inserirMovimentacao(conexao, idNegociacao, autor, valorKg, quantidadeKg, observacoes);
+            int linhas = inserirMovimentacao(conexao, proposta);
+            if (linhas == 0) {
+                throw new SQLException("Movimentação não gravada.");
+            }
 
             PreparedStatement pstm = conexao.prepareStatement(sql);
 
-            pstm.setBigDecimal(1, valorKg);
-            pstm.setBigDecimal(2, quantidadeKg);
-            pstm.setBigDecimal(3, calcularTotal(valorKg, quantidadeKg));
-            pstm.setLong(4, idNegociacao);
+            pstm.setBigDecimal(1, proposta.getValorKg());
+            pstm.setBigDecimal(2, proposta.getQuantidadeKg());
+            pstm.setBigDecimal(3, calcularTotal(proposta.getValorKg(), proposta.getQuantidadeKg()));
+            pstm.setLong(4, proposta.getIdNegociacao());
 
-            if (pstm.executeUpdate() == 0) {
+            int atualizadas = pstm.executeUpdate();
+            if (atualizadas == 0) {
                 throw new SQLException("Negociação não encontrada.");
             }
 
-            conexao.commit();
-
-            return idProposta;
+            return linhas + atualizadas;
 
         } catch (SQLException e) {
-            desfazer(conexao);
             throw new RuntimeException(e);
         } finally {
             conn.desconectar(conexao);
@@ -138,8 +134,7 @@ public class NegociacaoDAO {
 
     // === METODOS READ ================================================================================================
 
-    /* Visualizar negociacoes (tela Lista). Se "status" vier preenchido, mostra so as desse status
-       (novas propostas, em andamento, aceitas, recusadas, concluidas, canceladas). Vazio = todas. */
+    // Lista as negociacoes; filtra pelo status quando ele e informado.
 
     public ArrayList<Negociacao> listarNegociacoes(String status) {
 
@@ -147,7 +142,11 @@ public class NegociacaoDAO {
 
         boolean filtrar = status != null && !status.trim().isEmpty();
 
-        String sql = SQL_BASE + (filtrar ? "WHERE n.status = ? " : "") + "ORDER BY n.id_negociacao DESC";
+        String sql = SQL_BASE;
+        if (filtrar) {
+            sql += "WHERE n.status = ? ";
+        }
+        sql += "ORDER BY n.id_negociacao DESC";
 
         Connection conexao = conn.conectar();
 
@@ -175,7 +174,7 @@ public class NegociacaoDAO {
 
     // Visualizar detalhes da negociacao (telas Ver e Editar). Devolve null se nao existir.
 
-    public Negociacao buscarNegociacaoPorId(long idNegociacao) {
+    public Negociacao buscarNegociacaoPorId(Negociacao filtro) {
 
         Negociacao negociacao = null;
 
@@ -185,7 +184,7 @@ public class NegociacaoDAO {
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
-            pstm.setLong(1, idNegociacao);
+            pstm.setLong(1, filtro.getIdNegociacao());
 
             ResultSet rst = pstm.executeQuery();
 
@@ -204,9 +203,9 @@ public class NegociacaoDAO {
 
     // Visualizar historico da negociacao (linha do tempo), da mais antiga para a mais nova.
 
-    public ArrayList<Movimentacao> listarMovimentacoes(long idNegociacao) {
+    public ArrayList<Proposta> listarMovimentacoes(Negociacao negociacao) {
 
-        ArrayList<Movimentacao> movimentacoes = new ArrayList<>();
+        ArrayList<Proposta> movimentacoes = new ArrayList<>();
 
         String sql = "SELECT id_proposta, id_negociacao, autor, valor_kg, quantidade_kg, observacoes, data_proposta " +
                 "FROM proposta WHERE id_negociacao = ? ORDER BY data_proposta, id_proposta";
@@ -215,29 +214,33 @@ public class NegociacaoDAO {
 
         try {
             PreparedStatement pstm = conexao.prepareStatement(sql);
-            pstm.setLong(1, idNegociacao);
+            pstm.setLong(1, negociacao.getIdNegociacao());
 
             ResultSet rst = pstm.executeQuery();
 
             while (rst.next()) {
-                Movimentacao movimentacao = new Movimentacao();
+                Proposta proposta = new Proposta();
 
-                movimentacao.setIdProposta(rst.getLong("id_proposta"));
-                movimentacao.setIdNegociacao(rst.getLong("id_negociacao"));
-                movimentacao.setAutor(rst.getString("autor"));
-                movimentacao.setValorKg(rst.getBigDecimal("valor_kg"));
-                movimentacao.setQuantidadeKg(rst.getBigDecimal("quantidade_kg"));
-                movimentacao.setObservacoes(rst.getString("observacoes"));
+                proposta.setIdProposta(rst.getLong("id_proposta"));
+                proposta.setIdNegociacao(rst.getLong("id_negociacao"));
+                proposta.setAutor(rst.getString("autor"));
+                proposta.setValorKg(rst.getBigDecimal("valor_kg"));
+                proposta.setQuantidadeKg(rst.getBigDecimal("quantidade_kg"));
+                proposta.setObservacoes(rst.getString("observacoes"));
 
                 Timestamp data = rst.getTimestamp("data_proposta");
                 if (data != null) {
-                    movimentacao.setDataProposta(data.toLocalDateTime());
+                    proposta.setDataProposta(data.toLocalDateTime());
                 }
 
                 // a tabela nao guarda o tipo: a primeira e a Proposta e as seguintes sao Contrapropostas
-                movimentacao.setTipo(movimentacoes.isEmpty() ? "Proposta" : "Contraproposta");
+                if (movimentacoes.isEmpty()) {
+                    proposta.setTipo("Proposta");
+                } else {
+                    proposta.setTipo("Contraproposta");
+                }
 
-                movimentacoes.add(movimentacao);
+                movimentacoes.add(proposta);
             }
 
         } catch (SQLException e) {
@@ -308,12 +311,12 @@ public class NegociacaoDAO {
 
     // Quantas movimentacoes a negociacao tem (aparece no modal de excluir).
 
-    public int contarMovimentacoes(long idNegociacao) {
+    public int contarMovimentacoes(Negociacao negociacao) {
 
         Connection conexao = conn.conectar();
 
         try {
-            return contar(conexao, "SELECT COUNT(*) FROM proposta WHERE id_negociacao = ?", idNegociacao);
+            return contar(conexao, "SELECT COUNT(*) FROM proposta WHERE id_negociacao = ?", negociacao.getIdNegociacao());
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -324,12 +327,12 @@ public class NegociacaoDAO {
 
     // Se a negociacao ja virou venda (aparece no modal de excluir: "Venda concluida: Sim/Nao").
 
-    public boolean possuiVenda(long idNegociacao) {
+    public boolean possuiVenda(Negociacao negociacao) {
 
         Connection conexao = conn.conectar();
 
         try {
-            return contar(conexao, "SELECT COUNT(*) FROM venda WHERE id_negociacao = ?", idNegociacao) > 0;
+            return contar(conexao, "SELECT COUNT(*) FROM venda WHERE id_negociacao = ?", negociacao.getIdNegociacao()) > 0;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -340,11 +343,9 @@ public class NegociacaoDAO {
 
     // === METODOS UPDATE ==============================================================================================
 
-    /* Editar negociacao (tela Editar, bloco Resumo): material, quantidade, valor e status.
-       finalizada = true marca a data de conclusao (se ainda nao tinha); false limpa a data.
-       Se "autor" vier preenchido (o status foi encerrado agora), registra isso na linha do tempo. */
+    // Atualiza o resumo e registra uma proposta de encerramento quando informada.
 
-    public int atualizarResumo(Negociacao negociacao, boolean finalizada, String autor, String observacoes) {
+    public int atualizarResumo(Negociacao negociacao, Proposta proposta) {
 
         String sql = "UPDATE negociacao SET id_material = ?, quantidade_kg = ?, valor_kg_atual = ?, " +
                 "valor_total_atual = ?, status = ?, " +
@@ -354,8 +355,6 @@ public class NegociacaoDAO {
         Connection conexao = conn.conectar();
 
         try {
-            conexao.setAutoCommit(false);
-
             PreparedStatement pstm = conexao.prepareStatement(sql);
 
             pstm.setLong(1, negociacao.getIdMaterial());
@@ -363,33 +362,31 @@ public class NegociacaoDAO {
             pstm.setBigDecimal(3, negociacao.getValorKgAtual());
             pstm.setBigDecimal(4, calcularTotal(negociacao.getValorKgAtual(), negociacao.getQuantidadeKg()));
             pstm.setString(5, negociacao.getStatus());
-            pstm.setBoolean(6, finalizada);
+            pstm.setBoolean(6, negociacao.getDataConclusao() != null);
             pstm.setLong(7, negociacao.getIdNegociacao());
 
             int linhas = pstm.executeUpdate();
 
-            if (linhas > 0 && autor != null) {
-                inserirMovimentacao(conexao, negociacao.getIdNegociacao(), autor,
-                        negociacao.getValorKgAtual(), negociacao.getQuantidadeKg(), observacoes);
+            if (linhas > 0 && proposta != null) {
+                int propostas = inserirMovimentacao(conexao, proposta);
+                if (propostas == 0) {
+                    throw new SQLException("Movimentação não gravada.");
+                }
+                linhas += propostas;
             }
-
-            conexao.commit();
 
             return linhas;
 
         } catch (SQLException e) {
-            desfazer(conexao);
             throw new RuntimeException(e);
         } finally {
             conn.desconectar(conexao);
         }
     }
 
-    /* Aceitar, recusar, cancelar ou concluir: muda o status (nao apaga nada, a negociacao vai para o historico)
-       e registra o encerramento na linha do tempo, com o valor e a quantidade atuais da negociacao.
-       finalizada = true marca a data de conclusao. Se "autor" for null, so muda o status. */
+    // Altera o status e registra uma proposta de encerramento quando informada.
 
-    public int alterarStatus(long idNegociacao, String status, boolean finalizada, String autor, String observacoes) {
+    public int alterarStatus(Negociacao negociacao, Proposta proposta) {
 
         String sql = "UPDATE negociacao SET status = ?, " +
                 "data_conclusao = CASE WHEN ? THEN COALESCE(data_conclusao, CURRENT_TIMESTAMP) ELSE NULL END " +
@@ -398,35 +395,25 @@ public class NegociacaoDAO {
         Connection conexao = conn.conectar();
 
         try {
-            conexao.setAutoCommit(false);
-
             PreparedStatement pstm = conexao.prepareStatement(sql);
 
-            pstm.setString(1, status);
-            pstm.setBoolean(2, finalizada);
-            pstm.setLong(3, idNegociacao);
+            pstm.setString(1, negociacao.getStatus());
+            pstm.setBoolean(2, negociacao.getDataConclusao() != null);
+            pstm.setLong(3, negociacao.getIdNegociacao());
 
             int linhas = pstm.executeUpdate();
 
-            if (linhas > 0 && autor != null) {
-                PreparedStatement pstAtual = conexao.prepareStatement(
-                        "SELECT valor_kg_atual, quantidade_kg FROM negociacao WHERE id_negociacao = ?");
-                pstAtual.setLong(1, idNegociacao);
-
-                ResultSet rst = pstAtual.executeQuery();
-
-                if (rst.next()) {
-                    inserirMovimentacao(conexao, idNegociacao, autor,
-                            rst.getBigDecimal("valor_kg_atual"), rst.getBigDecimal("quantidade_kg"), observacoes);
+            if (linhas > 0 && proposta != null) {
+                int propostas = inserirMovimentacao(conexao, proposta);
+                if (propostas == 0) {
+                    throw new SQLException("Movimentação não gravada.");
                 }
+                linhas += propostas;
             }
-
-            conexao.commit();
 
             return linhas;
 
         } catch (SQLException e) {
-            desfazer(conexao);
             throw new RuntimeException(e);
         } finally {
             conn.desconectar(conexao);
@@ -435,45 +422,36 @@ public class NegociacaoDAO {
 
     // === METODOS DELETE ==============================================================================================
 
-    /* Excluir permanentemente: apaga as movimentacoes e a negociacao.
-       Se a negociacao ja virou venda, a venda continua registrada: ela so perde o vinculo (id_negociacao fica vazio).
-       Devolve: 0 = nao existe | 1 = excluida. */
+    // Exclui as propostas e a negociacao, desvinculando as vendas existentes.
 
-    public int excluirNegociacao(long idNegociacao) {
+    public int excluirNegociacao(Negociacao negociacao) {
 
         Connection conexao = conn.conectar();
 
         try {
-            if (contar(conexao, "SELECT COUNT(*) FROM negociacao WHERE id_negociacao = ?", idNegociacao) == 0) {
+            if (contar(conexao, "SELECT COUNT(*) FROM negociacao WHERE id_negociacao = ?", negociacao.getIdNegociacao()) == 0) {
                 return 0;
             }
 
-            conexao.setAutoCommit(false);
-
             PreparedStatement pst0 = conexao.prepareStatement("UPDATE venda SET id_negociacao = NULL WHERE id_negociacao = ?");
-            pst0.setLong(1, idNegociacao);
-            pst0.executeUpdate();
+            pst0.setLong(1, negociacao.getIdNegociacao());
+            int linhas = pst0.executeUpdate();
 
             PreparedStatement pst1 = conexao.prepareStatement("DELETE FROM proposta WHERE id_negociacao = ?");
-            pst1.setLong(1, idNegociacao);
-            pst1.executeUpdate();
+            pst1.setLong(1, negociacao.getIdNegociacao());
+            linhas += pst1.executeUpdate();
 
             PreparedStatement pst2 = conexao.prepareStatement("DELETE FROM negociacao WHERE id_negociacao = ?");
-            pst2.setLong(1, idNegociacao);
-            pst2.executeUpdate();
-
-            conexao.commit();
-
-            return 1;
+            pst2.setLong(1, negociacao.getIdNegociacao());
+            linhas += pst2.executeUpdate();
+            return linhas;
 
         } catch (SQLException e) {
-            desfazer(conexao);
             throw new RuntimeException(e);
         } finally {
             conn.desconectar(conexao);
         }
     }
-
     // === METODOS AUXILIARES (privados, so esta classe usa) ===========================================================
 
     // Transforma uma linha do banco em um objeto Negociacao
@@ -519,41 +497,41 @@ public class NegociacaoDAO {
         return negociacao;
     }
 
-    // Grava uma linha na tabela proposta (uma movimentacao da linha do tempo) e devolve o id dela
-    private long inserirMovimentacao(Connection conexao, long idNegociacao, String autor, BigDecimal valorKg,
-                                     BigDecimal quantidadeKg, String observacoes) throws SQLException {
+    // Grava uma linha na tabela proposta e preenche o ID gerado no objeto.
+    private int inserirMovimentacao(Connection conexao, Proposta proposta) throws SQLException {
 
-        long idProposta = proximoId(conexao, "proposta", "id_proposta");
+        long idProposta = proximoId("proposta");
 
         PreparedStatement pstm = conexao.prepareStatement(
                 "INSERT INTO proposta(id_proposta, id_negociacao, autor, valor_kg, quantidade_kg, observacoes, data_proposta) " +
                         "VALUES (?,?,?,?,?,?,?)");
 
         pstm.setLong(1, idProposta);
-        pstm.setLong(2, idNegociacao);
-        pstm.setString(3, autor);
-        pstm.setBigDecimal(4, valorKg);
-        pstm.setBigDecimal(5, quantidadeKg);
-        if (observacoes == null || observacoes.trim().isEmpty()) {
+        pstm.setLong(2, proposta.getIdNegociacao());
+        pstm.setString(3, proposta.getAutor());
+        pstm.setBigDecimal(4, proposta.getValorKg());
+        pstm.setBigDecimal(5, proposta.getQuantidadeKg());
+        if (proposta.getObservacoes() == null || proposta.getObservacoes().trim().isEmpty()) {
             pstm.setNull(6, Types.VARCHAR);
         } else {
-            pstm.setString(6, observacoes.trim());
+            pstm.setString(6, proposta.getObservacoes().trim());
         }
         pstm.setTimestamp(7, new Timestamp(System.currentTimeMillis()));
 
-        pstm.executeUpdate();
-
-        return idProposta;
+        int linhas = pstm.executeUpdate();
+        if (linhas > 0) {
+            proposta.setIdProposta(idProposta);
+        }
+        return linhas;
     }
 
-    // Proximo id de uma tabela: maior id que existe + 1 (usado porque o banco nao gera sozinho)
-    private long proximoId(Connection conexao, String tabela, String coluna) throws SQLException {
-
-        PreparedStatement pstm = conexao.prepareStatement("SELECT COALESCE(MAX(" + coluna + "), 0) + 1 FROM " + tabela);
-        ResultSet rst = pstm.executeQuery();
-        rst.next();
-
-        return rst.getLong(1);
+    // Usa a consulta de ultimo ID compartilhada pelo projeto.
+    private long proximoId(String tabela) {
+        long ultimoId = utilitario.selecionarUltimoId(tabela);
+        if (ultimoId == -1) {
+            return 1;
+        }
+        return ultimoId + 1;
     }
 
     // Valor total = valor por kg x quantidade (2 casas decimais)
@@ -595,14 +573,6 @@ public class NegociacaoDAO {
         rst.next();
 
         return rst.getInt(1);
-    }
-
-    private void desfazer(Connection conexao) {
-        try {
-            conexao.rollback();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

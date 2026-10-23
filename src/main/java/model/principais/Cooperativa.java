@@ -1,6 +1,7 @@
 
-package model;
+package model.principais;
 
+import model.auxiliares.RelacionamentosCooperativa;
 import model.enums.StatusCooperativa;
 import util.Utilitario;
 
@@ -14,6 +15,7 @@ public class Cooperativa {
     // ATRIBUTOS (tabela cooperativa)
 
     private Long idCooperativa; // PK
+    private final RelacionamentosCooperativa relacionamentos = new RelacionamentosCooperativa();
     private String nome; // NOT NULL - VARCHAR(150)
     private String cnpj; // NOT NULL - ENTRADA VALIDADA COM METODO
     private String nomePublico; // NOT NULL - VARCHAR(150)
@@ -31,25 +33,27 @@ public class Cooperativa {
     private StatusCooperativa status; // NOT NULL - CHECK COM DEFAULT
     private LocalDateTime dataCadastro; // NOT NULL - TIMESTAMP COM DEFAULT
 
-    // ATRIBUTOS (agregações com outras tabelas)
+    public Cooperativa() {
+    }
 
-    private int qtdCooperados;
-    private int qtdRotas;
-    private int qtdColetas;
-    private int qtdNegociacoes;
-
+    public Cooperativa(String nome, String cnpj, String nomePublico,
+                       String descricaoInstitucional, String logoUrl,
+                       String emailInstitucional, String telefoneWhatsapp,
+                       String cep, String endereco, String cidade, String estado) {
+        setNome(nome);
+        setCnpj(cnpj);
+        setNomePublico(nomePublico);
+        setDescricaoInstitucional(descricaoInstitucional);
+        setLogoUrl(logoUrl);
+        setEmailInstitucional(emailInstitucional);
+        setTelefoneWhatsapp(telefoneWhatsapp);
+        setCep(cep);
+        setEndereco(endereco);
+        setCidade(cidade);
+        setEstado(estado);
+    }
 
     // GETTERS E SETTERS
-
-    // Retorna o valor de qtdCooperados.
-    public int getQtdCooperados() {
-        return qtdCooperados;
-    }
-
-    // Define o valor de qtdCooperados.
-    public void setQtdCooperados(int qtdCooperados) {
-        this.qtdCooperados = qtdCooperados;
-    }
 
     // Retorna o valor de idCooperativa.
     public Long getIdCooperativa() { return idCooperativa; }
@@ -57,13 +61,19 @@ public class Cooperativa {
     // Define o valor de idCooperativa.
     public void setIdCooperativa(Long idCooperativa) { this.idCooperativa = idCooperativa; }
 
+    // Retorna os totais carregados pelas consultas de relacionamentos.
+    public RelacionamentosCooperativa getRelacionamentos() { return relacionamentos; }
+
     // Retorna o valor de nome.
     public String getNome() { return nome; }
 
     // Define o valor de nome.
     public void setNome(String nome) {
         nome = utilitario.normalizarTextoLivre(nome);
-        if (nome != null && nome.codePointCount(0, nome.length()) > 150) {
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException("nome é obrigatório.");
+        }
+        if (nome.length() > 150) {
             throw new IllegalArgumentException("nome deve ter no máximo 150 caracteres.");
         }
         this.nome = nome;
@@ -74,8 +84,11 @@ public class Cooperativa {
 
     // Define o valor de cnpj.
     public void setCnpj(String cnpj) {
+        if (cnpj == null) {
+            throw new IllegalArgumentException("cnpj é obrigatório.");
+        }
         cnpj = utilitario.filtrarCnpj(cnpj);
-        if (cnpj != null && cnpj.codePointCount(0, cnpj.length()) > 18) {
+        if (cnpj != null && cnpj.length() > 18) {
             throw new IllegalArgumentException("cnpj deve ter no máximo 18 caracteres.");
         }
         this.cnpj = cnpj;
@@ -87,7 +100,10 @@ public class Cooperativa {
     // Define o valor de nomePublico.
     public void setNomePublico(String nomePublico) {
         nomePublico = utilitario.normalizarTextoLivre(nomePublico);
-        if (nomePublico != null && nomePublico.codePointCount(0, nomePublico.length()) > 150) {
+        if (nomePublico == null || nomePublico.isBlank()) {
+            throw new IllegalArgumentException("nomePublico é obrigatório.");
+        }
+        if (nomePublico.length() > 150) {
             throw new IllegalArgumentException("nomePublico deve ter no máximo 150 caracteres.");
         }
         this.nomePublico = nomePublico;
@@ -106,7 +122,7 @@ public class Cooperativa {
 
     // Define o valor de logoUrl.
     public void setLogoUrl(String logoUrl) {
-        if (logoUrl != null && logoUrl.codePointCount(0, logoUrl.length()) > 500) {
+        if (logoUrl != null && logoUrl.length() > 500) {
             throw new IllegalArgumentException("logoUrl deve ter no máximo 500 caracteres.");
         }
         this.logoUrl = logoUrl;
@@ -118,7 +134,7 @@ public class Cooperativa {
     // Define o valor de emailInstitucional.
     public void setEmailInstitucional(String emailInstitucional) {
         emailInstitucional = utilitario.filtrarEmailInstitucional(emailInstitucional);
-        if (emailInstitucional != null && emailInstitucional.codePointCount(0, emailInstitucional.length()) > 150) {
+        if (emailInstitucional != null && emailInstitucional.length() > 150) {
             throw new IllegalArgumentException("emailInstitucional deve ter no máximo 150 caracteres.");
         }
         this.emailInstitucional = emailInstitucional;
@@ -130,7 +146,7 @@ public class Cooperativa {
     // Define o valor de telefoneWhatsapp.
     public void setTelefoneWhatsapp(String telefoneWhatsapp) {
         telefoneWhatsapp = utilitario.filtrarTelefoneWhatsapp(telefoneWhatsapp);
-        if (telefoneWhatsapp != null && telefoneWhatsapp.codePointCount(0, telefoneWhatsapp.length()) > 20) {
+        if (telefoneWhatsapp != null && telefoneWhatsapp.length() > 20) {
             throw new IllegalArgumentException("telefoneWhatsapp deve ter no máximo 20 caracteres.");
         }
         this.telefoneWhatsapp = telefoneWhatsapp;
@@ -142,7 +158,7 @@ public class Cooperativa {
     // Define o valor de cep.
     public void setCep(String cep) {
         cep = utilitario.filtrarCep(cep);
-        if (cep != null && cep.codePointCount(0, cep.length()) > 9) {
+        if (cep != null && cep.length() > 9) {
             throw new IllegalArgumentException("cep deve ter no máximo 9 caracteres.");
         }
         this.cep = cep;
@@ -154,7 +170,10 @@ public class Cooperativa {
     // Define o valor de endereco.
     public void setEndereco(String endereco) {
         endereco = utilitario.normalizarTextoLivre(endereco);
-        if (endereco != null && endereco.codePointCount(0, endereco.length()) > 255) {
+        if (endereco == null || endereco.isBlank()) {
+            throw new IllegalArgumentException("endereco é obrigatório.");
+        }
+        if (endereco.length() > 255) {
             throw new IllegalArgumentException("endereco deve ter no máximo 255 caracteres.");
         }
         this.endereco = endereco;
@@ -166,7 +185,10 @@ public class Cooperativa {
     // Define o valor de cidade.
     public void setCidade(String cidade) {
         cidade = utilitario.normalizarTextoLivre(cidade);
-        if (cidade != null && cidade.codePointCount(0, cidade.length()) > 100) {
+        if (cidade == null || cidade.isBlank()) {
+            throw new IllegalArgumentException("cidade é obrigatória.");
+        }
+        if (cidade.length() > 100) {
             throw new IllegalArgumentException("cidade deve ter no máximo 100 caracteres.");
         }
         this.cidade = cidade;
@@ -190,8 +212,10 @@ public class Cooperativa {
     // Define o valor de canalContatoPreferencial.
     public void setCanalContatoPreferencial(String canalContatoPreferencial) {
         canalContatoPreferencial = utilitario.normalizarTextoLivre(canalContatoPreferencial);
-        if (canalContatoPreferencial != null
-                && !canalContatoPreferencial.equals("WHATSAPP")
+        if (canalContatoPreferencial == null) {
+            throw new IllegalArgumentException("canalContatoPreferencial é obrigatório.");
+        }
+        if (!canalContatoPreferencial.equals("WHATSAPP")
                 && !canalContatoPreferencial.equals("TELEFONE")
                 && !canalContatoPreferencial.equals("EMAIL")) {
             throw new IllegalArgumentException("canalContatoPreferencial inválido.");
@@ -204,7 +228,7 @@ public class Cooperativa {
 
     // Define o valor de linkWhatsapp.
     public void setLinkWhatsapp(String linkWhatsapp) {
-        if (linkWhatsapp != null && linkWhatsapp.codePointCount(0, linkWhatsapp.length()) > 255) {
+        if (linkWhatsapp != null && linkWhatsapp.length() > 255) {
             throw new IllegalArgumentException("linkWhatsapp deve ter no máximo 255 caracteres.");
         }
         this.linkWhatsapp = linkWhatsapp;
@@ -215,6 +239,9 @@ public class Cooperativa {
 
     // Define o valor de status.
     public void setStatus(StatusCooperativa status) {
+        if (status == null) {
+            throw new IllegalArgumentException("status é obrigatório.");
+        }
         this.status = status;
     }
 
@@ -224,33 +251,4 @@ public class Cooperativa {
     // Define o valor de dataCadastro.
     public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 
-    // Retorna o valor de qtdRotas.
-    public int getQtdRotas() {
-        return qtdRotas;
-    }
-
-    // Define o valor de qtdRotas.
-    public void setQtdRotas(int qtdRotas) {
-        this.qtdRotas = qtdRotas;
-    }
-
-    // Retorna o valor de qtdColetas.
-    public int getQtdColetas() {
-        return qtdColetas;
-    }
-
-    // Define o valor de qtdColetas.
-    public void setQtdColetas(int qtdColetas) {
-        this.qtdColetas = qtdColetas;
-    }
-
-    // Retorna o valor de qtdNegociacoes.
-    public int getQtdNegociacoes() {
-        return qtdNegociacoes;
-    }
-
-    // Define o valor de qtdNegociacoes.
-    public void setQtdNegociacoes(int qtdNegociacoes) {
-        this.qtdNegociacoes = qtdNegociacoes;
-    }
 }

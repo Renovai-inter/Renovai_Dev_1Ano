@@ -1,6 +1,7 @@
 
-package model;
+package model.principais;
 
+import model.auxiliares.RelacionamentosColeta;
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
 import model.enums.OrigemEntrega;
@@ -8,7 +9,7 @@ import util.Utilitario;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class Coleta {
 
@@ -17,19 +18,40 @@ public class Coleta {
     // ATRIBUTOS
 
     private Long idColeta; // PK
-    private Long idCooperativa; // FK
+    private final RelacionamentosColeta relacionamentos = new RelacionamentosColeta();
     private TipoColeta tipo; // NOT NULL
     private StatusColeta status; // NOT NULL com DEFAULT
-    private Long idRota; // FK
-    private Long idEnderecoRota; // FK
-    private Long idCooperadoResponsavel; // FK
     private String origemEntrega; // VARCHAR(15)
     private String nomeLocalOrigem; // VARCHAR(150)
-    private Date dataAgendada; // DATE
+    private LocalDate dataAgendada; // DATE
     private LocalDateTime dataInicio; // TIMESTAMP
     private LocalDateTime dataFim; // TIMESTAMP
     private BigDecimal pesoTotalKg; // NUMERIC(12,2)
     private String observacoes; // TEXT
+
+    public Coleta() {
+    }
+
+    public Coleta(Long idCooperativa, TipoColeta tipo, StatusColeta status,
+                  Long idRota, Long idEnderecoRota, Long idCooperadoResponsavel,
+                  String origemEntrega, String nomeLocalOrigem, LocalDate dataAgendada,
+                  LocalDateTime dataInicio, LocalDateTime dataFim, BigDecimal pesoTotalKg,
+                  String observacoes) {
+        getRelacionamentos().setIdCooperativa(idCooperativa);
+        setTipo(tipo);
+        setStatus(status);
+        getRelacionamentos().setIdRota(idRota);
+        getRelacionamentos().setIdEnderecoRota(idEnderecoRota);
+        getRelacionamentos().setIdCooperadoResponsavel(idCooperadoResponsavel);
+        setOrigemEntrega(origemEntrega);
+        setNomeLocalOrigem(nomeLocalOrigem);
+        setDataAgendada(dataAgendada);
+        setDataInicio(dataInicio);
+        setDataFim(dataFim);
+        setPesoTotalKg(pesoTotalKg);
+        setObservacoes(observacoes);
+        validarTipoEVinculos();
+    }
 
     // GETTERS E SETTERS
 
@@ -39,11 +61,8 @@ public class Coleta {
     // Define o valor de idColeta.
     public void setIdColeta(Long idColeta) { this.idColeta = idColeta; }
 
-    // Retorna o valor de idCooperativa.
-    public Long getIdCooperativa() { return idCooperativa; }
-
-    // Define o valor de idCooperativa.
-    public void setIdCooperativa(Long idCooperativa) { this.idCooperativa = idCooperativa; }
+    // Reúne as chaves e os materiais associados à coleta.
+    public RelacionamentosColeta getRelacionamentos() { return relacionamentos; }
 
     // Retorna o valor de tipo.
     public TipoColeta getTipo() { return tipo; }
@@ -61,24 +80,6 @@ public class Coleta {
         this.status = status;
     }
 
-    // Retorna o valor de idRota.
-    public Long getIdRota() { return idRota; }
-
-    // Define o valor de idRota.
-    public void setIdRota(Long idRota) { this.idRota = idRota; }
-
-    // Retorna o valor de idEnderecoRota.
-    public Long getIdEnderecoRota() { return idEnderecoRota; }
-
-    // Define o valor de idEnderecoRota.
-    public void setIdEnderecoRota(Long idEnderecoRota) { this.idEnderecoRota = idEnderecoRota; }
-
-    // Retorna o valor de idCooperadoResponsavel.
-    public Long getIdCooperadoResponsavel() { return idCooperadoResponsavel; }
-
-    // Define o valor de idCooperadoResponsavel.
-    public void setIdCooperadoResponsavel(Long idCooperadoResponsavel) { this.idCooperadoResponsavel = idCooperadoResponsavel; }
-
     // Retorna o valor de origemEntrega.
     public String getOrigemEntrega() { return origemEntrega; }
 
@@ -91,23 +92,39 @@ public class Coleta {
         this.origemEntrega = origemEntrega;
     }
 
+    // Confere a combinação entre tipo, rota e origem prevista para a coleta.
+    public void validarTipoEVinculos() {
+        if (tipo == null) {
+            throw new IllegalArgumentException("tipo é obrigatório.");
+        }
+        if (tipo == TipoColeta.ENTREGA_COOPERATIVA) {
+            if (relacionamentos.getIdRota() != null || relacionamentos.getIdEnderecoRota() != null) {
+                throw new IllegalArgumentException("Entrega na cooperativa não usa rota nem endereço da rota.");
+            }
+        } else {
+            if (origemEntrega != null) {
+                throw new IllegalArgumentException("Coleta externa não usa origem de entrega.");
+            }
+        }
+    }
+
     // Retorna o valor de nomeLocalOrigem.
     public String getNomeLocalOrigem() { return nomeLocalOrigem; }
 
     // Define o valor de nomeLocalOrigem.
     public void setNomeLocalOrigem(String nomeLocalOrigem) {
         nomeLocalOrigem = utilitario.normalizarTextoLivre(nomeLocalOrigem);
-        if (nomeLocalOrigem != null && nomeLocalOrigem.codePointCount(0, nomeLocalOrigem.length()) > 150) {
+        if (nomeLocalOrigem != null && nomeLocalOrigem.length() > 150) {
             throw new IllegalArgumentException("nomeLocalOrigem deve ter no máximo 150 caracteres.");
         }
         this.nomeLocalOrigem = nomeLocalOrigem;
     }
 
     // Retorna o valor de dataAgendada.
-    public Date getDataAgendada() { return dataAgendada; }
+    public LocalDate getDataAgendada() { return dataAgendada; }
 
     // Define o valor de dataAgendada.
-    public void setDataAgendada(Date dataAgendada) { this.dataAgendada = dataAgendada; }
+    public void setDataAgendada(LocalDate dataAgendada) { this.dataAgendada = dataAgendada; }
 
     // Retorna o valor de dataInicio.
     public LocalDateTime getDataInicio() { return dataInicio; }

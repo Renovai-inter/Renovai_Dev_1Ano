@@ -1,8 +1,9 @@
 package controller;
 
 import dao.UsuarioDAO;
-import model.Usuario;
-import util.Senha;
+import model.auxiliares.Usuario;
+import model.enums.TipoUsuario;
+import util.SenhaAPI;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -39,27 +40,39 @@ public class LoginServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        String email = request.getParameter("email") == null
-                ? "" : request.getParameter("email").trim().toLowerCase();
-        String senha = request.getParameter("senha") == null
-                ? "" : request.getParameter("senha");
+        String email = request.getParameter("email");
+        if (email == null) {
+            email = "";
+        } else {
+            email = email.trim().toLowerCase();
+        }
+        String senha = request.getParameter("senha");
+        if (senha == null) {
+            senha = "";
+        }
 
         Usuario usuario;
         try {
-            usuario = email.isEmpty() ? null : usuarioDAO.buscarPorEmail(email);
+            if (email.isEmpty()) {
+                usuario = null;
+            } else {
+                Usuario filtro = new Usuario();
+                filtro.setEmail(email);
+                usuario = usuarioDAO.buscarPorEmail(filtro);
+            }
         } catch (RuntimeException e) {
             throw new ServletException("Erro ao consultar o usuário.", e);
         }
 
         // Mesma mensagem para e-mail inexistente, senha errada e conta sem permissão
-        if (usuario == null || !Senha.conferir(senha, usuario.getSenhaHash())) {
+        if (usuario == null || !SenhaAPI.conferir(senha, usuario.getSenhaHash())) {
             request.setAttribute("erro", "E-mail ou senha incorretos.");
             request.setAttribute("email", email);
             request.getRequestDispatcher("/login.jsp").forward(request, response);
             return;
         }
 
-        if (!"ADMINISTRADOR".equals(usuario.getTipoUsuario())) {
+        if (usuario.getTipoUsuario() != TipoUsuario.ADMINISTRADOR) {
             request.setAttribute("erro", "Esta área é restrita a administradores. Use o app do Renovaí.");
             request.setAttribute("email", email);
             request.getRequestDispatcher("/login.jsp").forward(request, response);
@@ -71,7 +84,7 @@ public class LoginServlet extends HttpServlet {
 
         sessao.setAttribute("usuarioLogado", usuario.getIdUsuario());
         sessao.setAttribute("tipoUsuario", usuario.getTipoUsuario());
-        sessao.setAttribute("nomeUsuario", primeiroNome(usuario.getNome()));
+        sessao.setAttribute("nomeUsuario", primeiroNome(usuario.getNomeCompleto()));
         sessao.setMaxInactiveInterval(8 * 60 * 60);
 
         response.sendRedirect(request.getContextPath() + "/dashboard");
@@ -79,6 +92,9 @@ public class LoginServlet extends HttpServlet {
 
     private String primeiroNome(String nomeCompleto) {
         String[] partes = nomeCompleto.trim().split("\\s+");
-        return partes.length > 0 ? partes[0] : nomeCompleto;
+        if (partes.length > 0) {
+            return partes[0];
+        }
+        return nomeCompleto;
     }
 }

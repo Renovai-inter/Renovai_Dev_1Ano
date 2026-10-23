@@ -2,8 +2,8 @@ package controller;
 
 import dao.ColetaDAO;
 import dao.DashboardDAO;
-import model.Atividade;
-import model.Coleta;
+import model.relatorio.AtividadeRecenteDashboard;
+import model.principais.Coleta;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
@@ -46,7 +45,10 @@ public class DashboardServlet extends HttpServlet {
 
         // Nome de quem está logado: guarde "nomeUsuario" na sessão no login
         HttpSession sessao = request.getSession(false);
-        Object nome = sessao != null ? sessao.getAttribute("nomeUsuario") : null;
+        Object nome = null;
+        if (sessao != null) {
+            nome = sessao.getAttribute("nomeUsuario");
+        }
 
         request.setAttribute("dashboardCarregado", true);
         request.setAttribute("saudacao", saudacao(agora.getHour()));
@@ -94,8 +96,8 @@ public class DashboardServlet extends HttpServlet {
     }
 
     // As 5 últimas coletas cadastradas, descritas pelo status atual
-    private List<Atividade> atividadesRecentes(LocalDate hoje) {
-        List<Atividade> atividades = new ArrayList<>();
+    private List<AtividadeRecenteDashboard> atividadesRecentes(LocalDate hoje) {
+        List<AtividadeRecenteDashboard> atividades = new ArrayList<>();
 
         List<Coleta> coletas = carregar(coletaDAO::listarColetas, "atividades recentes");
         if (coletas == null) return atividades;
@@ -103,7 +105,10 @@ public class DashboardServlet extends HttpServlet {
         for (int i = 0; i < Math.min(5, coletas.size()); i++) {
             Coleta c = coletas.get(i);
             String destaque = "Coleta CO-" + c.getIdColeta();
-            String status = c.getStatus() == null ? "" : c.getStatus();
+            String status = "";
+            if (c.getStatus() != null) {
+                status = c.getStatus().name();
+            }
 
             LocalDateTime quando = null;
             boolean temHora = true;
@@ -116,31 +121,28 @@ public class DashboardServlet extends HttpServlet {
                     break;
                 case "EM_ANDAMENTO":
                     texto = "iniciada";
-                    quando = c.getDataInicio() == null ? null : paraDataHora(c.getDataInicio());
+                    quando = c.getDataInicio();
                     break;
                 case "CANCELADA":
                     texto = "cancelada";
                     temHora = false;
-                    quando = c.getDataAgendada() == null ? null : paraDataHora(c.getDataAgendada());
+                    if (c.getDataAgendada() != null) {
+                        quando = c.getDataAgendada().atStartOfDay();
+                    }
                     break;
                 default:
                     texto = "agendada";
                     temHora = false;
                     if (c.getDataAgendada() != null) {
-                        quando = paraDataHora(c.getDataAgendada());
+                        quando = c.getDataAgendada().atStartOfDay();
                         texto += " para " + FORMATO_DATA.format(quando);
                     }
             }
 
-            atividades.add(new Atividade(horario(quando, temHora, hoje), destaque, texto));
+            atividades.add(new AtividadeRecenteDashboard(horario(quando, temHora, hoje), destaque, texto));
         }
 
         return atividades;
-    }
-
-    private LocalDateTime paraDataHora(java.util.Date data) {
-        // new Timestamp funciona tanto com java.util.Date quanto com java.sql.Date
-        return new Timestamp(data.getTime()).toLocalDateTime();
     }
 
     private String horario(LocalDateTime quando, boolean temHora, LocalDate hoje) {

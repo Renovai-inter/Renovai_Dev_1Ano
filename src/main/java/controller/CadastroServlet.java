@@ -1,8 +1,9 @@
 package controller;
 
 import dao.UsuarioDAO;
-import model.Usuario;
-import util.Senha;
+import model.auxiliares.Usuario;
+import model.enums.TipoUsuario;
+import util.SenhaAPI;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -35,27 +36,36 @@ public class CadastroServlet extends HttpServlet {
 
         String nome = valor(request.getParameter("nome"));
         String email = valor(request.getParameter("email")).toLowerCase();
-        String senha = request.getParameter("senha") == null ? "" : request.getParameter("senha");
-        String confirmacao = request.getParameter("confirmarSenha") == null
-                ? "" : request.getParameter("confirmarSenha");
+        String senha = request.getParameter("senha");
+        if (senha == null) {
+            senha = "";
+        }
+        String confirmacao = request.getParameter("confirmarSenha");
+        if (confirmacao == null) {
+            confirmacao = "";
+        }
         boolean termos = request.getParameter("termos") != null;
 
         String erro = validar(nome, email, senha, confirmacao, termos);
 
         try {
-            if (erro == null && usuarioDAO.emailExiste(email)) {
-                erro = "Este e-mail já está cadastrado.";
-            }
-
             if (erro == null) {
                 Usuario usuario = new Usuario();
-                usuario.setNome(nome);
                 usuario.setEmail(email);
-                usuario.setSenhaHash(Senha.gerarHash(senha));
-                usuario.setTipoUsuario("COOPERADO"); // fixo: o cadastro público nunca cria administrador
-
-                if (!usuarioDAO.cadastrar(usuario)) {
+                if (usuarioDAO.emailExiste(usuario)) {
                     erro = "Este e-mail já está cadastrado.";
+                }
+
+                if (erro == null) {
+                    usuario.setNomeCompleto(nome);
+                    usuario.setNomeUsuario(nome);
+                    usuario.setSenhaHash(SenhaAPI.gerarHash(senha));
+                    usuario.setTipoUsuario(TipoUsuario.COOPERADO); // fixo: o cadastro público nunca cria administrador
+
+                    int linhas = usuarioDAO.cadastrarUsuario(usuario);
+                    if (linhas == 0) {
+                        erro = "Não foi possível concluir o cadastro.";
+                    }
                 }
             }
         } catch (RuntimeException e) {
@@ -95,6 +105,9 @@ public class CadastroServlet extends HttpServlet {
     }
 
     private String valor(String texto) {
-        return texto == null ? "" : texto.trim();
+        if (texto == null) {
+            return "";
+        }
+        return texto.trim();
     }
 }

@@ -4,7 +4,7 @@
     <p class="aviso">Nenhuma movimentação registrada.</p>
 <% } else { %>
     <div class="linha-tempo">
-        <% for (Movimentacao mov : movimentacoes) {
+        <% for (Proposta mov : movimentacoes) {
                boolean daCooperativa = mov.isCooperativa();
         %>
             <div class="mov <%= daCooperativa ? "mov-coop" : "mov-reci" %>">

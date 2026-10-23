@@ -2,9 +2,12 @@
 package controller;
 
 import dao.ColetaDAO;
-import model.Coleta;
+import model.principais.Coleta;
+import model.auxiliares.ColetaMaterial;
 import dao.MaterialDAO;
-import model.Material;
+import model.principais.Material;
+import model.enums.StatusColeta;
+import model.enums.TipoColeta;
 import java.util.Objects;
 import java.util.function.Supplier;
 import jakarta.servlet.ServletException;
@@ -16,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,7 +39,9 @@ public class ColetaServlet extends HttpServlet {
         try {
             if ("detalhes".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));
-                Coleta coleta = coletaDAO.buscarPorId(id);
+                Coleta filtro = new Coleta();
+                filtro.setIdColeta(id);
+                Coleta coleta = coletaDAO.buscarPorId(filtro);
 
                 if (coleta == null) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND,
@@ -44,14 +50,16 @@ public class ColetaServlet extends HttpServlet {
                 }
 
                 Map<Long, BigDecimal> materiais =
-                        coletaDAO.listarMateriaisDaColeta(id);
+                        coletaDAO.listarMateriaisDaColeta(coleta);
 
                 BigDecimal soma = materiais.values().stream()
                         .filter(Objects::nonNull)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                BigDecimal informado = coleta.getPesoTotalKg() != null
-                        ? coleta.getPesoTotalKg() : BigDecimal.ZERO;
+                BigDecimal informado = BigDecimal.ZERO;
+                if (coleta.getPesoTotalKg() != null) {
+                    informado = coleta.getPesoTotalKg();
+                }
 
                 Map<Long, String> cooperativas =
                         opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas");
@@ -66,11 +74,11 @@ public class ColetaServlet extends HttpServlet {
                 request.setAttribute("somaMateriais", soma);
                 request.setAttribute("pesoConfere", informado.compareTo(soma) == 0);
                 request.setAttribute("nomeCooperativa",
-                        nomeDe(cooperativas, coleta.getIdCooperativa(), "Cooperativa"));
+                        nomeDe(cooperativas, coleta.getRelacionamentos().getIdCooperativa(), "Cooperativa"));
                 request.setAttribute("nomeRota",
-                        nomeDe(rotas, coleta.getIdRota(), "Rota"));
+                        nomeDe(rotas, coleta.getRelacionamentos().getIdRota(), "Rota"));
                 request.setAttribute("nomeCooperado",
-                        nomeDe(cooperados, coleta.getIdCooperadoResponsavel(), "Cooperado"));
+                        nomeDe(cooperados, coleta.getRelacionamentos().getIdCooperadoResponsavel(), "Cooperado"));
 
                 request.getRequestDispatcher("/detalhes-coleta.jsp")
                         .forward(request, response);
@@ -126,9 +134,14 @@ public class ColetaServlet extends HttpServlet {
     }
 
     private String nomeDe(Map<Long, String> mapa, Long id, String rotulo) {
-        if (id == null) return null;
+        if (id == null) {
+            return null;
+        }
         String nome = mapa.get(id);
-        return nome != null ? nome : rotulo + " #" + id;
+        if (nome != null) {
+            return nome;
+        }
+        return rotulo + " #" + id;
     }
 
     @Override
@@ -147,7 +160,10 @@ public class ColetaServlet extends HttpServlet {
 
             } else if ("iniciar".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));
-                if (!coletaDAO.atualizarStatus(id, "EM_ANDAMENTO")) {
+                Coleta alteracao = new Coleta();
+                alteracao.setIdColeta(id);
+                alteracao.setStatus(StatusColeta.EM_ANDAMENTO);
+                if (coletaDAO.atualizarStatus(alteracao) == 0) {
                     response.sendError(HttpServletResponse.SC_CONFLICT,
                             "Não foi possível iniciar esta coleta.");
                     return;
@@ -157,7 +173,10 @@ public class ColetaServlet extends HttpServlet {
 
             } else if ("finalizar".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));
-                if (!coletaDAO.atualizarStatus(id, "CONCLUIDA")) {
+                Coleta alteracao = new Coleta();
+                alteracao.setIdColeta(id);
+                alteracao.setStatus(StatusColeta.CONCLUIDA);
+                if (coletaDAO.atualizarStatus(alteracao) == 0) {
                     response.sendError(HttpServletResponse.SC_CONFLICT,
                             "Não foi possível finalizar esta coleta.");
                     return;
@@ -167,7 +186,9 @@ public class ColetaServlet extends HttpServlet {
 
             } else if ("cancelar".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));
-                if (!coletaDAO.atualizarStatus(id, "CANCELADA")) {
+                Coleta cancelamento = new Coleta();
+                cancelamento.setIdColeta(id);
+                if (coletaDAO.excluirColeta(cancelamento) == 0) {
                     response.sendError(HttpServletResponse.SC_CONFLICT,
                             "Não foi possível cancelar esta coleta.");
                     return;
@@ -185,7 +206,9 @@ public class ColetaServlet extends HttpServlet {
                     return;
                 }
 
-                if (!coletaDAO.excluirColeta(id)) {
+                Coleta exclusao = new Coleta();
+                exclusao.setIdColeta(id);
+                if (coletaDAO.apagarColeta(exclusao) == 0) {
                     response.sendError(HttpServletResponse.SC_NOT_FOUND,
                             "Coleta não encontrada.");
                     return;
@@ -212,37 +235,44 @@ public class ColetaServlet extends HttpServlet {
     private void cadastrar(HttpServletRequest request) {
         Coleta coleta = new Coleta();
 
-        coleta.setIdCooperativa(
+        coleta.getRelacionamentos().setIdCooperativa(
                 Long.parseLong(request.getParameter("idCooperativa")));
-        coleta.setTipo(request.getParameter("tipo"));
-        coleta.setStatus("AGENDADA");
+        coleta.setTipo(TipoColeta.valueOf(request.getParameter("tipo")));
+        coleta.setStatus(StatusColeta.AGENDADA);
         coleta.setObservacoes(request.getParameter("observacoes"));
 
         String data = request.getParameter("dataAgendada");
         if (data != null && !data.isBlank()) {
-            coleta.setDataAgendada(
-                    java.sql.Date.valueOf(LocalDate.parse(data)));
+            coleta.setDataAgendada(LocalDate.parse(data));
         }
 
         String rota = request.getParameter("idRota");
-        coleta.setIdRota(rota == null || rota.isBlank()
-                ? null : Long.parseLong(rota));
+        if (rota == null || rota.isBlank()) {
+            coleta.getRelacionamentos().setIdRota(null);
+        } else {
+            coleta.getRelacionamentos().setIdRota(Long.parseLong(rota));
+        }
 
         String endereco = request.getParameter("idEnderecoRota");
-        coleta.setIdEnderecoRota(endereco == null || endereco.isBlank()
-                ? null : Long.parseLong(endereco));
+        if (endereco == null || endereco.isBlank()) {
+            coleta.getRelacionamentos().setIdEnderecoRota(null);
+        } else {
+            coleta.getRelacionamentos().setIdEnderecoRota(Long.parseLong(endereco));
+        }
 
         String responsavel = request.getParameter("idCooperadoResponsavel");
-        coleta.setIdCooperadoResponsavel(
-                responsavel == null || responsavel.isBlank()
-                        ? null : Long.parseLong(responsavel));
+        if (responsavel == null || responsavel.isBlank()) {
+            coleta.getRelacionamentos().setIdCooperadoResponsavel(null);
+        } else {
+            coleta.getRelacionamentos().setIdCooperadoResponsavel(Long.parseLong(responsavel));
+        }
 
-        if ("COLETA_EXTERNA".equals(coleta.getTipo())) {
+        if (coleta.getTipo() == TipoColeta.COLETA_EXTERNA) {
             coleta.setOrigemEntrega(null);
             coleta.setNomeLocalOrigem(null);
-        } else if ("ENTREGA_COOPERATIVA".equals(coleta.getTipo())) {
-            coleta.setIdRota(null);
-            coleta.setIdEnderecoRota(null);
+        } else if (coleta.getTipo() == TipoColeta.ENTREGA_COOPERATIVA) {
+            coleta.getRelacionamentos().setIdRota(null);
+            coleta.getRelacionamentos().setIdEnderecoRota(null);
             coleta.setOrigemEntrega(request.getParameter("origemEntrega"));
             coleta.setNomeLocalOrigem(
                     request.getParameter("nomeLocalOrigem"));
@@ -282,6 +312,16 @@ public class ColetaServlet extends HttpServlet {
             }
         }
 
-        coletaDAO.cadastrarColeta(coleta, materiais);
+        ArrayList<ColetaMaterial> itens = new ArrayList<>();
+        for (Map.Entry<Long, BigDecimal> entrada : materiais.entrySet()) {
+            ColetaMaterial item = new ColetaMaterial();
+            item.setIdMaterial(entrada.getKey());
+            item.setQuantidadeKg(entrada.getValue());
+            itens.add(item);
+        }
+        coleta.getRelacionamentos().setMateriaisColetados(itens);
+        if (coletaDAO.cadastrarColeta(coleta) == 0) {
+            throw new IllegalStateException("Não foi possível cadastrar a coleta.");
+        }
     }
 }

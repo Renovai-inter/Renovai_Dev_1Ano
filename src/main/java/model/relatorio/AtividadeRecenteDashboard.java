@@ -1,12 +1,12 @@
-package model;
+package model.relatorio;
 
-public class Atividade {
+public class AtividadeRecenteDashboard {
 
     private final String horario;
     private final String destaque;
     private final String texto;
 
-    public Atividade(String horario, String destaque, String texto) {
+    public AtividadeRecenteDashboard(String horario, String destaque, String texto) {
         this.horario = horario;
         this.destaque = destaque;
         this.texto = texto;

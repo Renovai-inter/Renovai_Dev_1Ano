@@ -7,11 +7,11 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-public final class Senha {
+public final class SenhaAPI {
 
     private static final int ITERACOES = 210_000;
 
-    private Senha() {
+    private SenhaAPI() {
     }
 
     // Formato salvo no banco: iterações:sal:hash

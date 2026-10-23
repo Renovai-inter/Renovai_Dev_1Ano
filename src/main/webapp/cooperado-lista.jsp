@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.ArrayList, model.Cooperado" %>
+<%@ page import="java.util.ArrayList, model.principais.Cooperado" %>
 <%!
     // "GESTOR" vira "Gestor", "ATIVO" vira "Ativo" (o Figma mostra so a primeira letra maiuscula)
     private String capitalizar(String texto) {

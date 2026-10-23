@@ -1,5 +1,5 @@
 
-package model;
+package model.principais;
 
 import util.Utilitario;
 
@@ -12,6 +12,14 @@ public class Rota {
     private Long idRota; // PK
     private Long idCooperativa; // FK
     private String nomeRota; // NOT NULL - VARCHAR(100)
+
+    public Rota() {
+    }
+
+    public Rota(Long idCooperativa, String nomeRota) {
+        setIdCooperativa(idCooperativa);
+        setNomeRota(nomeRota);
+    }
 
     // GETTERS E SETTERS
 
@@ -33,7 +41,10 @@ public class Rota {
     // Define o valor de nomeRota.
     public void setNomeRota(String nomeRota) {
         nomeRota = utilitario.normalizarTextoLivre(nomeRota);
-        if (nomeRota != null && nomeRota.codePointCount(0, nomeRota.length()) > 100) {
+        if (nomeRota == null || nomeRota.isBlank()) {
+            throw new IllegalArgumentException("nomeRota é obrigatório.");
+        }
+        if (nomeRota.length() > 100) {
             throw new IllegalArgumentException("nomeRota deve ter no máximo 100 caracteres.");
         }
         this.nomeRota = nomeRota;
