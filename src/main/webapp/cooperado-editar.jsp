@@ -152,7 +152,7 @@
                         <label for="status">Status</label>
                         <select id="status" name="status">
                             <% for (String s : statusOpcoes) { %>
-                                <option value="<%= esc(s) %>" <%= s.equals(c.getStatus()) ? "selected" : "" %>><%= esc(rotulo(s)) %></option>
+                                <option value="<%= esc(s) %>" <%= c.getStatusEnum() != null && s.equals(c.getStatusEnum().name()) ? "selected" : "" %>><%= esc(rotulo(s)) %></option>
                             <% } %>
                         </select>
                     </div>
@@ -174,9 +174,9 @@
                     <div class="campo">
                         <label for="cargo">Cargo</label>
                         <select id="cargo" name="cargo">
-                            <option value="" <%= (c.getCargo() == null || c.getCargo().isEmpty()) ? "selected" : "" %>>Selecione o cargo</option>
+                            <option value="" <%= c.getCargoEnum() == null ? "selected" : "" %>>Selecione o cargo</option>
                             <% for (String cg : cargos) { %>
-                                <option value="<%= esc(cg) %>" <%= cg.equals(c.getCargo()) ? "selected" : "" %>><%= esc(rotulo(cg)) %></option>
+                                <option value="<%= esc(cg) %>" <%= c.getCargoEnum() != null && cg.equals(c.getCargoEnum().name()) ? "selected" : "" %>><%= esc(rotulo(cg)) %></option>
                             <% } %>
                         </select>
                     </div>

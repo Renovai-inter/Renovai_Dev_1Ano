@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, model.principais.Negociacao, model.auxiliares.Proposta" %>
-<%@ page import="model.auxiliares.Proposta" %>
 <%@ include file="negociacao-util.jspf" %>
 <%
     Negociacao negociacao = (Negociacao) request.getAttribute("negociacao");
