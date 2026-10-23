@@ -91,7 +91,12 @@ public class CooperadoServlet extends HttpServlet {
         request.setAttribute("permissoesDoCooperado", cooperado.getPermissoes());
         request.setAttribute("todasPermissoes", dao.listarTodasPermissoes());
         request.setAttribute("totalColetas", dao.contarColetasDoCooperado(cooperado));
-        request.getRequestDispatcher("/WEB-INF/cooperado-ver.jsp").forward(request, response);
+        ArrayList<String> atividadesOpcoes = new ArrayList<>();
+        for (AtividadeCooperado atividade : AtividadeCooperado.values()) {
+            atividadesOpcoes.add(atividade.name());
+        }
+        request.setAttribute("atividadesOpcoes", atividadesOpcoes);
+        request.getRequestDispatcher("/cooperado-ver.jsp").forward(request, response);
     }
 
     // Prepara o formulário de cadastro com as opções do banco.
@@ -99,6 +104,16 @@ public class CooperadoServlet extends HttpServlet {
             throws ServletException, IOException {
         request.setAttribute("cooperativas", dao.listarCooperativas());
         request.setAttribute("todasPermissoes", dao.listarTodasPermissoes());
+        ArrayList<String> cargos = new ArrayList<>();
+        for (CargoCooperado cargo : CargoCooperado.values()) {
+            cargos.add(cargo.name());
+        }
+        ArrayList<String> atividadesOpcoes = new ArrayList<>();
+        for (AtividadeCooperado atividade : AtividadeCooperado.values()) {
+            atividadesOpcoes.add(atividade.name());
+        }
+        request.setAttribute("cargos", cargos);
+        request.setAttribute("atividadesOpcoes", atividadesOpcoes);
         request.getRequestDispatcher("/cooperado-novo.jsp").forward(request, response);
     }
 
@@ -119,13 +134,28 @@ public class CooperadoServlet extends HttpServlet {
         request.setAttribute("cooperado", cooperado);
         request.setAttribute("cooperativas", dao.listarCooperativas());
         request.setAttribute("totalColetas", dao.contarColetasDoCooperado(cooperado));
+        ArrayList<String> cargos = new ArrayList<>();
+        for (CargoCooperado cargo : CargoCooperado.values()) {
+            cargos.add(cargo.name());
+        }
+        ArrayList<String> statusOpcoes = new ArrayList<>();
+        for (StatusCooperado status : StatusCooperado.values()) {
+            statusOpcoes.add(status.name());
+        }
+        ArrayList<String> atividadesOpcoes = new ArrayList<>();
+        for (AtividadeCooperado atividade : AtividadeCooperado.values()) {
+            atividadesOpcoes.add(atividade.name());
+        }
+        request.setAttribute("cargos", cargos);
+        request.setAttribute("statusOpcoes", statusOpcoes);
+        request.setAttribute("atividadesOpcoes", atividadesOpcoes);
         HttpSession sessao = request.getSession(false);
         if (sessao != null && id.equals(sessao.getAttribute("senhaInicialCooperadoId"))) {
             request.setAttribute("senhaNova", sessao.getAttribute("senhaInicialCooperado"));
             sessao.removeAttribute("senhaInicialCooperadoId");
             sessao.removeAttribute("senhaInicialCooperado");
         }
-        request.getRequestDispatcher("/WEB-INF/cooperado-editar.jsp").forward(request, response);
+        request.getRequestDispatcher("/cooperado-editar.jsp").forward(request, response);
     }
 
     // Cadastra conta, cooperado, atividades e permissões informados no formulário.

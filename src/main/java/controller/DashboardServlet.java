@@ -45,7 +45,10 @@ public class DashboardServlet extends HttpServlet {
 
         // Nome de quem está logado: guarde "nomeUsuario" na sessão no login
         HttpSession sessao = request.getSession(false);
-        Object nome = sessao != null ? sessao.getAttribute("nomeUsuario") : null;
+        Object nome = null;
+        if (sessao != null) {
+            nome = sessao.getAttribute("nomeUsuario");
+        }
 
         request.setAttribute("dashboardCarregado", true);
         request.setAttribute("saudacao", saudacao(agora.getHour()));
@@ -102,7 +105,10 @@ public class DashboardServlet extends HttpServlet {
         for (int i = 0; i < Math.min(5, coletas.size()); i++) {
             Coleta c = coletas.get(i);
             String destaque = "Coleta CO-" + c.getIdColeta();
-            String status = c.getStatus() == null ? "" : c.getStatus().name();
+            String status = "";
+            if (c.getStatus() != null) {
+                status = c.getStatus().name();
+            }
 
             LocalDateTime quando = null;
             boolean temHora = true;
@@ -120,7 +126,9 @@ public class DashboardServlet extends HttpServlet {
                 case "CANCELADA":
                     texto = "cancelada";
                     temHora = false;
-                    quando = c.getDataAgendada() == null ? null : c.getDataAgendada().atStartOfDay();
+                    if (c.getDataAgendada() != null) {
+                        quando = c.getDataAgendada().atStartOfDay();
+                    }
                     break;
                 default:
                     texto = "agendada";

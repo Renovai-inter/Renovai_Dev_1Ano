@@ -40,10 +40,16 @@ public class LoginServlet extends HttpServlet {
 
         request.setCharacterEncoding("UTF-8");
 
-        String email = request.getParameter("email") == null
-                ? "" : request.getParameter("email").trim().toLowerCase();
-        String senha = request.getParameter("senha") == null
-                ? "" : request.getParameter("senha");
+        String email = request.getParameter("email");
+        if (email == null) {
+            email = "";
+        } else {
+            email = email.trim().toLowerCase();
+        }
+        String senha = request.getParameter("senha");
+        if (senha == null) {
+            senha = "";
+        }
 
         Usuario usuario;
         try {
@@ -86,6 +92,9 @@ public class LoginServlet extends HttpServlet {
 
     private String primeiroNome(String nomeCompleto) {
         String[] partes = nomeCompleto.trim().split("\\s+");
-        return partes.length > 0 ? partes[0] : nomeCompleto;
+        if (partes.length > 0) {
+            return partes[0];
+        }
+        return nomeCompleto;
     }
 }

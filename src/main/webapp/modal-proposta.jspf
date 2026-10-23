@@ -1,4 +1,4 @@
-<%-- Modal "Adicionar movimentacao" (tela Editar). Abre pelo link href="#movimentacao".
+<%-- Modal "Adicionar proposta" (tela Editar). Abre pelo link href="#proposta".
      Usa a variavel "negociacao" da pagina. Se o servlet devolveu erro (atributo "abrirModal"),
      ele ja abre sozinho e mantem o que foi digitado. --%>
 <%
@@ -12,7 +12,7 @@
     String qtdMov = abrirModalMov ? request.getParameter("quantidade") : numero(negociacao.getQuantidadeKg());
     String obsMov = abrirModalMov ? request.getParameter("observacoes") : "";
 %>
-<div class="modal-fundo" id="movimentacao" <%= abrirModalMov ? "style=\"display:flex\"" : "" %>>
+<div class="modal-fundo" id="proposta" <%= abrirModalMov ? "style=\"display:flex\"" : "" %>>
     <div class="modal">
         <h3>Adicionar movimentação</h3>
         <p class="sub">Lançamento manual de proposta ou nova proposta</p>

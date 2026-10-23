@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.Cooperado, java.time.format.DateTimeFormatter" %>
+<%@ page import="java.util.*, model.principais.Cooperado, java.time.format.DateTimeFormatter" %>
 <%!
     // Apenas para EXIBIR: textos com acento para os valores que vem do banco (ex.: NEGOCIACOES -> Negociações).
     private static final String[][] ROTULOS = {

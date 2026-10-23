@@ -56,8 +56,10 @@ public class ColetaServlet extends HttpServlet {
                         .filter(Objects::nonNull)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-                BigDecimal informado = coleta.getPesoTotalKg() != null
-                        ? coleta.getPesoTotalKg() : BigDecimal.ZERO;
+                BigDecimal informado = BigDecimal.ZERO;
+                if (coleta.getPesoTotalKg() != null) {
+                    informado = coleta.getPesoTotalKg();
+                }
 
                 Map<Long, String> cooperativas =
                         opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas");
@@ -132,9 +134,14 @@ public class ColetaServlet extends HttpServlet {
     }
 
     private String nomeDe(Map<Long, String> mapa, Long id, String rotulo) {
-        if (id == null) return null;
+        if (id == null) {
+            return null;
+        }
         String nome = mapa.get(id);
-        return nome != null ? nome : rotulo + " #" + id;
+        if (nome != null) {
+            return nome;
+        }
+        return rotulo + " #" + id;
     }
 
     @Override
@@ -240,17 +247,25 @@ public class ColetaServlet extends HttpServlet {
         }
 
         String rota = request.getParameter("idRota");
-        coleta.getRelacionamentos().setIdRota(rota == null || rota.isBlank()
-                ? null : Long.parseLong(rota));
+        if (rota == null || rota.isBlank()) {
+            coleta.getRelacionamentos().setIdRota(null);
+        } else {
+            coleta.getRelacionamentos().setIdRota(Long.parseLong(rota));
+        }
 
         String endereco = request.getParameter("idEnderecoRota");
-        coleta.getRelacionamentos().setIdEnderecoRota(endereco == null || endereco.isBlank()
-                ? null : Long.parseLong(endereco));
+        if (endereco == null || endereco.isBlank()) {
+            coleta.getRelacionamentos().setIdEnderecoRota(null);
+        } else {
+            coleta.getRelacionamentos().setIdEnderecoRota(Long.parseLong(endereco));
+        }
 
         String responsavel = request.getParameter("idCooperadoResponsavel");
-        coleta.getRelacionamentos().setIdCooperadoResponsavel(
-                responsavel == null || responsavel.isBlank()
-                        ? null : Long.parseLong(responsavel));
+        if (responsavel == null || responsavel.isBlank()) {
+            coleta.getRelacionamentos().setIdCooperadoResponsavel(null);
+        } else {
+            coleta.getRelacionamentos().setIdCooperadoResponsavel(Long.parseLong(responsavel));
+        }
 
         if (coleta.getTipo() == TipoColeta.COLETA_EXTERNA) {
             coleta.setOrigemEntrega(null);

@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.Negociacao" %>
+<%@ page import="java.util.*, model.principais.Negociacao" %>
 <%@ include file="negociacao-util.jspf" %>
 <%
     ArrayList<Negociacao> lista = (ArrayList<Negociacao>) request.getAttribute("lista");

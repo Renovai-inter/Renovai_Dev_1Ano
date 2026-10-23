@@ -36,9 +36,14 @@ public class CadastroServlet extends HttpServlet {
 
         String nome = valor(request.getParameter("nome"));
         String email = valor(request.getParameter("email")).toLowerCase();
-        String senha = request.getParameter("senha") == null ? "" : request.getParameter("senha");
-        String confirmacao = request.getParameter("confirmarSenha") == null
-                ? "" : request.getParameter("confirmarSenha");
+        String senha = request.getParameter("senha");
+        if (senha == null) {
+            senha = "";
+        }
+        String confirmacao = request.getParameter("confirmarSenha");
+        if (confirmacao == null) {
+            confirmacao = "";
+        }
         boolean termos = request.getParameter("termos") != null;
 
         String erro = validar(nome, email, senha, confirmacao, termos);
@@ -100,6 +105,9 @@ public class CadastroServlet extends HttpServlet {
     }
 
     private String valor(String texto) {
-        return texto == null ? "" : texto.trim();
+        if (texto == null) {
+            return "";
+        }
+        return texto.trim();
     }
 }

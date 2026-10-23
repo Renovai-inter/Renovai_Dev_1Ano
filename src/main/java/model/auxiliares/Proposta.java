@@ -1,9 +1,9 @@
-package model;
+package model.auxiliares;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public class Movimentacao {
+public class Proposta {
 
     // ATRIBUTOS (tabela proposta)
 
@@ -31,15 +31,30 @@ public class Movimentacao {
 
     public String getAutor() { return autor; }
 
-    public void setAutor(String autor) { this.autor = autor; }
+    public void setAutor(String autor) {
+        if (!"COOPERATIVA".equals(autor) && !"EMPRESA".equals(autor)) {
+            throw new IllegalArgumentException("autor da proposta inválido.");
+        }
+        this.autor = autor;
+    }
 
     public BigDecimal getValorKg() { return valorKg; }
 
-    public void setValorKg(BigDecimal valorKg) { this.valorKg = valorKg; }
+    public void setValorKg(BigDecimal valorKg) {
+        if (valorKg == null || valorKg.signum() <= 0) {
+            throw new IllegalArgumentException("valorKg deve ser positivo.");
+        }
+        this.valorKg = valorKg;
+    }
 
     public BigDecimal getQuantidadeKg() { return quantidadeKg; }
 
-    public void setQuantidadeKg(BigDecimal quantidadeKg) { this.quantidadeKg = quantidadeKg; }
+    public void setQuantidadeKg(BigDecimal quantidadeKg) {
+        if (quantidadeKg != null && quantidadeKg.signum() <= 0) {
+            throw new IllegalArgumentException("quantidadeKg deve ser positiva.");
+        }
+        this.quantidadeKg = quantidadeKg;
+    }
 
     public String getObservacoes() { return observacoes; }
 
@@ -53,7 +68,7 @@ public class Movimentacao {
 
     public void setTipo(String tipo) { this.tipo = tipo; }
 
-    // true se quem fez a movimentacao foi a cooperativa (o resto e a recicladora)
+    // Indica se a proposta foi feita pela cooperativa.
     public boolean isCooperativa() {
         return autor != null && autor.toUpperCase().startsWith("COOP");
     }

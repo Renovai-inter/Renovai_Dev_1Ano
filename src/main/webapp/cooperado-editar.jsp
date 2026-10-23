@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.Cooperado" %>
+<%@ page import="java.util.*, model.principais.Cooperado" %>
 <%!
     // Apenas para EXIBIR: textos com acento para os valores que vem do banco (ex.: NEGOCIACOES -> Negociações).
     // O value enviado no formulario continua sendo o valor original do banco.
