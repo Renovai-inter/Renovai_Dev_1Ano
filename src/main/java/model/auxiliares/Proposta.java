@@ -1,11 +1,14 @@
 package model.auxiliares;
 
 import model.enums.AutorNegociacao;
+import util.Utilitario;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Proposta {
+
+    private final Utilitario utilitario = new Utilitario();
 
     // ATRIBUTOS (tabela proposta)
 
@@ -54,6 +57,7 @@ public class Proposta {
         if (valorKg == null || valorKg.signum() <= 0) {
             throw new IllegalArgumentException("valorKg deve ser positivo.");
         }
+        utilitario.validarNumeroDecimal(valorKg.toPlainString(), 8, 2);
         this.valorKg = valorKg;
     }
 
@@ -62,6 +66,9 @@ public class Proposta {
     public void setQuantidadeKg(BigDecimal quantidadeKg) {
         if (quantidadeKg != null && quantidadeKg.signum() <= 0) {
             throw new IllegalArgumentException("quantidadeKg deve ser positiva.");
+        }
+        if (quantidadeKg != null) {
+            utilitario.validarNumeroDecimal(quantidadeKg.toPlainString(), 10, 2);
         }
         this.quantidadeKg = quantidadeKg;
     }
