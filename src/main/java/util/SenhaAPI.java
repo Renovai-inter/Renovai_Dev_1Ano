@@ -13,6 +13,7 @@ public final class SenhaAPI {
 
     private SenhaAPI() {
     }
+    fdsa
 
     // Formato salvo no banco: iterações:sal:hash
     public static String gerarHash(String senha) {
