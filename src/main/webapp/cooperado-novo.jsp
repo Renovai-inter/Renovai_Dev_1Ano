@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=3">
-
+<link rel="icon" href="${ctx}/images/Nimo.svg" type="image/svg+xml">
 <style>
     /* Mantém o Cancelar como já funcionou */
     html body .conteudo form .rodape-form a.botao.botao-form.botao-contorno {
