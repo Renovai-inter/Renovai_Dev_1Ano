@@ -22,6 +22,9 @@
         <c:if test="${param.saiu == '1'}">
             <div class="aviso sucesso" role="status">Você saiu da sua conta.</div>
         </c:if>
+        <c:if test="${param.senha == 'ok'}">
+            <div class="aviso sucesso" role="status">Senha alterada com sucesso. Entre com a nova senha.</div>
+        </c:if>
         <c:if test="${not empty erro}">
             <div class="aviso erro" role="alert"><c:out value="${erro}"/></div>
         </c:if>
@@ -40,7 +43,9 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg>
                 <input type="password" name="senha" placeholder="Senha" required autocomplete="current-password">
             </label>
-
+            <p class="alt" style="text-align:right;margin:-6px 8px 14px 0">
+                <a href="${ctx}/esqueci-senha">Esqueci minha senha</a>
+            </p>
             <button type="submit" class="btn-principal" style="margin-top:8px">Entrar</button>
         </form>
 
