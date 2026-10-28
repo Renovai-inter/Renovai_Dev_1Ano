@@ -19,8 +19,8 @@ public class AutenticacaoFilter implements Filter {
 
     // Caminhos que não exigem login
     private static final List<String> PUBLICOS =
-            List.of("/login", "/cadastro", "/css/", "/img/", "/js/",
-                    "/images/", "/scripts/", "/pages/");
+            List.of("/login", "/cadastro", "/esqueci-senha", "/redefinir-senha",
+                    "/css/", "/img/", "/js/", "/images/", "/scripts/", "/pages/");
 
     // Landing page na raiz do site
     private static final List<String> PUBLICOS_EXATOS = List.of("/", "/index.html");
