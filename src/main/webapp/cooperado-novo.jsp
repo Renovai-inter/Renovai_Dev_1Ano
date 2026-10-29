@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=3">
 
 <style>
-    /* Mantém o Cancelar como já funcionou */
+
     html body .conteudo form .rodape-form a.botao.botao-form.botao-contorno {
         background: transparent !important;
         color: #6b9065 !important;
@@ -12,7 +12,6 @@
         opacity: 1 !important;
     }
 
-    /* Corrige o botão Criar cooperado */
     html body .conteudo form .rodape-form button.botao.botao-form.botao-escuro {
         display: inline-flex !important;
         align-items: center !important;

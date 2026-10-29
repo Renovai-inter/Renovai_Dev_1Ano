@@ -18,14 +18,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Negociação <%= esc(negociacao.getCodigo()) %></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=4">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=6">
 </head>
 <body>
 <div class="layout">
 
     <%@ include file="menu.jspf" %>
 
-    <div class="conteudo">
+    <div class="conteudo pagina-ver-neg">
 
         <div class="topo topo-form">
             <div>
@@ -37,13 +37,23 @@
                         </svg>
                         Negociações
                     </a>
-                    <span>&bull; Atualizada em <%= data(negociacao.getUltimaAtualizacao()) %> &bull;</span>
+                    <span>&bull; Atualizada em - <%= data(negociacao.getUltimaAtualizacao()) %></span>
                     <span class="selo selo-<%= classeStatus(negociacao.getStatus()) %>"><%= esc(legivel(negociacao.getStatus())) %></span>
                 </div>
             </div>
             <div class="acoes">
-                <a href="negociacao?acao=editar&id=<%= negociacao.getIdNegociacao() %>" class="botao claro">Editar</a>
-                <a href="#excluir" class="botao vinho">Excluir</a>
+                <a href="negociacao?acao=editar&id=<%= negociacao.getIdNegociacao() %>" class="botao claro" style="display:inline-flex;align-items:center;gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/>
+                    </svg>
+                    Editar
+                </a>
+                <a href="#excluir" class="botao vinho" style="display:inline-flex;align-items:center;gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/>
+                    </svg>
+                    Excluir
+                </a>
             </div>
         </div>
 
@@ -51,6 +61,7 @@
             <div class="erro"><%= esc(erro) %></div>
         <% } %>
 
+        <%-- Cartões Cooperativa / Recicladora (estrutura em negociacao-partes.jspf) --%>
         <%@ include file="negociacao-partes.jspf" %>
 
         <div class="cartao">
@@ -58,11 +69,12 @@
             <div class="resumo-grade">
                 <div class="dado"><small>Material</small><span><%= esc(negociacao.getNomeMaterial()) %></span></div>
                 <div class="dado"><small>Quantidade</small><span><%= kg(negociacao.getQuantidadeKg()) %></span></div>
-                <div class="dado"><small>Valor atual</small><span><%= moeda(negociacao.getValorKgAtual()) %>/kg</span></div>
+                <div class="dado"><small>Valor atual</small><span><%= moeda(negociacao.getValorKgAtual()) %></span></div>
                 <div class="dado"><small>Status</small><span class="selo selo-<%= classeStatus(negociacao.getStatus()) %>"><%= esc(legivel(negociacao.getStatus())) %></span></div>
             </div>
         </div>
 
+        <% if (request.getParameter("teste") != null) { %>
         <%-- TEMPORARIO (para testar o back): botoes das acoes aceitar, recusar e concluir do servlet.
              Eles nao existem no Figma; apague este bloco quando o fluxo estiver testado. --%>
         <div class="cartao">
@@ -86,8 +98,11 @@
             </div>
         </div>
 
+        <% } %>
+
         <div class="cartao">
             <h2 class="linha">Linha do tempo</h2>
+            <%-- Linha vertical, bolinhas e cartões (estrutura em negociacao-linha-tempo.jspf) --%>
             <%@ include file="negociacao-linha-tempo.jspf" %>
         </div>
 
@@ -95,5 +110,6 @@
 </div>
 
 <%@ include file="modal-excluir-negociacao.jspf" %>
+<%@ include file="notificacao.jspf" %>
 </body>
 </html>

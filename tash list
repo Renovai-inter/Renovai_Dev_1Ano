@@ -1,0 +1,34 @@
+[33m63c7aeb[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfix/servlet-cooperado[m[33m)[m Merge remote-tracking branch 'origin/master' into fix/servlet-cooperado
+[33mc3de87b[m[33m ([m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #35 from Renovai-inter/dev/LandingPage
+[33m340f05e[m[33m ([m[1;31morigin/dev/LandingPage[m[33m)[m feat: atualizando landing page com a versão mais recente do Renovai-desenvolvimento
+[33m9d6de1f[m feat: migrando landing page do Renovai-desenvolvimento para o webapp
+[33m410895e[m Merge pull request #33 from Renovai-inter/dev/novas-funcionalidades
+[33ma0847b7[m[33m ([m[1;31morigin/dev/novas-funcionalidades[m[33m)[m feat & fix: adicionando servlet e base do jsp e corrigindo erros da ColetaDAO
+[33mfc6abd3[m feat & fix: adicionando servlet e base do jsp e corrigindo erros da ColetaDAO
+[33m57ff99d[m[33m ([m[1;31morigin/dev/funcionalidade_cadastros[m[33m)[m feat: adicionar branch dev/funcionalidade-cadastros
+[33m203c7e2[m fix: corrigindo a branch
+[33m562d445[m Merge pull request #32 from Renovai-inter/refactor/refatoracao-backend
+[33mfa9cd0e[m Merge branch 'master' of https://github.com/Renovai-inter/Renovai_Dev_1Ano
+[33m89ec376[m Merge pull request #31 from Renovai-inter/hotfix/classe_ColetaDAO_Conexao
+[33m29a5e63[m refactor: executa estagio 2 de refatoracao de codigo
+[33md34902e[m fix: corrigir erros com a classe ColetaDAO e Conexao
+[33md847796[m Merge branch 'master' of https://github.com/Renovai-inter/Renovai_Dev_1Ano
+[33mae0bd5b[m feat: adicionando cadastros, logins, dashboards, cadastro, coletas e CSS
+[33m38cf023[m refactor: executa segunda refatoracao de codigo (sem padrao de codigo)
+[33ma15585a[m Merge pull request #28 from Renovai-inter/refactor/refatoracao-backend
+[33mb8f8dee[m feat: implementa método de validacao de numero decimal
+[33mc9abd88[m refactor: reestrutura metodos de validacao da utilitario e implementa em getters e setters das models
+[33ma8b6df0[m refactor: verifica model de cooperado
+[33m83e1e9c[m refactor: verifica model de cooperativa. Atualiza estrutura de validacao
+[33mf3b490c[m refactor: verifica model de cooperado
+[33m930875a[m refactor: verifica models material, rota e coleta. atualiza padrao de codigo
+[33m8036e40[m fix: atualiza padrao de codigo para definicao de pks
+[33m3ea13e7[m Merge branch 'master' of https://github.com/Renovai-inter/Renovai_Dev_1Ano
+[33m400d16e[m Merge pull request #27 from Renovai-inter/feature/cooperativadao-final
+[33m3a5d19a[m fix: atualizacao de skills para refatoracao backend pelo codex
+[33m978684e[m feat: implementa metodo de cadastro de gestor em cooperativaDAO
+[33m99a096a[m Merge branch 'master' of https://github.com/Renovai-inter/Renovai_Dev_1Ano
+[33m43d0c9f[m feat: cria metodo de cadastro de gestor em cooperadoDAO
+[33ma3ec2f9[m Merge pull request #25 from Renovai-inter/feat/inicio-servlet-cooperado
+[33m512f55e[m feat & fix: adicionando servlet e base do jsp e corrigindo erros da ColetaDAO
+[33m7cf4a29[m feat: adicionar servlet da coleta

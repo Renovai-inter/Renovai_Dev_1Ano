@@ -1,0 +1,577 @@
+<%@ page pageEncoding="UTF-8" %>
+
+<style>
+    .neg-toast {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        width: 720px;
+        max-width: calc(100vw - 32px);
+        box-sizing: border-box;
+        padding: 12px 16px;
+        border-radius: 14px;
+        background: rgba(196, 220, 194, 0.82);
+        -webkit-backdrop-filter: blur(16px) saturate(160%);
+        backdrop-filter: blur(16px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.55);
+        box-shadow: 0 10px 30px rgba(47, 93, 46, 0.18);
+        font-family: 'Poppins', sans-serif;
+        opacity: 0;
+        transform: translate(-50%, -160%);
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.45s ease;
+        pointer-events: none;
+    }
+    .neg-toast.mostrar {
+        opacity: 1;
+        transform: translate(-50%, 0);
+        pointer-events: auto;
+    }
+    .neg-toast-icone {
+        flex: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 9px;
+        background: rgba(255, 255, 255, 0.7);
+        border: 1px solid rgba(63, 107, 62, 0.25);
+        color: #3f6b3e;
+    }
+    .neg-toast-texto { flex: 1; min-width: 0; line-height: 1.25; }
+    .neg-toast-titulo { display: block; font-size: 15px; font-weight: 600; color: #2f5d2e; }
+    .neg-toast-msg { display: block; margin-top: 2px; font-size: 11px; color: #3f6b3e; }
+    .neg-toast-fechar {
+        flex: none;
+        display: flex;
+        padding: 4px;
+        border: 0;
+        background: transparent;
+        color: #3f6b3e;
+        cursor: pointer;
+        border-radius: 50%;
+    }
+    .neg-toast-fechar:hover { background: rgba(255, 255, 255, 0.5); }
+
+    /* botao ou link-botao carregando: um circulo gira no lugar do icone */
+    .botao.carregando { pointer-events: none; opacity: .8; }
+    .botao.carregando svg { display: none; }
+    .botao.carregando::before {
+        content: "";
+        display: inline-block;
+        width: 13px;
+        height: 13px;
+        margin-right: 4px;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        vertical-align: -2px;
+        animation: neg-giro 0.7s linear infinite;
+    }
+    @keyframes neg-giro { to { transform: rotate(360deg); } }
+
+    /* qualquer carregamento: cursor de espera + barra fina no topo da pagina */
+    html.neg-enviando, html.neg-enviando * { cursor: progress !important; }
+    .neg-progresso {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 3px;
+        z-index: 300;
+        background: #3f6b3e;
+        pointer-events: none;
+        animation: neg-progresso 10s cubic-bezier(0.1, 0.6, 0.2, 1) forwards;
+    }
+    @keyframes neg-progresso { to { width: 92%; } }
+
+    /* variante de erro (rosa avermelhado, icone X) */
+    .neg-toast.neg-toast-erro {
+        background: rgba(238, 190, 188, 0.9);
+        box-shadow: 0 10px 30px rgba(127, 29, 29, 0.18);
+    }
+    .neg-toast-erro .neg-toast-icone { color: #8b1f1f; border-color: rgba(139, 31, 31, 0.22); }
+    .neg-toast-erro .neg-toast-titulo { color: #7f1d1d; }
+    .neg-toast-erro .neg-toast-msg { color: #8b2626; }
+    .neg-toast-erro .neg-toast-fechar { color: #8b1f1f; }
+    @media (prefers-reduced-motion: reduce) {
+        .neg-toast { transition: opacity 0.2s ease; transform: translate(-50%, 0); }
+        .neg-progresso { animation: none; width: 60%; }
+    }
+</style>
+
+<%--
+    COMO USAR EM OUTRAS TELAS
+    - Telas de negociacao: inclua este arquivo normalmente (carregamento + notificacoes).
+    - Outras telas (cooperado, material etc.): so o carregamento, sem as notificacoes de negociacao.
+      Coloque esta linha ANTES do include:
+          <script>window.negSoCarregamento = true;</script>
+--%>
+<script>
+(function () {
+    // Se este arquivo for incluido mais de uma vez na mesma pagina, so a primeira copia funciona
+    // (evita notificacao duplicada).
+    if (window.negNotificacoesIniciado) { return; }
+    window.negNotificacoesIniciado = true;
+
+    // =====================================================================================
+    // PARTE 1 - CARREGAMENTO (vale para qualquer tela)
+    // =====================================================================================
+
+    var SELETOR_ENVIAR = 'button[type="submit"], button:not([type]), input[type="submit"]';
+    var temporizador = null;
+
+    // Liga o "carregando". Se o elemento for um botao (classe "botao"), ele ganha o circulo girando.
+    // "segundos" e o tempo maximo que o aviso fica na tela caso a pagina nunca troque (padrao 20).
+    function ligar(elemento, segundos) {
+        if (elemento && elemento.classList && elemento.classList.contains('botao')) {
+            elemento.classList.add('carregando');
+        }
+        document.documentElement.classList.add('neg-enviando');
+        if (document.body && !document.querySelector('.neg-progresso')) {
+            var barra = document.createElement('div');
+            barra.className = 'neg-progresso';
+            document.body.appendChild(barra);
+        }
+        clearTimeout(temporizador);
+        temporizador = setTimeout(desligar, (segundos || 20) * 1000);
+    }
+
+    function desligar() {
+        clearTimeout(temporizador);
+        document.documentElement.classList.remove('neg-enviando');
+        document.querySelectorAll('.botao.carregando').forEach(function (b) { b.classList.remove('carregando'); });
+        document.querySelectorAll('.neg-progresso').forEach(function (b) { b.remove(); });
+    }
+
+    // para outros scripts usarem:  negCarregando.ligar(botao)  /  negCarregando.desligar()
+    window.negCarregando = { ligar: ligar, desligar: desligar };
+
+    // ganchos que a PARTE 2 (notificacoes) preenche; ficam vazios quando so o carregamento esta ativo
+    var aoEnviar = null;   // function (form, botaoClicado)  -> guarda qual acao foi feita
+    var aoBarrar = null;   // function ()                    -> envio barrado pela validacao: apaga a marca
+
+    var submitProgramatico = false;
+
+    // 1) Qualquer formulario enviado (clique, Enter, requestSubmit).
+    //    Formularios com data-neg-ajax (que se enviam via fetch) cuidam do proprio carregando.
+    document.addEventListener('submit', function (evento) {
+        var form = evento.target;
+        if (!form || !form.querySelector) { return; }
+        if (form.hasAttribute('data-neg-ajax') || form.target === '_blank') { return; }
+
+        submitProgramatico = false;
+        var enviar = evento.submitter || null;
+        ligar(enviar || form.querySelector(SELETOR_ENVIAR));
+        if (aoEnviar) { aoEnviar(form, enviar); }
+
+        // se a validacao da propria pagina barrou o envio, desfaz (a menos que ela envie depois, via form.submit())
+        setTimeout(function () {
+            if (evento.defaultPrevented && !submitProgramatico) {
+                if (aoBarrar) { aoBarrar(); }
+                desligar();
+            }
+        }, 0);
+    }, true);
+
+    // 2) Envio por JavaScript com form.submit() (o navegador nao dispara o evento "submit" nesse caso)
+    var submitOriginal = HTMLFormElement.prototype.submit;
+    HTMLFormElement.prototype.submit = function () {
+        submitProgramatico = true;
+        try {
+            if (this.target !== '_blank') {
+                ligar(this.querySelector(SELETOR_ENVIAR));
+                if (aoEnviar) { aoEnviar(this, null); }
+            }
+        } catch (e) { /* nunca impede o envio */ }
+        return submitOriginal.apply(this, arguments);
+    };
+
+    // 3) Clique em link que leva para outra pagina. Link com classe "botao" ganha o circulo;
+    //    os demais (menu, "voltar", itens de tabela) mostram a barra no topo e o cursor de espera.
+    //    Para um link nao mostrar nada, coloque data-sem-carregando nele.
+    document.addEventListener('click', function (evento) {
+        if (evento.defaultPrevented || evento.button !== 0) { return; }
+        if (evento.ctrlKey || evento.metaKey || evento.shiftKey || evento.altKey) { return; }
+
+        var link = evento.target.closest ? evento.target.closest('a[href]') : null;
+        if (!link || link.hasAttribute('data-sem-carregando') || link.hasAttribute('download')) { return; }
+        if (link.target && link.target !== '_self') { return; }
+
+        var href = link.getAttribute('href');
+        if (!href || href.charAt(0) === '#' || /^(javascript|mailto|tel):/i.test(href)) { return; }
+        if (link.origin !== window.location.origin) { return; }
+
+        // so muda o #: continua na mesma pagina (abre modal, por exemplo)
+        if (link.pathname === window.location.pathname && link.search === window.location.search && link.hash) { return; }
+
+        // arquivos para baixar nao trocam de pagina
+        if (/\.(pdf|xlsx?|csv|zip|rar|docx?|png|jpe?g|gif)$/i.test(link.pathname)) { return; }
+
+        ligar(link);
+    }, false);
+
+    // 4) rede de seguranca: location.href = ..., F5, voltar/avancar (so se nada ja estiver carregando)
+    window.addEventListener('beforeunload', function () {
+        if (!document.documentElement.classList.contains('neg-enviando')) { ligar(null, 8); }
+    });
+
+    // voltar pelo botao do navegador nao deve deixar nada "carregando"
+    window.addEventListener('pageshow', desligar);
+
+    // Telas que so querem o carregamento (sem as notificacoes de negociacao) param aqui.
+    if (window.negSoCarregamento) { return; }
+
+    // =====================================================================================
+    // PARTE 2 - NOTIFICACOES DE NEGOCIACAO (sucesso e erro)
+    // =====================================================================================
+
+    var MENSAGENS = {
+        nova:        ['Nova negociação cadastrada!', 'Acesse a tela Negociações para visualizar a lista de negociações cadastrados.'],
+        atualizada:  ['Negociação atualizada!', 'As informações da negociação foram atualizadas com sucesso.'],
+        cancelada:   ['Negociação cancelada!', 'A negociação foi cancelada com sucesso e não estará mais disponível para as operações do sistema.'],
+        excluida:    ['Negociação excluída!', 'A negociação foi excluída com sucesso do sistema.'],
+        movAdicionada: ['Movimentação adicionada!', 'A movimentação foi adicionada à negociação com sucesso.'],
+        movExcluida:   ['Movimentação excluída!', 'A movimentação foi excluída da negociação com sucesso.'],
+        exclusaoComVenda: ['Não foi possível excluir!', 'Esta negociação possui uma venda concluída e não pode ser excluída permanentemente. Use a opção “Alterar status para cancelada” para preservar o histórico.', 'erro'],
+        exclusaoComVendaCancelada: ['Não foi possível excluir!', 'Esta negociação possui uma venda concluída e não pode ser excluída permanentemente. Como ela já está cancelada, o histórico já está preservado.', 'erro']
+    };
+
+    // avisos de sucesso que podem ser pedidos pela URL (?aviso=atualizada)
+    var AVISOS_URL = ['nova', 'atualizada', 'cancelada', 'excluida', 'movAdicionada', 'movExcluida'];
+
+    var ICONE_OK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+    var ICONE_ERRO = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+
+    // valor do campo "acao" (sem maiusculas, espacos, "_" ou "-") -> tipo de notificacao
+    var ACAO_PARA_TIPO = {
+        salvar: 'nova',
+        cadastrar: 'nova',
+        novo: 'nova',
+        atualizar: 'atualizada',
+        editar: 'atualizada',
+        alterar: 'atualizada',
+        salvaralteracoes: 'atualizada',
+        cancelar: 'cancelada',
+        excluir: 'excluida',
+        movimentar: 'movAdicionada'
+    };
+
+    var CHAVE = 'negNotificacao';
+    var VALIDADE = 600000; // 10 minutos
+
+    // ---------------------------------------------------------------- marca "o que o usuario fez"
+
+    // Guarda a acao em tres lugares, para o aviso aparecer mesmo que o navegador
+    // bloqueie algum deles (sessionStorage, localStorage ou cookie).
+    function marcar(tipo) {
+        var valor = JSON.stringify({ tipo: tipo, ts: Date.now() });
+        try { sessionStorage.setItem(CHAVE, valor); } catch (e) { /* sem sessionStorage */ }
+        try { localStorage.setItem(CHAVE, valor); } catch (e) { /* sem localStorage */ }
+        try { document.cookie = CHAVE + '=' + encodeURIComponent(valor) + '; path=/; max-age=600; SameSite=Lax'; } catch (e) { /* sem cookies */ }
+    }
+    window.negMarcar = marcar;
+
+    function limparMarca() {
+        try { sessionStorage.removeItem(CHAVE); } catch (e) { /* ok */ }
+        try { localStorage.removeItem(CHAVE); } catch (e) { /* ok */ }
+        try { document.cookie = CHAVE + '=; path=/; max-age=0; SameSite=Lax'; } catch (e) { /* ok */ }
+    }
+
+    // ---------------------------------------------------------------- toast
+
+    function mostrar(tipo) {
+        // aceita uma chave de MENSAGENS ou uma mensagem pronta: [titulo, texto, 'erro']
+        var msg = (typeof tipo === 'string') ? MENSAGENS[tipo] : tipo;
+        if (!msg || !document.body) { return; }
+
+        var ehErro = msg[2] === 'erro';
+        var toast = document.createElement('div');
+        toast.className = 'neg-toast' + (ehErro ? ' neg-toast-erro' : '');
+        toast.setAttribute('role', ehErro ? 'alert' : 'status');
+        toast.setAttribute('aria-live', ehErro ? 'assertive' : 'polite');
+        toast.innerHTML =
+            '<div class="neg-toast-icone">' + (ehErro ? ICONE_ERRO : ICONE_OK) + '</div>' +
+            '<div class="neg-toast-texto"><span class="neg-toast-titulo"></span><span class="neg-toast-msg"></span></div>' +
+            '<button type="button" class="neg-toast-fechar" aria-label="Fechar notificação"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg></button>';
+        toast.querySelector('.neg-toast-titulo').textContent = msg[0];
+        toast.querySelector('.neg-toast-msg').textContent = msg[1];
+        document.body.appendChild(toast);
+
+        var fechado = false;
+        function fechar() {
+            if (fechado) { return; }
+            fechado = true;
+            toast.classList.remove('mostrar');
+            setTimeout(function () { toast.remove(); }, 700);
+        }
+
+        toast.querySelector('.neg-toast-fechar').addEventListener('click', fechar);
+
+        // pequena pausa para a animacao de entrada acontecer
+        setTimeout(function () { toast.classList.add('mostrar'); }, 120);
+        setTimeout(fechar, ehErro ? 9000 : 5500);
+    }
+    window.negMostrarNotificacao = mostrar;
+
+    // ---------------------------------------------------------------- erros amigaveis
+
+    // O que o usuario estava tentando fazer (chave = mesmos tipos das notificacoes de sucesso)
+    var ACOES = {
+        nova:          { titulo: 'Não foi possível cadastrar!',                inf: 'cadastrar a negociação',    um: 'uma negociação',  este: 'Esta negociação',  fem: true, mov: false },
+        atualizada:    { titulo: 'Não foi possível atualizar!',                inf: 'atualizar a negociação',    um: 'uma negociação',  este: 'Esta negociação',  fem: true, mov: false },
+        cancelada:     { titulo: 'Não foi possível cancelar!',                 inf: 'cancelar a negociação',     um: 'uma negociação',  este: 'Esta negociação',  fem: true, mov: false },
+        excluida:      { titulo: 'Não foi possível excluir!',                  inf: 'excluir a negociação',      um: 'uma negociação',  este: 'Esta negociação',  fem: true, mov: false },
+        movAdicionada: { titulo: 'Não foi possível adicionar a movimentação!', inf: 'adicionar a movimentação',  um: 'uma movimentação', este: 'Esta movimentação', fem: true, mov: true },
+        movExcluida:   { titulo: 'Não foi possível excluir a movimentação!',   inf: 'excluir a movimentação',    um: 'uma movimentação', este: 'Esta movimentação', fem: true, mov: true }
+    };
+    var ACAO_PADRAO = { titulo: 'Não foi possível concluir!', inf: 'concluir a operação', um: 'um registro', este: 'Este registro', fem: false, mov: false };
+
+    // textos que denunciam mensagem tecnica (nunca devem aparecer para o usuario)
+    var TECNICO = /ERROR:|Exception|SQLState|SQL|org\.|java\.|javax\.|Detalhe:|Detail:|Where:|Hint:|\bat [\w.$]+\(|constraint|relation "/i;
+
+    // "id_material" -> "material"
+    function nomeCampo(coluna) {
+        return String(coluna).replace(/^id_/i, '').replace(/_/g, ' ');
+    }
+
+    // Cada regra: re = como reconhecer o erro; titulo = titulo fixo (ou null para usar o da acao);
+    // msg = funcao(textoDoErro, acao) que devolve a mensagem personalizada.
+    // A primeira regra que combinar vence, entao as mais especificas vem antes.
+    var REGRAS = [
+        { re: /numeric field overflow|out of range|value out of range/i,
+          titulo: 'Valor muito grande!',
+          msg: function (t, a) {
+              return 'Algum número informado é grande demais para ser guardado. Confira ' +
+                  (a.mov ? 'o valor e a quantidade da movimentação' : 'a quantidade e o valor da negociação') +
+                  ' e tente novamente.';
+          } },
+
+        { re: /invalid input syntax for type (numeric|integer|bigint|smallint|double|real)|NumberFormatException|For input string|is neither a decimal digit/i,
+          titulo: 'Número inválido!',
+          msg: function () {
+              return 'Há um número em formato inválido. Use apenas dígitos e vírgula, por exemplo 1500,00, e tente novamente.';
+          } },
+
+        { re: /invalid input syntax for type (date|time|timestamp)|DateTimeParseException|ParseException/i,
+          titulo: 'Data inválida!',
+          msg: function () { return 'Há uma data em formato inválido. Confira as datas informadas e tente novamente.'; } },
+
+        { re: /null value in column|violates not-null/i,
+          titulo: null,
+          msg: function (t, a) {
+              var c = t.match(/column "([^"]+)"/i);
+              return c ? 'O campo “' + nomeCampo(c[1]) + '” é obrigatório. Preencha-o para poder ' + a.inf + '.'
+                       : 'Há campos obrigatórios sem preencher. Preencha todos para poder ' + a.inf + '.';
+          } },
+
+        { re: /duplicate key value|unique constraint|already exists/i,
+          titulo: 'Registro já cadastrado!',
+          msg: function (t, a) {
+              return 'Já existe ' + a.um + ' com essas mesmas informações. Confira os dados antes de tentar de novo.';
+          } },
+
+        { re: /still referenced|is referenced from table|update or delete on table/i,
+          titulo: 'Não é possível excluir!',
+          msg: function (t, a) {
+              return a.este + ' está em uso em outros registros e não pode ser excluíd' + (a.fem ? 'a' : 'o') + ' do sistema.';
+          } },
+
+        { re: /foreign key constraint/i,
+          titulo: null,
+          msg: function () {
+              return 'Um dos itens escolhidos (como o material ou uma das partes) não existe mais ou foi removido. Atualize a página e tente novamente.';
+          } },
+
+        { re: /check constraint/i,
+          titulo: null,
+          msg: function () { return 'Algum dos valores informados não é aceito pelo sistema. Confira os campos e tente novamente.'; } },
+
+        { re: /value too long|string data, right truncation/i,
+          titulo: 'Texto muito longo!',
+          msg: function () { return 'Algum texto está maior do que o permitido. Reduza o tamanho e tente novamente.'; } },
+
+        { re: /invalid byte sequence|untranslatable character|character with byte sequence/i,
+          titulo: 'Caractere inválido!',
+          msg: function () { return 'Algum campo contém um caractere que o sistema não aceita. Remova símbolos especiais e tente novamente.'; } },
+
+        { re: /deadlock|could not serialize|lock timeout|due to lock/i,
+          titulo: 'Operação em conflito!',
+          msg: function () { return 'Outra operação estava acontecendo ao mesmo tempo. Aguarde alguns segundos e tente novamente.'; } },
+
+        { re: /connection (refused|reset|closed|attempt failed)|could not connect|I\/O error|terminating connection|too many connections|Cannot get a connection|Unable to acquire|timed? ?out|Communications link|SocketException|FATAL|database system is (starting up|shutting down)/i,
+          titulo: 'Sem conexão com o banco!',
+          msg: function () { return 'Não foi possível acessar o banco de dados agora. Tente novamente em alguns instantes.'; } },
+
+        { re: /permission denied|insufficient privilege/i,
+          titulo: 'Sem permissão!',
+          msg: function (t, a) { return 'Este acesso não tem permissão para ' + a.inf + '. Fale com o administrador do sistema.'; } },
+
+        { re: /NullPointerException|IllegalArgumentException|ClassCastException|IndexOutOfBounds/i,
+          titulo: null,
+          msg: function () { return 'Alguma informação necessária não chegou ao sistema. Atualize a página e tente novamente.'; } },
+
+        { re: /does not exist|syntax error at or near|SQLSyntax|ERROR: function/i,
+          titulo: 'Erro interno do sistema!',
+          msg: function (t, a) { return 'Houve uma falha interna ao tentar ' + a.inf + '. Avise o suporte informando o horário do problema.'; } }
+    ];
+
+    // Recebe o texto do erro (como veio do servidor) e o tipo da acao ('atualizada', 'excluida'...)
+    // e devolve [titulo, mensagem, 'erro'] ja personalizado.
+    function traduzirErro(texto, acao) {
+        var a = ACOES[acao] || ACAO_PADRAO;
+        var t = String(texto || '').replace(/\s+/g, ' ').trim();
+
+        for (var i = 0; i < REGRAS.length; i++) {
+            if (REGRAS[i].re.test(t)) {
+                return [REGRAS[i].titulo || a.titulo, REGRAS[i].msg(t, a), 'erro'];
+            }
+        }
+
+        // nenhuma regra reconheceu: se parece texto tecnico (ou veio vazio), usa a mensagem geral
+        if (!t || TECNICO.test(t)) {
+            return [a.titulo, 'Algo inesperado aconteceu ao tentar ' + a.inf + '. Confira as informações e tente novamente. Se continuar, avise o suporte.', 'erro'];
+        }
+
+        // senao o servidor ja mandou um texto amigavel (ex.: "Informe a quantidade"): mostra ele mesmo
+        var m = t.match(/^Não foi possível [^.!:]+[.!:]\s*(.+)$/i);
+        return [a.titulo, m ? m[1] : t, 'erro'];
+    }
+
+    // Para outras telas/scripts usarem:
+    //   negMostrarErroTexto(textoDoErro, 'atualizada')   -> traduz e mostra
+    //   negMostrarErro(titulo, mensagem)                 -> mostra a mensagem que voce escrever
+    window.negMostrarErroTexto = function (texto, acao) {
+        console.info('[notificacao] erro original:', String(texto || '').trim() || '(sem texto)');
+        mostrar(traduzirErro(texto, acao));
+    };
+    window.negMostrarErro = function (titulo, mensagem) {
+        mostrar([titulo, mensagem, 'erro']);
+    };
+
+    // ---------------------------------------------------------------- descobrir qual acao foi feita
+
+    function descobrirTipo(form, enviar) {
+        // 1) forma garantida: data-neg-tipo="atualizada" no <form> ou no botao
+        var forcado = (enviar && enviar.getAttribute && enviar.getAttribute('data-neg-tipo')) || form.getAttribute('data-neg-tipo');
+        if (forcado) { return forcado; }
+
+        var valor = null;
+
+        // 2) botao clicado que tem name="acao" (ex.: <button name="acao" value="atualizar">)
+        if (enviar && enviar.name === 'acao') { valor = enviar.value; }
+
+        // 3) campos do formulario
+        if (valor === null) {
+            var campo = form.querySelector('input[name="acao"]:checked')
+                || form.querySelector('input[type="hidden"][name="acao"]')
+                || form.querySelector('select[name="acao"]')
+                || form.querySelector('input[name="acao"]:not([type="radio"]):not([type="checkbox"])');
+            if (campo) { valor = campo.value; }
+        }
+
+        if (valor === null) { return null; }
+        return ACAO_PARA_TIPO[String(valor).toLowerCase().replace(/[\s_\-]/g, '')] || null;
+    }
+
+    // ligados aos ganchos da PARTE 1: guardam a acao feita para a proxima pagina mostrar o aviso
+    aoEnviar = function (form, enviar) {
+        var tipo = descobrirTipo(form, enviar);
+        if (tipo && MENSAGENS[tipo]) {
+            marcar(tipo);
+        } else {
+            console.info('[notificacao] formulario enviado sem acao reconhecida (campo "acao" = ' +
+                (form.querySelector('[name="acao"]') ? form.querySelector('[name="acao"]').value : 'inexistente') + ')');
+        }
+    };
+    aoBarrar = limparMarca;
+
+    // ---------------------------------------------------------------- mostrar na pagina seguinte
+
+    // Le (e apaga) a marca guardada na pagina anterior
+    function lerPendente() {
+        var doSession = null;
+        var doLocal = null;
+        var doCookie = null;
+
+        try { doSession = sessionStorage.getItem(CHAVE); sessionStorage.removeItem(CHAVE); } catch (e) { doSession = null; }
+        try { doLocal = localStorage.getItem(CHAVE); localStorage.removeItem(CHAVE); } catch (e) { doLocal = null; }
+
+        var m = document.cookie.match(new RegExp('(?:^|; )' + CHAVE + '=([^;]*)'));
+        if (m) { try { doCookie = decodeURIComponent(m[1]); } catch (e) { doCookie = null; } }
+        try { document.cookie = CHAVE + '=; path=/; max-age=0; SameSite=Lax'; } catch (e) { /* ok */ }
+
+        var bruto = doSession || doLocal || doCookie;
+        try { return bruto ? JSON.parse(bruto) : null; } catch (e) { return null; }
+    }
+
+    // Le (e tira da barra de enderecos) o ?aviso=... da URL. Esse caminho nao depende de
+    // storage nem de cookies, entao funciona mesmo que o navegador bloqueie tudo isso.
+    function lerAvisoDaUrl() {
+        try {
+            var url = new URL(window.location.href);
+            var valor = url.searchParams.get('aviso');
+            if (!valor) { return null; }
+            url.searchParams.delete('aviso');
+            window.history.replaceState(null, '', url.pathname + url.search + url.hash);
+            return valor;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    // Quando a pagina terminou de carregar (assim funciona onde quer que este arquivo seja incluido):
+    // mostra a notificacao de sucesso pendente, ou o erro (traduzido) que o servidor devolveu
+    function iniciar() {
+        var pendente = lerPendente();
+        var avisoUrl = lerAvisoDaUrl();
+        console.info('[notificacao] pagina carregada | aviso na URL = ' + avisoUrl +
+            ' | aviso guardado = ' + (pendente ? pendente.tipo : null));
+
+        // a acao que o usuario acabou de fazer (so vale se for recente)
+        var acao = (pendente && pendente.tipo && (Date.now() - pendente.ts) <= VALIDADE) ? pendente.tipo : null;
+
+        // So conta como erro se a caixa existir E tiver texto. Uma <div class="erro"> vazia
+        // (que o JSP pode deixar sempre na pagina) nao deve bloquear a notificacao.
+        var caixasErro = document.querySelectorAll('.erro');
+        var textoErro = '';
+        caixasErro.forEach(function (c) { textoErro += ' ' + c.textContent; });
+        textoErro = textoErro.replace(/\s+/g, ' ').trim();
+
+        if (textoErro === '') {
+            var tipo = (avisoUrl && AVISOS_URL.indexOf(avisoUrl) !== -1) ? avisoUrl : acao;
+            if (tipo) {
+                mostrar(tipo);
+            } else if (pendente) {
+                console.info('[notificacao] descartada: pendente ha mais de 10 minutos');
+            }
+            return;
+        }
+
+        // Qualquer erro vindo do servidor vira uma notificacao amigavel (a caixa de erro original
+        // fica escondida; o texto tecnico continua no console para quem for depurar).
+        console.info('[notificacao] erro original do servidor:', textoErro);
+        caixasErro.forEach(function (c) { c.style.display = 'none'; });
+
+        if (/ck_venda_origem_negociacao|relation\s+"venda"/i.test(textoErro)) {
+            // excluir negociacao que tem venda concluida; se ja esta cancelada, nao sugere cancelar de novo
+            var seloStatus = document.querySelector('.crumbs .selo');
+            var jaCancelada = seloStatus && /cancelad/i.test(seloStatus.textContent);
+            mostrar(jaCancelada ? 'exclusaoComVendaCancelada' : 'exclusaoComVenda');
+        } else {
+            mostrar(traduzirErro(textoErro, acao));
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', iniciar);
+    } else {
+        iniciar();
+    }
+})();
+</script>
+

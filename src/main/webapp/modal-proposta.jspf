@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8" %>
 <%-- Modal "Adicionar proposta" (tela Editar). Abre pelo link href="#proposta".
      Usa a variavel "negociacao" da pagina. Se o servlet devolveu erro (atributo "abrirModal"),
      ele ja abre sozinho e mantem o que foi digitado. --%>
@@ -13,7 +14,14 @@
     String obsMov = abrirModalMov ? request.getParameter("observacoes") : "";
 %>
 <div class="modal-fundo" id="proposta" <%= abrirModalMov ? "style=\"display:flex\"" : "" %>>
-    <div class="modal">
+    <div class="modal modal-mov">
+
+        <a href="negociacao?acao=editar&id=<%= negociacao.getIdNegociacao() %>" class="modal-fechar" aria-label="Fechar" title="Fechar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+            </svg>
+        </a>
+
         <h3>Adicionar movimentação</h3>
         <p class="sub">Lançamento manual de proposta ou nova proposta</p>
 
@@ -31,25 +39,25 @@
                 </select>
             </div>
 
-            <div class="grade" style="margin-top:14px">
+            <div class="grade">
                 <div class="campo">
-                    <label for="valorMov">Valor por kg (R$)</label>
-                    <input type="text" id="valorMov" name="valor" inputmode="decimal" placeholder="R$0,00" value="<%= esc(valorMov) %>">
+                    <label for="valorMov">Valor</label>
+                    <input type="text" id="valorMov" name="valor" inputmode="decimal" title="Valor por kg (R$)" placeholder="R$0,00" value="<%= esc(valorMov) %>">
                 </div>
                 <div class="campo">
-                    <label for="qtdMov">Quantidade (kg)</label>
-                    <input type="text" id="qtdMov" name="quantidade" inputmode="decimal" placeholder="0kg" value="<%= esc(qtdMov) %>">
+                    <label for="qtdMov">Quantidade</label>
+                    <input type="text" id="qtdMov" name="quantidade" inputmode="decimal" title="Quantidade (kg)" placeholder="0kg" value="<%= esc(qtdMov) %>">
                 </div>
             </div>
 
-            <div class="campo" style="margin-top:14px">
+            <div class="campo campo-obs">
                 <label for="obsMov">Observações</label>
                 <textarea id="obsMov" name="observacoes"><%= esc(obsMov) %></textarea>
             </div>
 
             <div class="rodape">
-                <a href="negociacao?acao=editar&id=<%= negociacao.getIdNegociacao() %>" class="botao claro">Cancelar</a>
-                <button type="submit" class="botao verde">Salvar</button>
+                <a href="negociacao?acao=editar&id=<%= negociacao.getIdNegociacao() %>" class="botao botao-cancelar-modal">Cancelar</a>
+                <button type="submit" class="botao botao-confirmar">Salvar</button>
             </div>
         </form>
     </div>
