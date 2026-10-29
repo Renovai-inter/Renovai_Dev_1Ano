@@ -74,6 +74,45 @@
     <title><%= esc(c.getNomeCompleto()) %></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=8">
+
+    <style>
+        .permissoes .perm-leitura {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-radius: 999px;
+            border: 1px solid #c9d8c5;
+            font-size: 14px;
+        }
+        .permissoes .perm-leitura input { display: none; }
+
+        .permissoes .perm-caixa {
+            width: 20px;
+            height: 20px;
+            border: 2px solid currentColor;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .permissoes .perm-caixa svg { width: 14px; height: 14px; }
+
+        /* Com permissão: verde clarinho com check */
+        .permissoes .perm-on {
+            background: #d3e3cf;
+            color: #2f4a2f;
+        }
+
+        /* Sem permissão: cinza e sem o check */
+        .permissoes .perm-off {
+            background: #eeeeea;
+            border-color: #dcdcd6;
+            color: #9a9a94;
+        }
+        .permissoes .perm-off .perm-caixa svg { display: none; }
+    </style>
 </head>
 <body>
 <div class="layout">
@@ -152,10 +191,16 @@
                             || "Configurações".equalsIgnoreCase(modulo)) {
                         continue;
                     }
+                    boolean temPermissao = permissoesDoCooperado.contains(perm.getKey());
                 %>
-                    <label class="perm perm-leitura"><%= esc(rotulo(modulo)) %>
-                        <input type="checkbox" disabled <%= permissoesDoCooperado.contains(perm.getKey()) ? "checked" : "" %>>
-                        <span class="chave"></span>
+                    <label class="perm perm-leitura <%= temPermissao ? "perm-on" : "perm-off" %>">
+                        <span class="perm-nome"><%= esc(rotulo(modulo)) %></span>
+                        <input type="checkbox" disabled <%= temPermissao ? "checked" : "" %>>
+                        <span class="perm-caixa">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M20 6 9 17l-5-5"/>
+                            </svg>
+                        </span>
                     </label>
                 <% } %>
             </div>
