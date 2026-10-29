@@ -3,24 +3,26 @@
 <% if (movimentacoes.isEmpty()) { %>
     <p class="aviso">Nenhuma movimentação registrada.</p>
 <% } else { %>
-    <div class="linha-tempo">
+    <div class="neg-linha">
         <% for (Proposta mov : movimentacoes) {
                boolean daCooperativa = mov.isCooperativa();
         %>
-            <div class="mov <%= daCooperativa ? "mov-coop" : "mov-reci" %>">
-                <div class="mov-topo">
-                    <span class="etiqueta <%= daCooperativa ? "etiqueta-coop" : "etiqueta-reci" %>"><%= daCooperativa ? "Cooperativa" : "Recicladora" %></span>
-                    <b><%= esc(daCooperativa ? negociacao.getNomeCooperativa() : negociacao.getNomeEmpresa()) %></b>
-                    <span class="tipo"><%= esc(mov.getTipo()) %></span>
+            <div class="neg-mov <%= daCooperativa ? "neg-mov-coop" : "neg-mov-reci" %>">
+                <span class="neg-ponto"></span>
+                <div class="neg-cartao" title="Registrada em <%= data(mov.getDataProposta()) %>">
+                    <div class="neg-cabeca">
+                        <span class="neg-etiqueta"><%= daCooperativa ? "Cooperativa" : "Recicladora" %></span>
+                        <b><%= esc(daCooperativa ? negociacao.getNomeCooperativa() : negociacao.getNomeEmpresa()) %></b>
+                        <span class="neg-tipo"><%= esc(mov.getTipo()) %></span>
+                    </div>
+                    <div class="neg-valores">
+                        <span>Valor: <b><%= moeda(mov.getValorKg()) %></b></span>
+                        <span>Quantidade: <b><%= kg(mov.getQuantidadeKg()) %></b></span>
+                    </div>
+                    <% if (mov.getObservacoes() != null && !mov.getObservacoes().trim().isEmpty()) { %>
+                        <p class="neg-obs">&ldquo;<%= esc(mov.getObservacoes()) %>&rdquo;</p>
+                    <% } %>
                 </div>
-                <div class="mov-dados">
-                    <span>Valor: <b><%= moeda(mov.getValorKg()) %>/kg</b></span>
-                    <span>Quantidade: <b><%= kg(mov.getQuantidadeKg()) %></b></span>
-                    <small><%= data(mov.getDataProposta()) %></small>
-                </div>
-                <% if (mov.getObservacoes() != null && !mov.getObservacoes().trim().isEmpty()) { %>
-                    <p class="mov-obs">&ldquo;<%= esc(mov.getObservacoes()) %>&rdquo;</p>
-                <% } %>
             </div>
         <% } %>
     </div>

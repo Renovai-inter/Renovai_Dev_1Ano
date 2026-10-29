@@ -1,3 +1,242 @@
+/* ===== TELA VER NEGOCIACAO: cartao "Resumo" =====. */
+
+.pagina-ver-neg .cartao h2.linha {
+    font-weight: 500;
+}
+
+/* quatro colunas: Material, Quantidade, Valor atual e Status */
+.pagina-ver-neg .resumo-grade {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px 28px;
+}
+
+/* rotulo pequeno em cinza */
+.pagina-ver-neg .resumo-grade .dado small {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #7a7a7a;
+}
+
+/* valor */
+.pagina-ver-neg .resumo-grade .dado > span:not(.selo) {
+    display: block;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: #1f1f1f;
+}
+
+/* "Valor atual" em destaque */
+.pagina-ver-neg .resumo-grade .dado:nth-child(3) > span {
+    font-weight: 600;
+}
+
+/* selo de status */
+.pagina-ver-neg .resumo-grade .dado span.selo {
+    min-width: 80px;
+    padding: 4px 12px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+@media (max-width: 860px) {
+    .pagina-ver-neg .resumo-grade {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+/* ===== LINHA DO TEMPO DAS MOVIMENTACOES (negociacao-linha-tempo.jspf) ===== */
+
+.neg-linha {
+    position: relative;
+    padding-left: 40px;
+}
+
+/* linha vertical */
+.neg-linha::before {
+    content: "";
+    position: absolute;
+    top: 6px;
+    bottom: 0;
+    left: 5px;
+    width: 2px;
+    background: #d6d6d6;
+}
+
+.neg-linha .neg-mov {
+    position: relative;
+    margin-bottom: 14px;
+}
+
+.neg-linha .neg-mov:last-child {
+    margin-bottom: 0;
+}
+
+/* bolinha (verde = cooperativa, vinho = recicladora) */
+.neg-linha .neg-ponto {
+    position: absolute;
+    top: 16px;
+    left: -40px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #4f9a58;
+    box-shadow: 0 0 0 3px #ffffff;
+}
+
+.neg-linha .neg-mov-reci .neg-ponto {
+    background: #86213f;
+}
+
+/* cartao da movimentacao */
+.neg-linha .neg-cartao {
+    padding: 14px 20px 16px;
+    border: 1px solid #e3e0dc;
+    border-radius: 16px;
+    background: #faf9f6;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+/* cabecalho: etiqueta do autor, nome e tipo */
+.neg-linha .neg-cabeca {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.neg-linha .neg-cabeca b {
+    font-size: 12px;
+    font-weight: 600;
+    color: #1f1f1f;
+}
+
+.neg-linha .neg-etiqueta {
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+    background: #d8ecd3;
+    color: #3f6b45;
+}
+
+.neg-linha .neg-mov-reci .neg-etiqueta {
+    background: #f3d6df;
+    color: #86213f;
+}
+
+.neg-linha .neg-tipo {
+    padding: 1px 10px;
+    border: 1px solid #cfcfcf;
+    border-radius: 4px;
+    background: #ffffff;
+    font-size: 9.5px;
+    color: #666666;
+}
+
+/* valor e quantidade */
+.neg-linha .neg-valores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 26px;
+    margin-top: 10px;
+}
+
+.neg-linha .neg-valores span {
+    font-size: 14px;
+    color: #8a8a8a;
+}
+
+.neg-linha .neg-valores b {
+    font-size: 15px;
+    font-weight: 500;
+    color: #2b2b2b;
+}
+
+/* observacao */
+.neg-linha .neg-obs {
+    margin: 8px 0 0;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #555555;
+}
+
+/* ===== CARTOES DA COOPERATIVA E DA RECICLADORA (negociacao-partes.jspf) ===== */
+
+.neg-partes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-bottom: 18px;
+}
+
+.neg-partes .neg-parte {
+    padding: 20px 26px 22px;
+    border-left: 7px solid #6b9065;
+    border-radius: 22px;
+    background: #ffffff;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.neg-partes .neg-parte-reci {
+    border-left-color: #86213f;
+}
+
+/* rotulo pequeno com icone */
+.neg-partes .neg-parte-rotulo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.neg-partes .neg-parte-coop .neg-parte-rotulo {
+    color: #3f6b45;
+}
+
+.neg-partes .neg-parte-reci .neg-parte-rotulo {
+    color: #881c4d;
+}
+
+.neg-partes .neg-parte-rotulo svg {
+    flex-shrink: 0;
+}
+
+/* nome grande */
+.neg-partes .neg-parte strong {
+    display: block;
+    margin-top: 8px;
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: #1f1f1f;
+}
+
+/* cidade/estado e CNPJ */
+.neg-partes .neg-parte span {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #7a7a7a;
+}
+
+@media (max-width: 860px) {
+    .neg-partes {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+}
+
+
 /* ===== PERMISSOES SOMENTE LEITURA (tela Ver) ===== */
 .perm-leitura {
     cursor: not-allowed !important;
@@ -926,3 +1165,802 @@ table {
         min-width: 640px;
     }
 }
+
+/* ===== TELA EDITAR NEGOCIACAO (v2) ===== */
+
+/* ----- titulos dos cartoes ----- */
+.pagina-editar-neg .cartao h2.linha {
+    font-weight: 500;
+}
+
+/* ----- Linha do tempo: titulo a esquerda, botao a direita ----- */
+.pagina-editar-neg .neg-cartao-topo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.pagina-editar-neg .neg-cartao-topo h2.linha {
+    flex: 1;
+    margin: 0;
+    font-size: 20px;
+}
+
+.pagina-editar-neg .neg-pilula {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 32px;
+    padding: 0 16px;
+    border: 1px solid #e1ecde;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #4f9a58;
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+    transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.pagina-editar-neg .neg-pilula svg {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+}
+
+.pagina-editar-neg .neg-pilula:hover {
+    background: #f3f9f2;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
+}
+
+/* ----- Resumo ----- */
+.pagina-editar-neg .resumo-grade {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px 28px;
+}
+
+.pagina-editar-neg .resumo-grade .campo label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #7a7a7a;
+}
+
+.pagina-editar-neg .resumo-grade .campo input,
+.pagina-editar-neg .resumo-grade .campo select {
+    width: 100%;
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    background-color: #ffffff;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: #2b2b2b;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.pagina-editar-neg .resumo-grade .campo input:focus,
+.pagina-editar-neg .resumo-grade .campo select:focus {
+    border-color: #6b9065;
+    box-shadow: 0 0 0 3px rgba(107, 144, 101, 0.18);
+}
+
+/* selects com setinha vinho (material; e status se o JavaScript nao carregar) */
+.pagina-editar-neg .resumo-grade .campo select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 36px;
+    background-color: #eef3e8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2386213f'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+}
+
+.pagina-editar-neg .resumo-grade .campo #status {
+    color: #86213f;
+    background-color: #ffffff;
+}
+
+/* ----- quantidade e valor: unidade dentro do campo + setinhas de subir/descer ----- */
+.pagina-editar-neg .campo-numero {
+    position: relative;
+}
+
+.pagina-editar-neg .resumo-grade .campo .campo-numero input {
+    padding-right: 34px;
+}
+
+.pagina-editar-neg .campo-unidade.unidade-kg::after {
+    content: "kg";
+    position: absolute;
+    right: 32px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: #8a8a8a;
+    pointer-events: none;
+}
+
+.pagina-editar-neg .campo-unidade.unidade-real::before {
+    content: "R$";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: #8a8a8a;
+    pointer-events: none;
+}
+
+.pagina-editar-neg .resumo-grade .campo .unidade-kg input {
+    padding-right: 58px;
+}
+
+.pagina-editar-neg .resumo-grade .campo .unidade-real input {
+    padding-left: 38px;
+}
+
+.pagina-editar-neg .spin {
+    position: absolute;
+    top: 50%;
+    right: 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    transform: translateY(-50%);
+}
+
+.pagina-editar-neg .spin button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 14px;
+    height: 12px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #86213f;
+    cursor: pointer;
+}
+
+.pagina-editar-neg .spin button:hover {
+    color: #5e1229;
+}
+
+.pagina-editar-neg .spin button svg {
+    width: 8px;
+    height: 6px;
+}
+
+/* ----- status: lista suspensa personalizada ----- */
+.pagina-editar-neg .dropdown-status {
+    position: relative;
+}
+
+.pagina-editar-neg .dropdown-status-botao {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    color: #86213f;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.pagina-editar-neg .dropdown-status-botao:focus-visible,
+.pagina-editar-neg .dropdown-status.aberto .dropdown-status-botao {
+    outline: none;
+    border-color: #6b9065;
+    box-shadow: 0 0 0 3px rgba(107, 144, 101, 0.18);
+}
+
+.pagina-editar-neg .dropdown-status-botao svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+.pagina-editar-neg .dropdown-status.aberto .dropdown-status-botao svg {
+    transform: rotate(180deg);
+}
+
+.pagina-editar-neg .dropdown-status-lista[hidden] {
+    display: none;
+}
+
+.pagina-editar-neg .dropdown-status-lista {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 20;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow: hidden;
+    border: 1px solid #d9e6d4;
+    border-radius: 12px;
+    background: #f2f7ee;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.pagina-editar-neg .dropdown-status-lista li {
+    padding: 9px 14px;
+    border-bottom: 1px solid #e1ebdd;
+    font-size: 12px;
+    font-weight: 500;
+    color: #86213f;
+    cursor: pointer;
+}
+
+.pagina-editar-neg .dropdown-status-lista li:last-child {
+    border-bottom: 0;
+}
+
+.pagina-editar-neg .dropdown-status-lista li:hover,
+.pagina-editar-neg .dropdown-status-lista li:focus {
+    outline: none;
+    background: #e6f0e1;
+}
+
+.pagina-editar-neg .dropdown-status-lista li[aria-selected="true"] {
+    background: #e9f2e4;
+}
+
+@media (max-width: 860px) {
+    .pagina-editar-neg .resumo-grade {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+
+/* ===== TELA LISTA DE NEGOCIACOES =====
+
+
+/* ----- topo: titulo, subtitulo e botao ----- */
+.pagina-lista-neg .topo p.sub-pequeno {
+    font-size: 12px;
+}
+
+.pagina-lista-neg .topo .botao-sombra {
+    height: 40px;
+    padding: 0 22px;
+    gap: 10px;
+    border-radius: 14px;
+    font-size: 13px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+}
+
+.pagina-lista-neg .topo .botao-sombra svg {
+    width: 20px;
+    height: 20px;
+}
+
+/* ----- cartao branco ----- */
+.pagina-lista-neg .cartao-lista {
+    min-height: 0;
+    border-radius: 32px;
+}
+
+/* ----- busca ----- */
+.pagina-lista-neg .busca-caixa {
+    width: 302px;
+    margin: 21px 0 19px 26px;
+}
+
+.pagina-lista-neg .busca-caixa svg {
+    left: 16px;
+    width: 20px;
+    height: 20px;
+    color: #9a9a9a;
+}
+
+.pagina-lista-neg .busca {
+    height: 40px;
+    padding-left: 46px;
+    font-size: 13px;
+    border-color: #d3d3d3;
+}
+
+/* ----- tabela: colunas se ajustam sozinhas, sem rolagem lateral ----- */
+.pagina-lista-neg table.tabela.tabela-negociacoes {
+    table-layout: auto;
+}
+
+.pagina-lista-neg table.tabela.tabela-negociacoes th:nth-child(n),
+.pagina-lista-neg table.tabela.tabela-negociacoes td:nth-child(n) {
+    width: auto;
+    padding: 0 12px;
+    text-align: center;
+}
+
+.pagina-lista-neg table.tabela.tabela-negociacoes th:first-child,
+.pagina-lista-neg table.tabela.tabela-negociacoes td:first-child {
+    padding-left: 26px;
+    text-align: left;
+}
+
+.pagina-lista-neg table.tabela.tabela-negociacoes th:last-child,
+.pagina-lista-neg table.tabela.tabela-negociacoes td:last-child {
+    padding-right: 26px;
+    text-align: right;
+}
+
+/* cabecalho: faixa cinza com texto vinho */
+.pagina-lista-neg table.tabela.tabela-negociacoes th:nth-child(n) {
+    height: 36px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+}
+
+/* linhas */
+.pagina-lista-neg table.tabela.tabela-negociacoes td:nth-child(n) {
+    height: 59px;
+    font-size: 12.5px;
+    border-bottom: 1px solid #d9d9d9;
+}
+
+/* linha "Nenhuma negociacao encontrada" */
+.pagina-lista-neg table.tabela.tabela-negociacoes .sem-dados td:nth-child(n) {
+    height: 64px;
+    padding-left: 8px;
+    text-align: center;
+    border-bottom: 0;
+}
+
+/* ----- cores do texto ----- */
+.pagina-lista-neg .tabela-negociacoes .codigo {
+    color: #9a9a9a;
+}
+
+.pagina-lista-neg .tabela-negociacoes .txt-verde {
+    color: #3f6b45;
+}
+
+.pagina-lista-neg .tabela-negociacoes .txt-vinho {
+    color: #881c4d;
+}
+
+/* material quebra em duas linhas (ex.: Papelao / Ondulado) */
+.pagina-lista-neg .material-nome {
+    display: inline-block;
+    max-width: 100px;
+    white-space: normal;
+    line-height: 1.3;
+}
+
+/* ----- selo de status ----- */
+.pagina-lista-neg .tabela-negociacoes .selo {
+    min-width: 74px;
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* ----- icones de editar e excluir ----- */
+.pagina-lista-neg .acoes-linha {
+    white-space: nowrap;
+}
+
+.pagina-lista-neg .acoes-linha a {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.pagina-lista-neg .acoes-linha a + a {
+    margin-left: 12px;
+}
+
+.pagina-lista-neg .acoes-linha svg {
+    width: 18px;
+    height: 18px;
+}
+
+.pagina-lista-neg .acoes-linha .editar {
+    color: #86ad8c;
+}
+
+.pagina-lista-neg .acoes-linha .editar:hover {
+    color: #527b58;
+}
+
+.pagina-lista-neg .acoes-linha .excluir {
+    color: #86213f;
+}
+
+.pagina-lista-neg .acoes-linha .excluir:hover {
+    color: #6a1832;
+}
+
+/* ===== MODAL EXCLUIR NEGOCIACAO =====*/
+
+.modal-neg {
+    position: relative;
+    width: 440px;
+    padding: 24px 26px 22px;
+    border-radius: 18px;
+}
+
+/* titulo e botao de fechar (X) */
+.modal-neg h3 {
+    margin: 0;
+    padding-right: 30px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #7b1e3a;
+}
+
+.modal-neg .modal-fechar {
+    position: absolute;
+    top: 22px;
+    right: 24px;
+    display: inline-flex;
+    color: #86213f;
+}
+
+.modal-neg .modal-fechar:hover {
+    color: #6a1832;
+}
+
+.modal-neg .sub {
+    margin: 6px 0 16px;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: #6b6b6b;
+}
+
+/* registros relacionados */
+.modal-neg .mini {
+    margin: 0 0 8px;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: #7a7a7a;
+}
+
+.modal-neg .registros {
+    margin-bottom: 16px;
+    padding: 8px 14px;
+    border: 1px solid #e3e3e3;
+    border-radius: 12px;
+    background: #ffffff;
+}
+
+.modal-neg .registros div {
+    padding: 5px 0;
+    font-size: 11px;
+}
+
+.modal-neg .registros span {
+    color: #8a8a8a;
+}
+
+.modal-neg .registros b {
+    font-weight: 600;
+    color: #2b2b2b;
+}
+
+/* opcoes (alterar status / excluir) */
+.modal-neg .opcao {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    background: #ffffff;
+    font-size: 10.5px;
+    line-height: 1.4;
+    color: #7a7a7a;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.modal-neg .opcao b {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 3px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #2b2b2b;
+}
+
+.modal-neg .opcao b svg {
+    flex-shrink: 0;
+}
+
+.modal-neg .opcao.perigo b {
+    color: #86213f;
+}
+
+/* opcao marcada: verde (alterar status) */
+.modal-neg .opcao:has(input:checked) {
+    border-color: #4f9a58;
+    background: #f1f7ee;
+    box-shadow: 0 0 0 0.5px #4f9a58;
+}
+
+/* opcao marcada: vinho (excluir) */
+.modal-neg .opcao.perigo:has(input:checked) {
+    border-color: #86213f;
+    background: #fbeef2;
+    box-shadow: 0 0 0 0.5px #86213f;
+}
+
+/* bolinhas (radio) desenhadas */
+.modal-neg .opcao input[type="radio"] {
+    appearance: none;
+    -webkit-appearance: none;
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    margin: 2px 0 0;
+    border: 1.5px solid #9aa09a;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+}
+
+.modal-neg .opcao input[type="radio"]:checked {
+    border-color: #4f9a58;
+    background: #4f9a58;
+    box-shadow: inset 0 0 0 3px #ffffff;
+}
+
+.modal-neg .opcao.perigo input[type="radio"] {
+    border-color: #86213f;
+}
+
+.modal-neg .opcao.perigo input[type="radio"]:checked {
+    border-color: #86213f;
+    background: #86213f;
+    box-shadow: inset 0 0 0 3px #ffffff;
+}
+
+/* campo de confirmacao */
+.modal-neg .campo-confirmacao {
+    margin-top: 14px;
+}
+
+.modal-neg .campo-confirmacao label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #2b2b2b;
+}
+
+.modal-neg .campo-confirmacao input {
+    width: 100%;
+    height: 38px;
+    padding: 0 14px;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    background: #f4f4f4;
+    font-family: inherit;
+    font-size: 12px;
+    outline: none;
+}
+
+.modal-neg .campo-confirmacao input:focus {
+    border-color: #6b9065;
+}
+
+/* botoes do rodape */
+.modal-neg .rodape {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.modal-neg .rodape .botao {
+    height: 34px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.modal-neg .rodape .botao-cancelar-modal {
+    background: #ffffff;
+    color: #4f9a58;
+    border: 1px solid #8bb894;
+}
+
+.modal-neg .rodape .botao-cancelar-modal:hover {
+    background: #edf5ed;
+    filter: none;
+}
+
+/* botao principal: verde (alterar status) e vinho quando a opcao for excluir */
+.modal-neg .rodape .botao-confirmar {
+    background: #4f9a58;
+    color: #ffffff;
+    border: 1px solid #4f9a58;
+}
+
+.modal-neg .rodape .botao-confirmar:hover {
+    background: #478451;
+    border-color: #478451;
+    filter: none;
+}
+
+.modal-neg .rodape .botao-confirmar.perigo {
+    background: #86213f;
+    border-color: #86213f;
+}
+
+.modal-neg .rodape .botao-confirmar.perigo:hover {
+    background: #6a1832;
+    border-color: #6a1832;
+}
+
+/* ===== MODAL ADICIONAR MOVIMENTACAO =====*/
+
+.modal-mov {
+    position: relative;
+    width: 460px;
+    padding: 24px 26px 22px;
+    border-radius: 18px;
+}
+
+/* titulo, subtitulo e botao de fechar (X) */
+.modal-mov h3 {
+    margin: 0;
+    padding-right: 30px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #7b1e3a;
+}
+
+.modal-mov .modal-fechar {
+    position: absolute;
+    top: 22px;
+    right: 24px;
+    display: inline-flex;
+    color: #86213f;
+}
+
+.modal-mov .modal-fechar:hover {
+    color: #6a1832;
+}
+
+.modal-mov .sub {
+    margin: 4px 0 18px;
+    font-size: 11.5px;
+    color: #6b6b6b;
+}
+
+/* rotulos em vinho */
+.modal-mov .campo label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #86213f;
+}
+
+/* campos */
+.modal-mov .campo input,
+.modal-mov .campo select,
+.modal-mov .campo textarea {
+    width: 100%;
+    border: 1px solid #d6d6d6;
+    border-radius: 12px;
+    background-color: #ffffff;
+    font-family: inherit;
+    font-size: 12px;
+    color: #2b2b2b;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.modal-mov .campo input,
+.modal-mov .campo select {
+    height: 38px;
+    padding: 0 14px;
+}
+
+.modal-mov .campo input:focus,
+.modal-mov .campo select:focus,
+.modal-mov .campo textarea:focus {
+    border-color: #6b9065;
+    box-shadow: 0 0 0 3px rgba(107, 144, 101, 0.18);
+}
+
+/* select verde clarinho com setinha vinho */
+.modal-mov .campo select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 36px;
+    border-color: #d3e3cd;
+    background-color: #eef5ea;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%2386213f'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+}
+
+/* valor e quantidade lado a lado */
+.modal-mov .grade {
+    margin-top: 14px;
+    gap: 0 16px;
+}
+
+/* observacoes */
+.modal-mov .campo-obs {
+    margin-top: 14px;
+}
+
+.modal-mov .campo textarea {
+    min-height: 92px;
+    padding: 12px 14px;
+    line-height: 1.4;
+    resize: vertical;
+}
+
+/* botoes do rodape */
+.modal-mov .rodape {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.modal-mov .rodape .botao {
+    height: 34px;
+    padding: 0 20px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.modal-mov .rodape .botao-cancelar-modal {
+    background: #ffffff;
+    color: #4f9a58;
+    border: 1px solid #8bb894;
+}
+
+.modal-mov .rodape .botao-cancelar-modal:hover {
+    background: #edf5ed;
+    filter: none;
+}
+
+.modal-mov .rodape .botao-confirmar {
+    background: #4f9a58;
+    color: #ffffff;
+    border: 1px solid #4f9a58;
+}
+
+.modal-mov .rodape .botao-confirmar:hover {
+    background: #478451;
+    border-color: #478451;
+    filter: none;
+}
+

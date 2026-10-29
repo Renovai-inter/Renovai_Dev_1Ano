@@ -1,3 +1,4 @@
+<%@ page pageEncoding="UTF-8" %>
 <%-- Modal "Excluir negociacao" (telas Ver e Editar). Abre pelo link href="#excluir".
      Usa as variaveis "negociacao" e "movimentacoes" da pagina. --%>
 <%
@@ -5,9 +6,16 @@
     Boolean temVendaModal = (Boolean) request.getAttribute("temVenda");
 %>
 <div class="modal-fundo" id="excluir">
-    <div class="modal">
+    <div class="modal modal-neg">
+
+        <a href="#" class="modal-fechar" aria-label="Fechar" title="Fechar">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+            </svg>
+        </a>
+
         <h3>Excluir negociação</h3>
-        <p class="sub">Revise o impacto antes de confirmar a ação sobre a negociação <%= esc(negociacao.getCodigo()) %>.</p>
+        <p class="sub">Revise o impacto antes de confirmar a ação sobre essa negociação &ldquo;<%= esc(negociacao.getCodigo()) %>&rdquo;.</p>
 
         <p class="mini">Registros relacionados afetados</p>
         <div class="registros">
@@ -25,28 +33,63 @@
             <label class="opcao">
                 <input type="radio" name="acao" value="cancelar" checked>
                 <div>
-                    <b>Alterar status para "Cancelado"</b>
-                    O histórico é preservado e a negociação passa a ser considerada cancelada.
+                    <b>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>
+                        </svg>
+                        Alterar status para &ldquo;cancelada&rdquo;
+                    </b>
+                    O histórico é preservado e a negociação passa a ser considerada &ldquo;cancelada&rdquo;.
                 </div>
             </label>
 
             <label class="opcao perigo">
                 <input type="radio" name="acao" value="excluir">
                 <div>
-                    <b>Excluir permanentemente</b>
-                    Ação irreversível: remove a negociação e toda a linha do tempo.
+                    <b>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+                            <line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>
+                        </svg>
+                        Excluir permanentemente
+                    </b>
+                    Ação irreversível, remove todo o histórico da negociação.
                 </div>
             </label>
 
-            <div class="campo" style="margin-top:12px">
-                <label for="confirmacao">Para excluir permanentemente, digite "<%= esc(negociacao.getCodigo()) %>" para confirmar</label>
-                <input type="text" id="confirmacao" name="confirmacao" autocomplete="off" placeholder="<%= esc(negociacao.getCodigo()) %>">
+            <div class="campo campo-confirmacao">
+                <label for="confirmacao">Digite &ldquo;<%= esc(negociacao.getCodigo()) %>&rdquo; para confirmar:</label>
+                <input type="text" id="confirmacao" name="confirmacao" autocomplete="off">
             </div>
 
             <div class="rodape">
-                <a href="#" class="botao claro">Cancelar</a>
-                <button type="submit" class="botao vinho">Confirmar</button>
+                <a href="#" class="botao botao-cancelar-modal">Cancelar</a>
+                <button type="submit" class="botao botao-confirmar" id="botaoConfirmarNeg">Alterar status</button>
             </div>
         </form>
     </div>
 </div>
+
+<%@ include file="negociacao-notificacoes.jsp" %>
+<script>
+    // So visual: o botao mostra "Alterar status" (verde) ou "Excluir" (vinho) conforme a opcao marcada.
+    // O envio continua igual: acao = cancelar ou excluir.
+    (function () {
+        var radios = document.querySelectorAll('#excluir input[name="acao"]');
+        var botao = document.getElementById('botaoConfirmarNeg');
+
+        function atualizar() {
+            var marcado = document.querySelector('#excluir input[name="acao"]:checked');
+            var excluir = marcado && marcado.value === 'excluir';
+
+            botao.textContent = excluir ? 'Excluir' : 'Alterar status';
+            botao.classList.toggle('perigo', excluir);
+        }
+
+        radios.forEach(function (radio) {
+            radio.addEventListener('change', atualizar);
+        });
+
+        atualizar();
+    })();
+</script>
