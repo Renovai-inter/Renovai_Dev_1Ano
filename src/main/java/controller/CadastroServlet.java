@@ -58,7 +58,7 @@ public class CadastroServlet extends HttpServlet {
 
                 if (erro == null) {
                     usuario.setNomeCompleto(nome);
-                    usuario.setNomeUsuario(nome);
+                    usuario.setNomeUsuario(email);
                     usuario.setSenhaHash(SenhaAPI.gerarHash(senha));
                     usuario.setTipoUsuario(TipoUsuario.COOPERADO); // fixo: o cadastro público nunca cria administrador
 
@@ -89,8 +89,8 @@ public class CadastroServlet extends HttpServlet {
         if (nome.length() < 3 || nome.length() > 150) {
             return "Informe seu nome completo.";
         }
-        if (email.length() > 150 || !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
-            return "Informe um e-mail válido.";
+        if (email.length() > 50 || !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+            return "Informe um e-mail válido, com até 50 caracteres.";
         }
         if (senha.length() < 8 || senha.length() > 100) {
             return "A senha deve ter de 8 a 100 caracteres.";

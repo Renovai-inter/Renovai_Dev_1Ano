@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Conta criada | Renovaí</title>
     <link rel="stylesheet" href="${ctx}/css/auth.css">
+    <link rel="icon" href="${ctx}/images/Nimo.svg" type="image/svg+xml">
 </head>
 <body>
 <main class="auth">

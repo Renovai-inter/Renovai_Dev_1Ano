@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Coleta CO-${coleta.idColeta} | Renovaí</title>
     <link rel="stylesheet" href="${ctx}/css/renovai.css">
+    <link rel="icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
 
     <style>
         .duas-colunas { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; }
