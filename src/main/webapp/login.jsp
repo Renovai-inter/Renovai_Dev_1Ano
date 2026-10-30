@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Entrar | Renovaí</title>
     <link rel="stylesheet" href="${ctx}/css/auth.css">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
 </head>
 <body>
 <main class="auth">

@@ -24,6 +24,8 @@ private String campo(jakarta.servlet.http.HttpServletRequest request, String nom
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
         <link rel="stylesheet" href="${pageContext.request.contextPath}/css/cooperativas.css">
+        <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
+
     </head>
     <body>
         <div class="layout">

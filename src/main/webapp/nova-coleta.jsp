@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nova coleta | Renovaí</title>
     <link rel="stylesheet" href="${ctx}/css/renovai.css">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
+
 
     <style>
         .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }

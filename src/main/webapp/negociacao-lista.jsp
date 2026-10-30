@@ -21,6 +21,8 @@
     <title>Negociações</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=12">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
+
     <style>
         /* Ajustes finos da lista para ficar igual ao Figma (ficam aqui para funcionar mesmo com o estilo.css desatualizado) */
         .pagina-lista-neg .tabela-negociacoes { border-collapse: collapse; }

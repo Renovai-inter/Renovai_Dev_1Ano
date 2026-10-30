@@ -13,6 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
 
     <style>
         .aviso-sucesso { background: #d8e8cf; color: #2f5a35; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-size: .9rem; }
