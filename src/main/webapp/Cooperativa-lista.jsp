@@ -56,19 +56,25 @@ return value.toString()
                                 <th>Status</th>
                                 <th>Cooperados</th>
                                 <th>Cadastro</th>
-                                <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <% if(itens==null||itens.isEmpty()){ %>
                                 <tr>
-                                <td colspan="6">Nenhuma cooperativa encontrada.</td>
+                                <td colspan="5">Nenhuma cooperativa encontrada.</td>
                                 </tr>
                                 <% }else{for(Cooperativa c:itens){ %>
                                 <tr>
                                 <td>
-                                <a class="coop-name" href="cooperativa?pagina=detalhe&id=<%=c.getIdCooperativa()%>">▣ &nbsp;<%=h(c.getNomePublico())%>
-                                </a>
+                                <div class="coop-identificacao">
+                                    <a class="coop-name" href="cooperativa?pagina=detalhe&id=<%=c.getIdCooperativa()%>">
+                                        <svg class="coop-icone" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01M9 12v.01M9 15v.01M9 18v.01"/></svg>
+                                        <%=h(c.getNomePublico())%>
+                                    </a>
+                                    <a class="editar" title="Editar cooperativa" aria-label="Editar cooperativa" href="cooperativa?pagina=editar&id=<%=c.getIdCooperativa()%>">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+                                    </a>
+                                </div>
                                 <small>
                                 <%=h(c.getNome())%>
                                 </small>
@@ -87,9 +93,6 @@ return value.toString()
                         <td>
                             <%=c.getDataCadastro()==null?"—":h(c.getDataCadastro().toLocalDate())%>
                         </td>
-                        <td>
-                            <a title="Ver detalhes" href="cooperativa?pagina=detalhe&id=<%=c.getIdCooperativa()%>">✎</a>
-                        </td>
                     </tr>
                     <% }} %>
                 </tbody>
@@ -98,5 +101,6 @@ return value.toString()
     </section>
 </main>
 </div>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

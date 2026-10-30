@@ -1,0 +1,71 @@
+<%@ page pageEncoding="UTF-8" %>
+<style>
+  #operacao-progresso { position: fixed; inset: 0 0 auto; height: 4px; z-index: 10000; background: #d8e8cf; opacity: 0; pointer-events: none; transition: opacity .15s; }
+  #operacao-progresso.ativo { opacity: 1; }
+  #operacao-progresso::after { content: ""; display: block; width: 0; height: 100%; background: #568b61; }
+  #operacao-progresso.ativo::after { animation: operacao-avanco 10s ease-out forwards; }
+  @keyframes operacao-avanco { to { width: 92%; } }
+  #operacao-notificacoes { position: fixed; top: 20px; left: 50%; width: min(720px, calc(100vw - 32px)); transform: translateX(-50%); z-index: 10001; display: grid; gap: 10px; pointer-events: none; }
+  #operacao-notificacoes .operacao-toast { box-sizing: border-box; display: flex; align-items: center; gap: 14px; margin: 0; padding: 12px 16px; border: 1px solid #c4d8c2; border-radius: 14px; background: rgba(196, 220, 194, .94); box-shadow: 0 10px 30px rgba(47, 93, 46, .18); color: #2f5d2e; font: 500 14px/1.4 Poppins, sans-serif; opacity: 0; transform: translateY(-20px); transition: transform .6s, opacity .45s; pointer-events: auto; }
+  #operacao-notificacoes .operacao-toast.mostrar { opacity: 1; transform: translateY(0); }
+  #operacao-notificacoes .operacao-toast.erro { background: rgba(248, 226, 231, .96); border-color: #e1b8c5; color: #7f1d1d; }
+  .operacao-toast-icone { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 9px; background: rgba(255, 255, 255, .7); }
+  .operacao-toast-texto { flex: 1; min-width: 0; }
+  .operacao-toast-texto strong, .operacao-toast-texto span { display: block; }
+  .operacao-toast-texto span { font-size: 11px; font-weight: 400; margin-top: 2px; }
+  .operacao-toast-fechar { flex: none; border: 0; background: transparent; color: inherit; cursor: pointer; padding: 4px; }
+  :where(a, button, input, select, textarea):focus-visible { outline: 3px solid #315d3c; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { #operacao-progresso.ativo::after { animation-duration: .01s; } #operacao-notificacoes .operacao-toast { transition: none; } }
+</style>
+<div id="operacao-progresso" role="progressbar" aria-label="Carregando operação" aria-hidden="true"></div>
+<script>
+(() => {
+  const barra = document.getElementById('operacao-progresso');
+  function iniciar() { barra.classList.add('ativo'); barra.removeAttribute('aria-hidden'); }
+  window.addEventListener('pageshow', () => { barra.classList.remove('ativo'); barra.setAttribute('aria-hidden', 'true'); });
+  document.addEventListener('submit', event => {
+    const form = event.target;
+    setTimeout(() => { if (!event.defaultPrevented && form.checkValidity()) iniciar(); }, 0);
+  }, true);
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href]');
+    if (!link || link.target || link.hasAttribute('download') || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const destino = link.getAttribute('href');
+    if (!destino || destino.startsWith('#') || destino.startsWith('javascript:')) return;
+    const url = new URL(destino, location.href);
+    if (url.origin !== location.origin) return;
+    setTimeout(() => { if (!event.defaultPrevented) iniciar(); }, 0);
+  }, true);
+
+  // Somente avisos criados para os novos fluxos usam o molde visual de Negociação.
+  // Mensagens antigas (.aviso, .erro, .coop-alert) continuam no lugar original.
+  const novosAvisos = document.querySelectorAll('.operacao-aviso, .aviso-sucesso');
+  if (novosAvisos.length) {
+    const lista = document.createElement('div');
+    lista.id = 'operacao-notificacoes';
+    lista.setAttribute('aria-live', 'polite');
+    document.body.appendChild(lista);
+    novosAvisos.forEach(aviso => {
+      const erro = aviso.classList.contains('erro');
+      const mensagem = aviso.textContent.trim();
+      aviso.classList.add('operacao-toast');
+      aviso.setAttribute('role', erro ? 'alert' : 'status');
+      aviso.innerHTML = '<span class="operacao-toast-icone" aria-hidden="true"></span><span class="operacao-toast-texto"><strong></strong><span></span></span><button type="button" class="operacao-toast-fechar" aria-label="Fechar notificação">✕</button>';
+      aviso.querySelector('.operacao-toast-icone').innerHTML = erro ? '✕' : '✓';
+      aviso.querySelector('.operacao-toast-texto strong').textContent = erro ? 'Não foi possível concluir!' : 'Operação concluída!';
+      aviso.querySelector('.operacao-toast-texto span').textContent = mensagem;
+      lista.appendChild(aviso);
+      let fechado = false;
+      function fechar() {
+        if (fechado) return;
+        fechado = true;
+        aviso.classList.remove('mostrar');
+        setTimeout(() => aviso.remove(), 700);
+      }
+      aviso.querySelector('.operacao-toast-fechar').addEventListener('click', fechar);
+      setTimeout(() => { if (!fechado) aviso.classList.add('mostrar'); }, 120);
+      setTimeout(fechar, erro ? 9000 : 5500);
+    });
+  }
+})();
+</script>

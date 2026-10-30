@@ -67,7 +67,7 @@ public class Cooperativa {
     // Retorna o valor de nome.
     public String getNome() { return nome; }
 
-    // Define o valor de nome.
+    // Normaliza e valida o nome obrigatório da cooperativa.
     public void setNome(String nome) {
         nome = utilitario.normalizarTextoLivre(nome);
         if (nome == null || nome.isBlank()) {
@@ -82,7 +82,7 @@ public class Cooperativa {
     // Retorna o valor de cnpj.
     public String getCnpj() { return utilitario.formatarCnpj(cnpj); }
 
-    // Define o valor de cnpj.
+    // Filtra e valida o CNPJ antes de armazená-lo.
     public void setCnpj(String cnpj) {
         if (cnpj == null) {
             throw new IllegalArgumentException("cnpj é obrigatório.");

@@ -31,8 +31,8 @@ public class MaterialDAO {
         // Declaração
 
         if (material == null || material.getNome() == null
-                || material.getCategoria() == null || material.getOrigem() == null) {
-            throw new IllegalArgumentException("Nome, categoria e origem são obrigatórios.");
+                || material.getCategoria() == null) {
+            throw new IllegalArgumentException("Nome e categoria são obrigatórios.");
         }
         long ultimoId = utilitario.selecionarUltimoId("material");
         long novoId;
@@ -45,8 +45,7 @@ public class MaterialDAO {
 
         // Comando SQL
 
-        String sql = "INSERT INTO material (id_material, nome, categoria, \"Origem\") " +
-                "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO material (id_material, nome, categoria) VALUES (?, ?, ?)";
 
         // Executar PreparedStatement
 
@@ -54,7 +53,6 @@ public class MaterialDAO {
             pstmt.setLong(1, novoId);
             pstmt.setString(2, material.getNome());
             pstmt.setString(3, material.getCategoria());
-            pstmt.setString(4, material.getOrigem());
             int linhas = pstmt.executeUpdate();
             if (linhas > 0) {
                 material.setIdMaterial(novoId);
@@ -79,7 +77,7 @@ public class MaterialDAO {
 
         // Comando SQL
 
-        String sql = "SELECT id_material, nome, categoria, \"Origem\" FROM material";
+        String sql = "SELECT id_material, nome, categoria FROM material";
 
         // Executar PreparedStatement
 
@@ -93,7 +91,6 @@ public class MaterialDAO {
                 material.setIdMaterial(idMaterial);
                 material.setNome(nomeMaterial);
                 material.setCategoria(categoria);
-                material.setOrigem(rs.getString("Origem"));
                 materiais.add(material);
             }
             return materiais;

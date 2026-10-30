@@ -34,13 +34,7 @@ public class MaterialServlet extends HttpServlet {
 
             int linhas;
             if ("cadastrar".equals(acao)) {
-                String origem = request.getParameter("origem");
-                if (origem == null || origem.isBlank()) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                            "Informe a origem do material.");
-                    return;
-                }
-                linhas = materialDAO.cadastrarMaterial(new Material(nome, categoria, origem));
+                linhas = materialDAO.cadastrarMaterial(new Material(nome, categoria));
             } else if ("editar".equals(acao)) {
                 Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
                 Material alteracao = new Material();
@@ -54,7 +48,7 @@ public class MaterialServlet extends HttpServlet {
                 exclusao.setIdMaterial(idMaterial);
                 linhas = materialDAO.excluirMaterial(exclusao);
             } else {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Ação inválida.");
+                mostrarErro(request, response, "Ação inválida.");
                 return;
             }
 
@@ -62,22 +56,21 @@ public class MaterialServlet extends HttpServlet {
 
             if (linhas == 0) {
                 if ("cadastrar".equals(acao)) {
-                    response.sendError(HttpServletResponse.SC_CONFLICT,
-                            "Não foi possível cadastrar este material.");
+                    mostrarErro(request, response, "Não foi possível cadastrar este material.");
                 } else {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                            "Material não encontrado.");
+                    mostrarErro(request, response, "Material não encontrado.");
                 }
                 return;
             }
 
             // Encaminhamento
 
-            response.sendRedirect(request.getContextPath() + "/material");
+            response.sendRedirect(request.getContextPath() + "/material?sucesso=" + acao);
         } catch (IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            mostrarErro(request, response, e.getMessage());
         } catch (RuntimeException e) {
-            throw new ServletException("Erro ao processar o material.", e);
+            getServletContext().log("Erro ao processar o material.", e);
+            mostrarErro(request, response, "Não foi possível concluir a operação do material.");
         }
     }
 
@@ -87,6 +80,11 @@ public class MaterialServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+            Object erro = request.getSession().getAttribute("erroMaterial");
+            if (erro != null) {
+                request.setAttribute("erroMaterial", erro);
+                request.getSession().removeAttribute("erroMaterial");
+            }
             // Processamento da ação
 
             List<Material> materiais = materialDAO.listarMateriais();
@@ -101,5 +99,12 @@ public class MaterialServlet extends HttpServlet {
         } catch (RuntimeException e) {
             throw new ServletException("Erro ao consultar materiais.", e);
         }
+    }
+
+    // Mantém a falha visível na tela de materiais após o redirecionamento.
+    private void mostrarErro(HttpServletRequest request, HttpServletResponse response, String mensagem)
+            throws IOException {
+        request.getSession().setAttribute("erroMaterial", mensagem);
+        response.sendRedirect(request.getContextPath() + "/material");
     }
 }

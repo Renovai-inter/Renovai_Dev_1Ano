@@ -276,15 +276,15 @@
             <span>Área Administrativa</span>
         </div>
         <nav>
-            <a href="#">Dashboard</a>
-            <a href="#">Cooperativas</a>
-            <a href="#">Cooperados</a>
+            <a href="${ctx}/dashboard">Dashboard</a>
+            <a href="${ctx}/cooperativa">Cooperativas</a>
+            <a href="${ctx}/cooperado">Cooperados</a>
             <a href="${ctx}/coleta" class="ativo" aria-current="page">Coletas</a>
             <a href="${ctx}/material">Materiais</a>
-            <a href="#">Negociações</a>
+            <a href="${ctx}/negociacao">Negociações</a>
         </nav>
         <div class="usuario">
-            Nome usuário
+            <b><c:out value="${empty sessionScope.nomeUsuario ? 'Usuário' : sessionScope.nomeUsuario}"/></b>
             <small>Administrador</small>
         </div>
     </aside>
@@ -299,11 +299,15 @@
             <a href="${ctx}/coleta?acao=nova" class="btn btn-verde">Nova coleta</a>
         </header>
 
+        <c:if test="${not empty erroColeta}"><div class="operacao-aviso erro" role="alert"><c:out value="${erroColeta}"/></div></c:if>
         <c:if test="${param.sucesso == 'cadastro'}">
             <div class="aviso-sucesso" role="status">Coleta cadastrada com sucesso.</div>
         </c:if>
         <c:if test="${param.sucesso == 'exclusao'}">
             <div class="aviso-sucesso" role="status">Coleta excluída com sucesso.</div>
+        </c:if>
+        <c:if test="${param.sucesso == 'cancelamento'}">
+            <div class="aviso-sucesso" role="status">Coleta cancelada com sucesso.</div>
         </c:if>
 
         <section class="painel">
@@ -329,17 +333,19 @@
                     <c:forEach items="${coletas}" var="coleta">
 
                         <fmt:formatNumber value="${coleta.pesoTotalKg}" maxFractionDigits="2" var="pesoFmt"/>
+                        <c:set var="pesoExibicao" value="—"/>
+                        <c:if test="${not empty coleta.pesoTotalKg}"><c:set var="pesoExibicao" value="${pesoFmt} kg"/></c:if>
 
                         <%-- NOVO: nome da cooperativa (cai para "Cooperativa #id" se não achar) --%>
-                        <c:set var="nomeCoop" value="${cooperativas[coleta.idCooperativa]}"/>
+                        <c:set var="nomeCoop" value="${cooperativas[coleta.relacionamentos.idCooperativa]}"/>
                         <c:if test="${empty nomeCoop}">
-                            <c:set var="nomeCoop" value="Cooperativa #${coleta.idCooperativa}"/>
+                            <c:set var="nomeCoop" value="Cooperativa #${coleta.relacionamentos.idCooperativa}"/>
                         </c:if>
 
                         <%-- NOVO: nome do responsável (cai para "Cooperado #id", ou "—" se não houver) --%>
-                        <c:set var="nomeResp" value="${empty coleta.idCooperadoResponsavel ? '—' : cooperados[coleta.idCooperadoResponsavel]}"/>
+                        <c:set var="nomeResp" value="${empty coleta.relacionamentos.idCooperadoResponsavel ? '—' : cooperados[coleta.relacionamentos.idCooperadoResponsavel]}"/>
                         <c:if test="${empty nomeResp}">
-                            <c:set var="nomeResp" value="Cooperado #${coleta.idCooperadoResponsavel}"/>
+                            <c:set var="nomeResp" value="Cooperado #${coleta.relacionamentos.idCooperadoResponsavel}"/>
                         </c:if>
 
                         <tr>
@@ -362,11 +368,11 @@
                             <td>
                                 <c:choose>
                                     <c:when test="${empty coleta.dataAgendada}">—</c:when>
-                                    <c:otherwise><fmt:formatDate value="${coleta.dataAgendada}" pattern="dd/MM/yyyy"/></c:otherwise>
+                                    <c:otherwise><fmt:formatNumber value="${coleta.dataAgendada.dayOfMonth}" pattern="00"/>/<fmt:formatNumber value="${coleta.dataAgendada.monthValue}" pattern="00"/>/<c:out value="${coleta.dataAgendada.year}"/></c:otherwise>
                                 </c:choose>
                             </td>
 
-                            <td><c:out value="${pesoFmt}"/> kg</td>
+                            <td><c:out value="${pesoExibicao}"/></td>
 
                             <td>
                                 <span class="status" data-status="<c:out value='${coleta.status}'/>">
@@ -381,15 +387,15 @@
                             </td>
 
                             <td class="acoes">
-                                <a class="icone editar" href="${ctx}/coleta?acao=detalhes&id=${coleta.idColeta}"
-                                   aria-label="Ver detalhes da coleta CO-${coleta.idColeta}">
+                                <a class="icone editar" href="${ctx}/coleta?acao=editar&id=${coleta.idColeta}"
+                                   aria-label="Editar coleta CO-${coleta.idColeta}">
                                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zm17.7-10.2a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                                 </a>
                                 <button type="button" class="icone excluir btn-excluir"
                                         aria-label="Excluir coleta CO-${coleta.idColeta}"
                                         data-id="${coleta.idColeta}"
                                         data-cooperativa="<c:out value='${nomeCoop}'/>"
-                                        data-peso="<c:out value='${pesoFmt}'/> kg">
+                                        data-peso="<c:out value='${pesoExibicao}'/>">
                                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                                 </button>
                             </td>
@@ -493,5 +499,6 @@
         $("semResultado").hidden = !(linhas.length > 0 && visiveis === 0);
     });
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

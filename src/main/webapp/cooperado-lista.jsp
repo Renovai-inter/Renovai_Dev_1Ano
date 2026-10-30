@@ -43,6 +43,12 @@
             </a>
         </div>
 
+        <% if ("inativacao".equals(request.getParameter("sucesso"))) { %><div class="operacao-aviso" role="status">Cooperado inativado com sucesso.</div><% } %>
+        <% if ("exclusao".equals(request.getParameter("sucesso"))) { %><div class="operacao-aviso" role="status">Cooperado excluído com sucesso.</div><% } %>
+        <% if ("naoEncontrado".equals(request.getParameter("erro"))) { %><div class="operacao-aviso erro" role="alert">Cooperado não encontrado.</div><% } %>
+        <% if ("acaoInvalida".equals(request.getParameter("erro"))) { %><div class="operacao-aviso erro" role="alert">Ação inválida.</div><% } %>
+        <% if ("operacao".equals(request.getParameter("erro"))) { %><div class="operacao-aviso erro" role="alert">Não foi possível concluir a operação do cooperado.</div><% } %>
+
         <div class="cartao cartao-lista">
             <div class="busca-caixa">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -149,5 +155,6 @@
         semResultado.style.display = (achou === 0 && linhas.length > 0) ? '' : 'none';
     });
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

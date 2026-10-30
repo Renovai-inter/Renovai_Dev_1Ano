@@ -36,7 +36,7 @@ return value.toString()
                 </span>
             </p>
         </div>
-        <button class="coop-btn danger" type="button" onclick="document.getElementById('excluirModal').showModal()">Excluir</button>
+        <div class="coop-actions"><a class="coop-btn" href="cooperativa?pagina=editar&id=<%=c.getIdCooperativa()%>">Editar</a><button class="coop-btn danger" type="button" onclick="document.getElementById('excluirModal').showModal()">Excluir</button></div>
     </header>
     <% if(request.getAttribute("erro")!=null){ %>
     <div class="coop-alert erro">
@@ -152,5 +152,6 @@ return value.toString()
 <% } %>
 </main>
 </div>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

@@ -59,15 +59,15 @@
             <span>Área Administrativa</span>
         </div>
         <nav>
-            <a href="#">Dashboard</a>
-            <a href="#">Cooperativas</a>
-            <a href="#">Cooperados</a>
+            <a href="${ctx}/dashboard">Dashboard</a>
+            <a href="${ctx}/cooperativa">Cooperativas</a>
+            <a href="${ctx}/cooperado">Cooperados</a>
             <a href="${ctx}/coleta" class="ativo" aria-current="page">Coletas</a>
             <a href="${ctx}/material">Materiais</a>
-            <a href="#">Negociações</a>
+            <a href="${ctx}/negociacao">Negociações</a>
         </nav>
         <div class="usuario">
-            Nome usuário
+            <b><c:out value="${empty sessionScope.nomeUsuario ? 'Usuário' : sessionScope.nomeUsuario}"/></b>
             <small>Administrador</small>
         </div>
     </aside>
@@ -94,6 +94,7 @@
             </div>
 
             <div class="acoes-topo">
+                <a class="btn btn-contorno" href="${ctx}/coleta?acao=editar&id=${coleta.idColeta}">Editar</a>
                 <c:if test="${coleta.status == 'AGENDADA'}">
                     <form method="post" action="${ctx}/coleta" accept-charset="UTF-8">
                         <input type="hidden" name="acao" value="iniciar">
@@ -123,6 +124,14 @@
             </div>
         </header>
 
+        <c:if test="${param.sucesso == 'atualizada'}"><div class="aviso-sucesso" role="status">Coleta atualizada com sucesso.</div></c:if>
+        <c:if test="${param.sucesso == 'iniciada'}">
+            <div class="aviso-sucesso" role="status">Coleta iniciada com sucesso.</div>
+        </c:if>
+        <c:if test="${param.sucesso == 'finalizada'}">
+            <div class="aviso-sucesso" role="status">Coleta finalizada com sucesso.</div>
+        </c:if>
+
         <div class="duas-colunas">
             <!-- ===== DADOS DA COLETA ===== -->
             <section class="card">
@@ -139,17 +148,13 @@
                                 <dt>Endereço</dt>
                                 <dd>
                                     <c:choose>
-                                        <c:when test="${empty coleta.idEnderecoRota}"><span class="suave">(definido pela rota)</span></c:when>
-                                        <c:otherwise>Endereço #<c:out value="${coleta.idEnderecoRota}"/></c:otherwise>
+                                        <c:when test="${empty coleta.relacionamentos.idEnderecoRota}"><span class="suave">(definido pela rota)</span></c:when>
+                                        <c:otherwise>Endereço #<c:out value="${coleta.relacionamentos.idEnderecoRota}"/></c:otherwise>
                                     </c:choose>
                                 </dd>
                             </div>
                         </c:when>
                         <c:otherwise>
-                            <div>
-                                <dt>Origem da entrega</dt>
-                                <dd><c:out value="${empty coleta.origemEntrega ? '—' : coleta.origemEntrega}"/></dd>
-                            </div>
                             <div>
                                 <dt>Local de origem</dt>
                                 <dd><c:out value="${empty coleta.nomeLocalOrigem ? '—' : coleta.nomeLocalOrigem}"/></dd>
@@ -166,7 +171,7 @@
                         <dd>
                             <c:choose>
                                 <c:when test="${empty coleta.dataAgendada}">—</c:when>
-                                <c:otherwise><fmt:formatDate value="${coleta.dataAgendada}" pattern="dd/MM/yyyy"/></c:otherwise>
+                                <c:otherwise><fmt:formatNumber value="${coleta.dataAgendada.dayOfMonth}" pattern="00"/>/<fmt:formatNumber value="${coleta.dataAgendada.monthValue}" pattern="00"/>/<c:out value="${coleta.dataAgendada.year}"/></c:otherwise>
                             </c:choose>
                         </dd>
                     </div>
@@ -295,5 +300,6 @@
         el.addEventListener("click", () => modal.close());
     });
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

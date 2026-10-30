@@ -59,6 +59,8 @@
     String menuItemAtivo = (String) request.getAttribute("menuAtivo");
     if (menuItemAtivo == null) menuItemAtivo = "";
     String raizMenu = request.getContextPath();   // ex.: /Renovai_Dev_1Ano_war_exploded
+    String nomeMenu = (String) session.getAttribute("nomeUsuario");
+    if (nomeMenu == null || nomeMenu.isBlank()) nomeMenu = "Usuário";
 %>
 <div class="menu">
 
@@ -66,7 +68,7 @@
         <img src="${pageContext.request.contextPath}/img/logo-renovai.png" alt="Renovai - Área Administrativa">
     </div>
 
-    <a href="#">
+    <a href="<%= raizMenu %>/dashboard"<%= "dashboard".equals(menuItemAtivo) ? " class=\"ativo\"" : "" %>>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/>
             <rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
@@ -74,7 +76,7 @@
         <span>Dashboard</span>
     </a>
 
-    <a href="#">
+    <a href="<%= raizMenu %>/cooperativa">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/>
             <path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/>
@@ -91,7 +93,7 @@
         <span>Cooperados</span>
     </a>
 
-    <a href="#">
+    <a href="<%= raizMenu %>/coleta">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/>
             <path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/>
@@ -100,7 +102,7 @@
         <span>Coletas</span>
     </a>
 
-    <a href="#">
+    <a href="<%= raizMenu %>/material">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="m7.5 4.27 9 5.15"/>
             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
@@ -126,7 +128,7 @@
             </svg>
         </span>
         <div>
-            <b>Nome usuário</b>
+            <b><%= esc(nomeMenu) %></b>
             <small>Administrador</small>
         </div>
     </div>

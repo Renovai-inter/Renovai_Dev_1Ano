@@ -19,8 +19,8 @@
         <c:choose>
             <c:when test="${enviado}">
                 <div class="aviso sucesso" role="status">
-                    Se o e-mail informado pertencer a um administrador, enviamos um link de redefinição.
-                    Ele vale por 30 minutos. Confira também a caixa de spam.
+                    Recebemos sua solicitação. Se o e-mail pertencer a um administrador e o serviço de e-mail estiver disponível,
+                    você receberá um link de redefinição válido por 30 minutos. Confira também a caixa de spam.
                 </div>
                 <p class="alt"><a href="${ctx}/login">Voltar para o login</a></p>
             </c:when>
@@ -44,5 +44,6 @@
         <img src="${ctx}/img/mascote.png" alt="" onerror="this.style.display='none'">
     </aside>
 </main>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

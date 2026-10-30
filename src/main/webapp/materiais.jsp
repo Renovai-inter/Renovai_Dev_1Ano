@@ -23,6 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        .aviso-sucesso { background: #d8e8cf; color: #2f5a35; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-size: .9rem; }
         :root {
             --verde-menu: #618c66;
             --verde-ativo: #b3cca9;
@@ -231,15 +232,15 @@
             <span>Área Administrativa</span>
         </div>
         <nav>
-            <a href="#">Dashboard</a>
-            <a href="#">Cooperativas</a>
-            <a href="#">Cooperados</a>
-            <a href="#">Coletas</a>
+            <a href="${ctx}/dashboard">Dashboard</a>
+            <a href="${ctx}/cooperativa">Cooperativas</a>
+            <a href="${ctx}/cooperado">Cooperados</a>
+            <a href="${ctx}/coleta">Coletas</a>
             <a href="${ctx}/material" class="ativo" aria-current="page">Materiais</a>
-            <a href="#">Negociações</a>
+            <a href="${ctx}/negociacao">Negociações</a>
         </nav>
         <div class="usuario">
-            Nome usuário
+            <b><c:out value="${empty sessionScope.nomeUsuario ? 'Usuário' : sessionScope.nomeUsuario}"/></b>
             <small>Administrador</small>
         </div>
     </aside>
@@ -253,6 +254,17 @@
             </div>
             <button type="button" class="btn btn-verde" id="btnNovo">Novo material</button>
         </header>
+
+        <c:if test="${not empty erroMaterial}"><div class="operacao-aviso erro" role="alert"><c:out value="${erroMaterial}"/></div></c:if>
+        <c:if test="${param.sucesso == 'cadastrar'}">
+            <div class="aviso-sucesso" role="status">Material cadastrado com sucesso.</div>
+        </c:if>
+        <c:if test="${param.sucesso == 'editar'}">
+            <div class="aviso-sucesso" role="status">Material atualizado com sucesso.</div>
+        </c:if>
+        <c:if test="${param.sucesso == 'excluir'}">
+            <div class="aviso-sucesso" role="status">Material excluído com sucesso.</div>
+        </c:if>
 
         <section class="painel">
             <div class="filtros">
@@ -385,6 +397,7 @@
 
     // Abrir modais
     $("btnNovo").addEventListener("click", () => modalNovo.showModal());
+    <c:if test="${param.novo == '1'}">modalNovo.showModal();</c:if>
 
     document.querySelectorAll(".btn-editar").forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -431,5 +444,6 @@
     busca.addEventListener("input", filtrar);
     filtro.addEventListener("change", filtrar);
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

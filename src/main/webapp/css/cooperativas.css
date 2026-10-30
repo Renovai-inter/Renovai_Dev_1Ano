@@ -32,7 +32,7 @@
 }
 
 .coop-btn {
-    background:#568b61;
+    background:#6b9065;
     border:0;
     border-radius:8px;
     color:white!important;
@@ -43,8 +43,21 @@
     font-size:12px
 }
 
+.coop-btn:hover {
+    background:#477b50
+}
+
+.coop-btn:disabled {
+    opacity:.55;
+    cursor:not-allowed
+}
+
 .coop-btn.danger {
-    background:#a83b65
+    background:#86213f
+}
+
+.coop-btn.danger:hover {
+    background:#701c40
 }
 
 .coop-card {
@@ -105,10 +118,16 @@
 }
 
 .coop-name {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
     font-weight:600;
     color:#333;
     text-decoration:none
 }
+
+.coop-identificacao { display:flex; align-items:center; gap:10px; }
+.coop-identificacao .editar { flex-shrink:0; }
 
 .coop-pill {
     background:#e9f4d8;

@@ -14,6 +14,22 @@
     <link rel="stylesheet" href="${ctx}/css/renovai.css">
 
     <style>
+        .layout > .menu {
+            width: 240px;
+            height: 100vh;
+            min-height: 100vh;
+            padding: 28px 16px;
+            background: var(--verde-menu);
+            border-radius: 0;
+        }
+        .layout > .menu .logo { margin: 0 0 28px 12px; }
+        .layout > .menu .logo img { width: 150px; }
+        .layout > .menu a { height: auto; color: #fff; text-decoration: none; border-radius: 10px; }
+        .layout > .menu a.ativo { background: var(--verde-ativo); color: #2f4d33; }
+        .layout > .menu .usuario { margin-top: auto; }
+        .layout > .menu .usuario b { display: block; font-size: .9rem; }
+        .layout > .menu .usuario small { display: block; font-size: .75rem; }
+
         .eyebrow { margin: 0; color: var(--texto-suave); font-size: .95rem; text-transform: uppercase; }
         .topo h1 { margin-top: 2px; }
 
@@ -126,24 +142,8 @@
 
 <div class="layout">
 
-    <aside class="sidebar">
-        <div class="marca">
-            <strong>Renovaí</strong>
-            <span>Área Administrativa</span>
-        </div>
-        <nav>
-            <a href="${ctx}/dashboard" class="ativo" aria-current="page">Dashboard</a>
-            <a href="#">Cooperativas</a>
-            <a href="#">Cooperados</a>
-            <a href="${ctx}/coleta">Coletas</a>
-            <a href="${ctx}/material">Materiais</a>
-            <a href="#">Negociações</a>
-        </nav>
-        <div class="usuario">
-            <c:out value="${empty nomeUsuario ? 'Nome usuário' : nomeUsuario}"/>
-            <small>Administrador</small>
-        </div>
-    </aside>
+    <% request.setAttribute("menuAtivo", "dashboard"); %>
+    <%@ include file="/menu.jspf" %>
 
     <main>
         <header class="topo">
@@ -253,11 +253,11 @@
         <section class="painel-dash secao" aria-labelledby="tAcoes">
             <h2 id="tAcoes">Ações rápidas</h2>
             <div class="acoes-rapidas">
-                <a class="btn-acao" href="#"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-building"/></svg>Cadastrar cooperativa</a>
+                <a class="btn-acao" href="${ctx}/cooperativa?pagina=nova"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-building"/></svg>Cadastrar cooperativa</a>
                 <a class="btn-acao" href="${ctx}/coleta?acao=nova"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-truck"/></svg>Nova coleta</a>
-                <a class="btn-acao" href="#"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-swap"/></svg>Nova negociação</a>
+                <a class="btn-acao" href="${ctx}/negociacao?acao=novo"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-swap"/></svg>Nova negociação</a>
                 <a class="btn-acao" href="${ctx}/material?novo=1"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-box"/></svg>Novo material</a>
-                <a class="btn-acao" href="#"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-person-add"/></svg>Cadastrar cooperado</a>
+                <a class="btn-acao" href="${ctx}/cooperado?acao=novo"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-person-add"/></svg>Cadastrar cooperado</a>
             </div>
         </section>
     </main>
@@ -381,5 +381,6 @@
         });
     })();
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

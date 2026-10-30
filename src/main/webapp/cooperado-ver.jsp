@@ -1,13 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, model.principais.Cooperado, java.time.format.DateTimeFormatter" %>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><%= esc(c.getNomeCompleto()) %></title>
-    <link rel="icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=8">
-</head>
 <%!
     // Apenas para EXIBIR: textos com acento para os valores que vem do banco (ex.: NEGOCIACOES -> Negociações).
     private static final String[][] ROTULOS = {
@@ -80,6 +72,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><%= esc(c.getNomeCompleto()) %></title>
+    <link rel="icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=8">
 
@@ -156,6 +149,7 @@
         <% if (erro != null) { %>
             <div class="erro"><%= esc(erro) %></div>
         <% } %>
+        <% if ("atualizacao".equals(request.getParameter("sucesso"))) { %><div class="operacao-aviso" role="status">Cooperado atualizado com sucesso.</div><% } %>
 
         <div class="duas-colunas">
             <div class="cartao cartao-form">
@@ -233,5 +227,6 @@
 </div>
 
 <%@ include file="modal-excluir.jspf" %>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

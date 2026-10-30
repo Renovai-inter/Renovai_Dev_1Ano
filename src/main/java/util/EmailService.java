@@ -28,9 +28,7 @@ public final class EmailService {
         String senha = config("SMTP_PASSWORD", null);
 
         if (host == null || usuario == null || senha == null) {
-            LOG.warning("E-mail não configurado (SMTP_HOST, SMTP_USER, SMTP_PASSWORD). "
-                    + "Link de redefinição para " + destino + ": " + link);
-            return;
+            throw new MessagingException("Serviço de e-mail não configurado.");
         }
 
         String porta = config("SMTP_PORT", "587");

@@ -59,10 +59,11 @@ public class CooperadoServlet extends HttpServlet {
             } else if ("excluir".equals(acao)) {
                 excluir(request, response);
             } else {
-                response.sendRedirect("cooperado");
+                response.sendRedirect("cooperado?erro=acaoInvalida");
             }
         } catch (RuntimeException e) {
-            throw new ServletException("Falha ao processar cooperado.", e);
+            getServletContext().log("Falha ao processar cooperado.", e);
+            response.sendRedirect("cooperado?erro=operacao");
         }
     }
 
@@ -77,14 +78,14 @@ public class CooperadoServlet extends HttpServlet {
     private void abrirVer(HttpServletRequest request, HttpServletResponse response, Long id)
             throws ServletException, IOException {
         if (id == null) {
-            response.sendRedirect("cooperado");
+            response.sendRedirect("cooperado?erro=naoEncontrado");
             return;
         }
         Cooperado filtro = new Cooperado();
         filtro.setIdCooperado(id);
         Cooperado cooperado = dao.buscarCooperadoPorId(filtro);
         if (cooperado == null) {
-            response.sendRedirect("cooperado");
+            response.sendRedirect("cooperado?erro=naoEncontrado");
             return;
         }
         request.setAttribute("cooperado", cooperado);
@@ -121,14 +122,14 @@ public class CooperadoServlet extends HttpServlet {
     private void abrirEditar(HttpServletRequest request, HttpServletResponse response, Long id)
             throws ServletException, IOException {
         if (id == null) {
-            response.sendRedirect("cooperado");
+            response.sendRedirect("cooperado?erro=naoEncontrado");
             return;
         }
         Cooperado filtro = new Cooperado();
         filtro.setIdCooperado(id);
         Cooperado cooperado = dao.buscarCooperadoPorId(filtro);
         if (cooperado == null) {
-            response.sendRedirect("cooperado");
+            response.sendRedirect("cooperado?erro=naoEncontrado");
             return;
         }
         request.setAttribute("cooperado", cooperado);
@@ -180,7 +181,7 @@ public class CooperadoServlet extends HttpServlet {
             HttpSession sessao = request.getSession();
             sessao.setAttribute("senhaInicialCooperadoId", entrada.getIdCooperado());
             sessao.setAttribute("senhaInicialCooperado", entrada.getSenhaInicial());
-            response.sendRedirect("cooperado?acao=editar&id=" + entrada.getIdCooperado());
+            response.sendRedirect("cooperado?acao=editar&id=" + entrada.getIdCooperado() + "&sucesso=cadastro");
         } catch (IllegalArgumentException e) {
             request.setAttribute("erro", e.getMessage());
             abrirNovo(request, response);
@@ -192,7 +193,7 @@ public class CooperadoServlet extends HttpServlet {
             throws ServletException, IOException {
         Long id = lerId(request);
         if (id == null) {
-            response.sendRedirect("cooperado");
+            response.sendRedirect("cooperado?erro=naoEncontrado");
             return;
         }
         try {
@@ -213,10 +214,10 @@ public class CooperadoServlet extends HttpServlet {
             alteracao.setAtividadesCooperado(atividades);
             int linhas = dao.editarCooperado(alteracao);
             if (linhas == 0) {
-                response.sendRedirect("cooperado");
+                response.sendRedirect("cooperado?erro=naoEncontrado");
                 return;
             }
-            response.sendRedirect("cooperado?acao=ver&id=" + id);
+            response.sendRedirect("cooperado?acao=ver&id=" + id + "&sucesso=atualizacao");
         } catch (IllegalArgumentException e) {
             request.setAttribute("erro", e.getMessage());
             abrirEditar(request, response, id);
@@ -228,14 +229,14 @@ public class CooperadoServlet extends HttpServlet {
             throws ServletException, IOException {
         Long id = lerId(request);
         if (id == null) {
-            response.sendRedirect("cooperado");
+            response.sendRedirect("cooperado?erro=naoEncontrado");
             return;
         }
         Cooperado cooperado = new Cooperado();
         cooperado.setIdCooperado(id);
         int linhas = dao.redefinirSenha(cooperado);
         if (linhas == 0) {
-            response.sendRedirect("cooperado");
+            response.sendRedirect("cooperado?erro=naoEncontrado");
             return;
         }
         request.setAttribute("senhaNova", cooperado.getSenhaInicial());
@@ -249,9 +250,15 @@ public class CooperadoServlet extends HttpServlet {
         if (id != null) {
             Cooperado cooperado = new Cooperado();
             cooperado.setIdCooperado(id);
-            dao.inativarCooperado(cooperado);
+            int linhas = dao.inativarCooperado(cooperado);
+            if (linhas > 0) {
+                response.sendRedirect("cooperado?sucesso=inativacao");
+            } else {
+                response.sendRedirect("cooperado?erro=naoEncontrado");
+            }
+            return;
         }
-        response.sendRedirect("cooperado");
+        response.sendRedirect("cooperado?erro=naoEncontrado");
     }
 
     // Exclui o cooperado quando as referências do banco permitem.
@@ -259,14 +266,18 @@ public class CooperadoServlet extends HttpServlet {
             throws ServletException, IOException {
         Long id = lerId(request);
         if (id == null) {
-            response.sendRedirect("cooperado");
+            response.sendRedirect("cooperado?erro=naoEncontrado");
             return;
         }
         try {
             Cooperado cooperado = new Cooperado();
             cooperado.setIdCooperado(id);
-            dao.excluirCooperado(cooperado);
-            response.sendRedirect("cooperado");
+            int linhas = dao.excluirCooperado(cooperado);
+            if (linhas > 0) {
+                response.sendRedirect("cooperado?sucesso=exclusao");
+            } else {
+                response.sendRedirect("cooperado?erro=naoEncontrado");
+            }
         } catch (RuntimeException e) {
             if (restricaoDeReferencia(e)) {
                 request.setAttribute("erro",

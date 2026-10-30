@@ -59,9 +59,9 @@ public class ColetaDAO {
         // Comando SQL
 
         String sql = "INSERT INTO coleta (id_coleta, id_cooperativa, tipo, status, id_rota, " +
-                "id_endereco_rota, id_cooperado_responsavel, origem_entrega, nome_local_origem, " +
+                "id_endereco_rota, id_cooperado_responsavel, nome_local_origem, " +
                 "data_agendada, data_inicio, data_fim, peso_total_kg, observacoes) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         String sqlMaterial = "INSERT INTO coleta_material (id_coleta, id_material, quantidade_kg) " +
                 "VALUES (?, ?, ?)";
 
@@ -78,25 +78,24 @@ public class ColetaDAO {
             pstmt.setObject(5, coleta.getRelacionamentos().getIdRota(), Types.BIGINT);
             pstmt.setObject(6, coleta.getRelacionamentos().getIdEnderecoRota(), Types.BIGINT);
             pstmt.setObject(7, coleta.getRelacionamentos().getIdCooperadoResponsavel(), Types.BIGINT);
-            pstmt.setString(8, coleta.getOrigemEntrega());
-            pstmt.setString(9, coleta.getNomeLocalOrigem());
+            pstmt.setString(8, coleta.getNomeLocalOrigem());
             if (coleta.getDataAgendada() == null) {
-                pstmt.setNull(10, Types.DATE);
+                pstmt.setNull(9, Types.DATE);
             } else {
-                pstmt.setDate(10, Date.valueOf(coleta.getDataAgendada()));
+                pstmt.setDate(9, Date.valueOf(coleta.getDataAgendada()));
             }
             if (coleta.getDataInicio() == null) {
-                pstmt.setNull(11, Types.TIMESTAMP);
+                pstmt.setNull(10, Types.TIMESTAMP);
             } else {
-                pstmt.setTimestamp(11, Timestamp.valueOf(coleta.getDataInicio()));
+                pstmt.setTimestamp(10, Timestamp.valueOf(coleta.getDataInicio()));
             }
             if (coleta.getDataFim() == null) {
-                pstmt.setNull(12, Types.TIMESTAMP);
+                pstmt.setNull(11, Types.TIMESTAMP);
             } else {
-                pstmt.setTimestamp(12, Timestamp.valueOf(coleta.getDataFim()));
+                pstmt.setTimestamp(11, Timestamp.valueOf(coleta.getDataFim()));
             }
-            pstmt.setBigDecimal(13, coleta.getPesoTotalKg());
-            pstmt.setString(14, coleta.getObservacoes());
+            pstmt.setBigDecimal(12, coleta.getPesoTotalKg());
+            pstmt.setString(13, coleta.getObservacoes());
             int linhas = pstmt.executeUpdate();
             if (linhas == 0) {
                 return 0;
@@ -169,7 +168,7 @@ public class ColetaDAO {
 
     private static final String CONSULTA_COLETAS =
             "SELECT id_coleta, id_cooperativa, tipo, status, id_rota, id_endereco_rota, " +
-            "id_cooperado_responsavel, origem_entrega, nome_local_origem, data_agendada, " +
+            "id_cooperado_responsavel, nome_local_origem, data_agendada, " +
             "data_inicio, data_fim, peso_total_kg, observacoes FROM coleta";
 
     // Lista as coletas cadastradas.
@@ -315,7 +314,6 @@ public class ColetaDAO {
         coleta.getRelacionamentos().setIdRota(idOpcional(rs, "id_rota"));
         coleta.getRelacionamentos().setIdEnderecoRota(idOpcional(rs, "id_endereco_rota"));
         coleta.getRelacionamentos().setIdCooperadoResponsavel(idOpcional(rs, "id_cooperado_responsavel"));
-        coleta.setOrigemEntrega(rs.getString("origem_entrega"));
         coleta.setNomeLocalOrigem(rs.getString("nome_local_origem"));
         Date data = rs.getDate("data_agendada");
         if (data != null) {
@@ -362,7 +360,7 @@ public class ColetaDAO {
         }
     }
 
-    // Atualiza a origem de uma coleta existente.
+    // Atualiza o nome do local de origem de uma coleta existente.
     public int cadastrarOrigem(Coleta coleta) {
 
         // Declaração
@@ -374,14 +372,13 @@ public class ColetaDAO {
 
         // Comando SQL
 
-        String sql = "UPDATE coleta SET origem_entrega = ?, nome_local_origem = ? WHERE id_coleta = ?";
+        String sql = "UPDATE coleta SET nome_local_origem = ? WHERE id_coleta = ?";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setString(1, coleta.getOrigemEntrega());
-            pstmt.setString(2, coleta.getNomeLocalOrigem());
-            pstmt.setLong(3, coleta.getIdColeta());
+            pstmt.setString(1, coleta.getNomeLocalOrigem());
+            pstmt.setLong(2, coleta.getIdColeta());
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar a origem da coleta.", e);
@@ -459,45 +456,100 @@ public class ColetaDAO {
             throw new IllegalArgumentException("coleta é obrigatória.");
         }
         coleta.validarTipoEVinculos();
-        if (coleta.getIdColeta() == null || coleta.getTipo() == null || coleta.getStatus() == null) {
-            throw new IllegalArgumentException("ID, tipo e status são obrigatórios.");
+        if (coleta.getIdColeta() == null || coleta.getTipo() == null || coleta.getStatus() == null
+                || coleta.getRelacionamentos().getIdCooperativa() == null) {
+            throw new IllegalArgumentException("ID, cooperativa, tipo e status são obrigatórios.");
         }
         Connection conexao = conn.conectar();
 
         // Comando SQL
 
-        String sql = "UPDATE coleta SET tipo = ?, status = ?, origem_entrega = ?, " +
+        String sql = "UPDATE coleta SET id_cooperativa = ?, id_rota = ?, id_endereco_rota = ?, " +
+                "id_cooperado_responsavel = ?, tipo = ?, status = ?, " +
                 "nome_local_origem = ?, data_agendada = ?, data_inicio = ?, data_fim = ?, " +
                 "peso_total_kg = ?, observacoes = ? WHERE id_coleta = ?";
 
         // Executar PreparedStatement
 
         try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
-            pstmt.setString(1, coleta.getTipo().name());
-            pstmt.setString(2, coleta.getStatus().name());
-            pstmt.setString(3, coleta.getOrigemEntrega());
-            pstmt.setString(4, coleta.getNomeLocalOrigem());
+            pstmt.setLong(1, coleta.getRelacionamentos().getIdCooperativa());
+            pstmt.setObject(2, coleta.getRelacionamentos().getIdRota(), Types.BIGINT);
+            pstmt.setObject(3, coleta.getRelacionamentos().getIdEnderecoRota(), Types.BIGINT);
+            pstmt.setObject(4, coleta.getRelacionamentos().getIdCooperadoResponsavel(), Types.BIGINT);
+            pstmt.setString(5, coleta.getTipo().name());
+            pstmt.setString(6, coleta.getStatus().name());
+            pstmt.setString(7, coleta.getNomeLocalOrigem());
             if (coleta.getDataAgendada() == null) {
-                pstmt.setNull(5, Types.DATE);
+                pstmt.setNull(8, Types.DATE);
             } else {
-                pstmt.setDate(5, Date.valueOf(coleta.getDataAgendada()));
+                pstmt.setDate(8, Date.valueOf(coleta.getDataAgendada()));
             }
             if (coleta.getDataInicio() == null) {
-                pstmt.setNull(6, Types.TIMESTAMP);
+                pstmt.setNull(9, Types.TIMESTAMP);
             } else {
-                pstmt.setTimestamp(6, Timestamp.valueOf(coleta.getDataInicio()));
+                pstmt.setTimestamp(9, Timestamp.valueOf(coleta.getDataInicio()));
             }
             if (coleta.getDataFim() == null) {
-                pstmt.setNull(7, Types.TIMESTAMP);
+                pstmt.setNull(10, Types.TIMESTAMP);
             } else {
-                pstmt.setTimestamp(7, Timestamp.valueOf(coleta.getDataFim()));
+                pstmt.setTimestamp(10, Timestamp.valueOf(coleta.getDataFim()));
             }
-            pstmt.setBigDecimal(8, coleta.getPesoTotalKg());
-            pstmt.setString(9, coleta.getObservacoes());
-            pstmt.setLong(10, coleta.getIdColeta());
+            pstmt.setBigDecimal(11, coleta.getPesoTotalKg());
+            pstmt.setString(12, coleta.getObservacoes());
+            pstmt.setLong(13, coleta.getIdColeta());
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar coleta.", e);
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+    // Sincroniza os materiais informados após a atualização da coleta.
+    public int atualizarMateriaisDaColeta(Coleta coleta) {
+        if (coleta == null || coleta.getIdColeta() == null) {
+            throw new IllegalArgumentException("ID da coleta é obrigatório.");
+        }
+        Map<Long, BigDecimal> novos = new LinkedHashMap<>();
+        for (ColetaMaterial item : coleta.getRelacionamentos().getMateriaisColetados()) {
+            if (item == null || item.getIdMaterial() == null || item.getQuantidadeKg() == null
+                    || novos.putIfAbsent(item.getIdMaterial(), item.getQuantidadeKg()) != null) {
+                throw new IllegalArgumentException("Confira os materiais e suas quantidades sem repetir material.");
+            }
+        }
+        Map<Long, BigDecimal> antigos = listarMateriaisDaColeta(coleta);
+        Connection conexao = conn.conectar();
+        int linhas = 0;
+        try (PreparedStatement atualizar = conexao.prepareStatement(
+                "UPDATE coleta_material SET quantidade_kg = ? WHERE id_coleta = ? AND id_material = ?");
+             PreparedStatement inserir = conexao.prepareStatement(
+                     "INSERT INTO coleta_material (id_coleta, id_material, quantidade_kg) VALUES (?, ?, ?)");
+             PreparedStatement excluir = conexao.prepareStatement(
+                     "DELETE FROM coleta_material WHERE id_coleta = ? AND id_material = ?")) {
+            for (Map.Entry<Long, BigDecimal> item : novos.entrySet()) {
+                atualizar.setBigDecimal(1, item.getValue());
+                atualizar.setLong(2, coleta.getIdColeta());
+                atualizar.setLong(3, item.getKey());
+                int atualizadas = atualizar.executeUpdate();
+                if (atualizadas == 0) {
+                    inserir.setLong(1, coleta.getIdColeta());
+                    inserir.setLong(2, item.getKey());
+                    inserir.setBigDecimal(3, item.getValue());
+                    linhas += inserir.executeUpdate();
+                } else {
+                    linhas += atualizadas;
+                }
+            }
+            for (Long idAntigo : antigos.keySet()) {
+                if (!novos.containsKey(idAntigo)) {
+                    excluir.setLong(1, coleta.getIdColeta());
+                    excluir.setLong(2, idAntigo);
+                    linhas += excluir.executeUpdate();
+                }
+            }
+            return linhas;
+        } catch (SQLException e) {
+            throw new RuntimeException("Falha ao atualizar materiais da coleta; gravações anteriores podem ter sido mantidas.", e);
         } finally {
             conn.desconectar(conexao);
         }

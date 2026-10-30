@@ -4,7 +4,6 @@ package model.principais;
 import model.auxiliares.RelacionamentosColeta;
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
-import model.enums.OrigemEntrega;
 import util.Utilitario;
 
 import java.math.BigDecimal;
@@ -21,7 +20,6 @@ public class Coleta {
     private final RelacionamentosColeta relacionamentos = new RelacionamentosColeta();
     private TipoColeta tipo; // NOT NULL
     private StatusColeta status; // NOT NULL com DEFAULT
-    private String origemEntrega; // VARCHAR(15)
     private String nomeLocalOrigem; // VARCHAR(150)
     private LocalDate dataAgendada; // DATE
     private LocalDateTime dataInicio; // TIMESTAMP
@@ -34,7 +32,7 @@ public class Coleta {
 
     public Coleta(Long idCooperativa, TipoColeta tipo, StatusColeta status,
                   Long idRota, Long idEnderecoRota, Long idCooperadoResponsavel,
-                  String origemEntrega, String nomeLocalOrigem, LocalDate dataAgendada,
+                  String nomeLocalOrigem, LocalDate dataAgendada,
                   LocalDateTime dataInicio, LocalDateTime dataFim, BigDecimal pesoTotalKg,
                   String observacoes) {
         getRelacionamentos().setIdCooperativa(idCooperativa);
@@ -43,7 +41,6 @@ public class Coleta {
         getRelacionamentos().setIdRota(idRota);
         getRelacionamentos().setIdEnderecoRota(idEnderecoRota);
         getRelacionamentos().setIdCooperadoResponsavel(idCooperadoResponsavel);
-        setOrigemEntrega(origemEntrega);
         setNomeLocalOrigem(nomeLocalOrigem);
         setDataAgendada(dataAgendada);
         setDataInicio(dataInicio);
@@ -80,19 +77,7 @@ public class Coleta {
         this.status = status;
     }
 
-    // Retorna o valor de origemEntrega.
-    public String getOrigemEntrega() { return origemEntrega; }
-
-    // Define o valor de origemEntrega.
-    public void setOrigemEntrega(String origemEntrega) {
-        origemEntrega = utilitario.normalizarTextoLivre(origemEntrega);
-        if (origemEntrega != null) {
-            OrigemEntrega.valueOf(origemEntrega);
-        }
-        this.origemEntrega = origemEntrega;
-    }
-
-    // Confere a combinação entre tipo, rota e origem prevista para a coleta.
+    // Confere a combinação entre tipo e rota prevista para a coleta.
     public void validarTipoEVinculos() {
         if (tipo == null) {
             throw new IllegalArgumentException("tipo é obrigatório.");
@@ -100,10 +85,6 @@ public class Coleta {
         if (tipo == TipoColeta.ENTREGA_COOPERATIVA) {
             if (relacionamentos.getIdRota() != null || relacionamentos.getIdEnderecoRota() != null) {
                 throw new IllegalArgumentException("Entrega na cooperativa não usa rota nem endereço da rota.");
-            }
-        } else {
-            if (origemEntrega != null) {
-                throw new IllegalArgumentException("Coleta externa não usa origem de entrega.");
             }
         }
     }

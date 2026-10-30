@@ -233,7 +233,7 @@ public class NegociacaoServlet extends HttpServlet {
                 abrirNovo(request, response);
                 return;
             }
-            response.sendRedirect("negociacao?acao=ver&id=" + negociacao.getIdNegociacao());
+            response.sendRedirect("negociacao?acao=ver&id=" + negociacao.getIdNegociacao() + "&aviso=nova");
 
         } catch (RuntimeException e) {
             request.setAttribute("erro", "Não foi possível criar a negociação. " + mensagemDoBanco(e));
@@ -323,7 +323,7 @@ public class NegociacaoServlet extends HttpServlet {
                 return;
             }
 
-            response.sendRedirect("negociacao?acao=ver&id=" + id);
+            response.sendRedirect("negociacao?acao=ver&id=" + id + "&aviso=atualizada");
 
         } catch (RuntimeException e) {
             request.setAttribute("erro", "Não foi possível salvar. " + mensagemDoBanco(e));
@@ -362,9 +362,13 @@ public class NegociacaoServlet extends HttpServlet {
 
         try {
             proposta.setAutor(autor);
-            dao.adicionarMovimentacao(proposta);
-
-            response.sendRedirect("negociacao?acao=editar&id=" + id);
+            if (dao.adicionarMovimentacao(proposta) == 0) {
+                request.setAttribute("erro", "Não foi possível adicionar a movimentação.");
+                request.setAttribute("abrirModal", true);
+                abrirEditar(request, response, id);
+                return;
+            }
+            response.sendRedirect("negociacao?acao=editar&id=" + id + "&aviso=movAdicionada");
 
         } catch (RuntimeException e) {
             request.setAttribute("erro", "Não foi possível adicionar a movimentação. " + mensagemDoBanco(e));
@@ -433,9 +437,16 @@ public class NegociacaoServlet extends HttpServlet {
             if (proposta != null) {
                 proposta.setAutor(autor);
             }
-            dao.alterarStatus(negociacao, proposta);
-
-            response.sendRedirect("negociacao?acao=ver&id=" + id);
+            if (dao.alterarStatus(negociacao, proposta) == 0) {
+                request.setAttribute("erro", "Negociação não encontrada.");
+                abrirVer(request, response, id);
+                return;
+            }
+            if ("cancelar".equals(acao)) {
+                response.sendRedirect("negociacao?acao=ver&id=" + id + "&aviso=cancelada");
+            } else {
+                response.sendRedirect("negociacao?acao=ver&id=" + id);
+            }
 
         } catch (RuntimeException e) {
             request.setAttribute("erro", "Não foi possível alterar o status. " + mensagemDoBanco(e));
@@ -475,7 +486,11 @@ public class NegociacaoServlet extends HttpServlet {
         }
 
         try {
-            dao.excluirNegociacao(negociacao);
+            if (dao.excluirNegociacao(negociacao) == 0) {
+                request.setAttribute("erro", "Negociação não encontrada.");
+                abrirVer(request, response, id);
+                return;
+            }
 
         } catch (RuntimeException e) {
             request.setAttribute("erro", "Não foi possível excluir. " + mensagemDoBanco(e));
@@ -483,7 +498,7 @@ public class NegociacaoServlet extends HttpServlet {
             return;
         }
 
-        response.sendRedirect("negociacao");
+        response.sendRedirect("negociacao?aviso=excluida");
     }
 
     // === AUXILIARES ==================================================================================================
