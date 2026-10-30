@@ -163,7 +163,6 @@
 
             var botao = form.querySelector('button[type="submit"]');
             var enviando = false;
-            var CHAVE = 'negNotificacao';
             var LIMITE = 10000000000; // 10^10: o maior valor que colunas numeric(12,2) aceitam
 
             if (!window.negMostrarErroTexto) {
@@ -177,27 +176,8 @@
                 else { alert(titulo + '\n' + mensagem); }
             }
 
-            // Marca "negociacao atualizada" para a proxima pagina mostrar o aviso
-            // (guarda no navegador; o ?aviso= na URL, abaixo, e o reforco que nao depende disso).
-            function marcarNotificacao(tipo) {
-                if (window.negMarcar) { window.negMarcar(tipo); return; }
-                var valor = JSON.stringify({ tipo: tipo, ts: Date.now() });
-                try { sessionStorage.setItem(CHAVE, valor); } catch (e) { /* ok */ }
-                try { localStorage.setItem(CHAVE, valor); } catch (e) { /* ok */ }
-                try { document.cookie = CHAVE + '=' + encodeURIComponent(valor) + '; path=/; max-age=600; SameSite=Lax'; } catch (e) { /* ok */ }
-            }
-
-            // acrescenta ?aviso=tipo (ou &aviso=tipo) na URL de destino, respeitando o #
-            function comAviso(url, tipo) {
-                var partes = String(url).split('#');
-                var base = partes[0];
-                base += (base.indexOf('?') === -1 ? '?' : '&') + 'aviso=' + encodeURIComponent(tipo);
-                return partes.length > 1 ? base + '#' + partes.slice(1).join('#') : base;
-            }
-
             function irPara(url) {
-                marcarNotificacao('atualizada');
-                window.location.href = comAviso(url, 'atualizada');
+                window.location.href = url;
             }
 
             // ---- "carregando" --------------------------------------------------------------------
@@ -285,8 +265,14 @@
                         ', redirecionou = ' + resposta.redirected + ', url = ' + resposta.url);
 
                     // caso normal: o servlet redireciona depois de salvar
-                    if (resposta.redirected) {
+                    if (resposta.redirected && new URL(resposta.url).searchParams.get('aviso') === 'atualizada') {
                         irPara(resposta.url);
+                        return;
+                    }
+                    if (resposta.redirected) {
+                        enviando = false;
+                        desligarCarregando();
+                        erroBonito('Não foi possível atualizar!', 'A negociação não foi atualizada. Confira os dados e tente novamente.');
                         return;
                     }
 
@@ -294,14 +280,6 @@
                         var doc = new DOMParser().parseFromString(html, 'text/html');
                         var caixaErro = doc.querySelector('.erro');
                         var textoErro = caixaErro ? caixaErro.textContent.trim() : '';
-
-                        // salvou, mas o servlet respondeu a pagina direto (sem redirecionar)
-                        if (resposta.ok && textoErro === '') {
-                            console.info('[editar] salvo sem redirecionamento; indo para a tela da negociacao');
-                            irPara('negociacao?acao=ver&id=' +
-                                encodeURIComponent(form.querySelector('input[name="id"]').value));
-                            return;
-                        }
 
                         // erro: mostra o aviso bonito aqui mesmo, sem recarregar
                         // (o que foi digitado continua nos campos e nada e marcado como sucesso)

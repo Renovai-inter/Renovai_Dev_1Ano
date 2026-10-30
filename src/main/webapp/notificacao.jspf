@@ -543,7 +543,8 @@
         textoErro = textoErro.replace(/\s+/g, ' ').trim();
 
         if (textoErro === '') {
-            var tipo = (avisoUrl && AVISOS_URL.indexOf(avisoUrl) !== -1) ? avisoUrl : acao;
+            // O envio identifica a ação para traduzir erros; só o Servlet confirma sucesso.
+            var tipo = (avisoUrl && AVISOS_URL.indexOf(avisoUrl) !== -1) ? avisoUrl : null;
             if (tipo) {
                 mostrar(tipo);
             } else if (pendente) {
