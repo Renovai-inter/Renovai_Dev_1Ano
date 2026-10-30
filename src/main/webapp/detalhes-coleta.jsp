@@ -171,7 +171,7 @@
                         <dd>
                             <c:choose>
                                 <c:when test="${empty coleta.dataAgendada}">—</c:when>
-                                <c:otherwise><fmt:formatDate value="${coleta.dataAgendada}" pattern="dd/MM/yyyy"/></c:otherwise>
+                                <c:otherwise><fmt:formatNumber value="${coleta.dataAgendada.dayOfMonth}" pattern="00"/>/<fmt:formatNumber value="${coleta.dataAgendada.monthValue}" pattern="00"/>/<c:out value="${coleta.dataAgendada.year}"/></c:otherwise>
                             </c:choose>
                         </dd>
                     </div>

@@ -333,6 +333,8 @@
                     <c:forEach items="${coletas}" var="coleta">
 
                         <fmt:formatNumber value="${coleta.pesoTotalKg}" maxFractionDigits="2" var="pesoFmt"/>
+                        <c:set var="pesoExibicao" value="—"/>
+                        <c:if test="${not empty coleta.pesoTotalKg}"><c:set var="pesoExibicao" value="${pesoFmt} kg"/></c:if>
 
                         <%-- NOVO: nome da cooperativa (cai para "Cooperativa #id" se não achar) --%>
                         <c:set var="nomeCoop" value="${cooperativas[coleta.relacionamentos.idCooperativa]}"/>
@@ -366,11 +368,11 @@
                             <td>
                                 <c:choose>
                                     <c:when test="${empty coleta.dataAgendada}">—</c:when>
-                                    <c:otherwise><fmt:formatDate value="${coleta.dataAgendada}" pattern="dd/MM/yyyy"/></c:otherwise>
+                                    <c:otherwise><fmt:formatNumber value="${coleta.dataAgendada.dayOfMonth}" pattern="00"/>/<fmt:formatNumber value="${coleta.dataAgendada.monthValue}" pattern="00"/>/<c:out value="${coleta.dataAgendada.year}"/></c:otherwise>
                                 </c:choose>
                             </td>
 
-                            <td><c:out value="${pesoFmt}"/> kg</td>
+                            <td><c:out value="${pesoExibicao}"/></td>
 
                             <td>
                                 <span class="status" data-status="<c:out value='${coleta.status}'/>">
@@ -386,14 +388,14 @@
 
                             <td class="acoes">
                                 <a class="icone editar" href="${ctx}/coleta?acao=editar&id=${coleta.idColeta}"
-                                   aria-label="Ver detalhes da coleta CO-${coleta.idColeta}">
+                                   aria-label="Editar coleta CO-${coleta.idColeta}">
                                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zm17.7-10.2a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                                 </a>
                                 <button type="button" class="icone excluir btn-excluir"
                                         aria-label="Excluir coleta CO-${coleta.idColeta}"
                                         data-id="${coleta.idColeta}"
                                         data-cooperativa="<c:out value='${nomeCoop}'/>"
-                                        data-peso="<c:out value='${pesoFmt}'/> kg">
+                                        data-peso="<c:out value='${pesoExibicao}'/>">
                                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                                 </button>
                             </td>
