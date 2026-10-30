@@ -29,6 +29,7 @@
             <a href="${ctx}/material">Materiais</a>
             <a href="${ctx}/negociacao">Negociações</a>
         </nav>
+        <div class="usuario"><b><c:out value="${empty sessionScope.nomeUsuario ? 'Usuário' : sessionScope.nomeUsuario}"/></b><small>Administrador</small></div>
     </aside>
     <main class="edicao">
         <header class="topo"><div><h1>Editar coleta CO-<c:out value="${coleta.idColeta}"/></h1>

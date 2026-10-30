@@ -67,7 +67,7 @@
             <a href="${ctx}/negociacao">Negociações</a>
         </nav>
         <div class="usuario">
-            Nome usuário
+            <b><c:out value="${empty sessionScope.nomeUsuario ? 'Usuário' : sessionScope.nomeUsuario}"/></b>
             <small>Administrador</small>
         </div>
     </aside>

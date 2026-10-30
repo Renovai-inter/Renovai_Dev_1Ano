@@ -59,6 +59,8 @@
     String menuItemAtivo = (String) request.getAttribute("menuAtivo");
     if (menuItemAtivo == null) menuItemAtivo = "";
     String raizMenu = request.getContextPath();   // ex.: /Renovai_Dev_1Ano_war_exploded
+    String nomeMenu = (String) session.getAttribute("nomeUsuario");
+    if (nomeMenu == null || nomeMenu.isBlank()) nomeMenu = "Usuário";
 %>
 <div class="menu">
 
@@ -66,7 +68,7 @@
         <img src="${pageContext.request.contextPath}/img/logo-renovai.png" alt="Renovai - Área Administrativa">
     </div>
 
-    <a href="<%= raizMenu %>/dashboard">
+    <a href="<%= raizMenu %>/dashboard"<%= "dashboard".equals(menuItemAtivo) ? " class=\"ativo\"" : "" %>>
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/>
             <rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>
@@ -126,7 +128,7 @@
             </svg>
         </span>
         <div>
-            <b>Nome usuário</b>
+            <b><%= esc(nomeMenu) %></b>
             <small>Administrador</small>
         </div>
     </div>

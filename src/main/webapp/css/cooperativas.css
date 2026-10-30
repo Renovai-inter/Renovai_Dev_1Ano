@@ -118,10 +118,16 @@
 }
 
 .coop-name {
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
     font-weight:600;
     color:#333;
     text-decoration:none
 }
+
+.coop-identificacao { display:flex; align-items:center; gap:10px; }
+.coop-identificacao .editar { flex-shrink:0; }
 
 .coop-pill {
     background:#e9f4d8;
