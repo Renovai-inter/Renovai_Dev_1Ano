@@ -139,7 +139,7 @@
             <% if (erro != null) { %>
                 <div class="erro"><%= esc(erro) %></div>
             <% } %>
-            <% if ("cadastro".equals(request.getParameter("sucesso"))) { %><div class="aviso-sucesso" role="status">Cooperado cadastrado com sucesso.</div><% } %>
+            <% if ("cadastro".equals(request.getParameter("sucesso"))) { %><div class="operacao-aviso" role="status">Cooperado cadastrado com sucesso.</div><% } %>
 
             <% if (senhaNova != null) { %>
                 <div class="sucesso">Senha redefinida. Nova senha temporária: <b><%= esc(senhaNova) %></b>.

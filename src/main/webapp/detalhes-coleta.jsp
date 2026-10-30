@@ -156,10 +156,6 @@
                         </c:when>
                         <c:otherwise>
                             <div>
-                                <dt>Origem da entrega</dt>
-                                <dd><c:out value="${empty coleta.origemEntrega ? '—' : coleta.origemEntrega}"/></dd>
-                            </div>
-                            <div>
                                 <dt>Local de origem</dt>
                                 <dd><c:out value="${empty coleta.nomeLocalOrigem ? '—' : coleta.nomeLocalOrigem}"/></dd>
                             </div>

@@ -255,7 +255,7 @@
             <button type="button" class="btn btn-verde" id="btnNovo">Novo material</button>
         </header>
 
-        <c:if test="${not empty erroMaterial}"><div class="aviso erro" role="alert"><c:out value="${erroMaterial}"/></div></c:if>
+        <c:if test="${not empty erroMaterial}"><div class="operacao-aviso erro" role="alert"><c:out value="${erroMaterial}"/></div></c:if>
         <c:if test="${param.sucesso == 'cadastrar'}">
             <div class="aviso-sucesso" role="status">Material cadastrado com sucesso.</div>
         </c:if>
@@ -340,8 +340,6 @@
             <option>ELETRONICOS</option>
             <option>OUTROS</option>
         </select>
-        <label for="novaOrigem">Origem</label>
-        <input type="text" id="novaOrigem" name="origem" required maxlength="10">
         <div class="rodape">
             <button type="button" class="btn btn-contorno" data-fechar>Cancelar</button>
             <button type="submit" class="btn btn-verde">Salvar</button>

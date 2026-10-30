@@ -8,7 +8,6 @@ import dao.MaterialDAO;
 import model.principais.Material;
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
-import model.enums.OrigemEntrega;
 import java.util.Objects;
 import java.util.function.Supplier;
 import jakarta.servlet.ServletException;
@@ -53,8 +52,11 @@ public class ColetaServlet extends HttpServlet {
                     return;
                 }
                 request.setAttribute("coleta", coleta);
-                request.setAttribute("origens", java.util.Arrays.stream(OrigemEntrega.values())
-                        .map(Enum::name).toList());
+                request.setAttribute("cooperativas", opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas"));
+                request.setAttribute("cooperados", opcoesOuVazio(coletaDAO::listarCooperados, "cooperados"));
+                request.setAttribute("rotas", opcoesOuVazio(coletaDAO::listarRotas, "rotas"));
+                request.setAttribute("materiaisCatalogo", materialDAO.listarMateriais());
+                request.setAttribute("materiaisAtuais", coletaDAO.listarMateriaisDaColeta(coleta));
                 request.getRequestDispatcher("/editar-coleta.jsp").forward(request, response);
             } else if ("detalhes".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));
@@ -102,8 +104,6 @@ public class ColetaServlet extends HttpServlet {
                         .forward(request, response);
 
             } else if ("nova".equals(acao)) {
-                request.setAttribute("origens", java.util.Arrays.stream(OrigemEntrega.values())
-                        .map(Enum::name).toList());
                 request.setAttribute("cooperativas",
                         opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas"));
                 request.setAttribute("cooperados",
@@ -182,16 +182,63 @@ public class ColetaServlet extends HttpServlet {
                     mostrarErro(request, response, "Coleta não encontrada.");
                     return;
                 }
+                coleta.getRelacionamentos().setIdCooperativa(
+                        Long.parseLong(request.getParameter("idCooperativa")));
+                if (coleta.getTipo() == TipoColeta.COLETA_EXTERNA) {
+                    String rota = request.getParameter("idRota");
+                    Long idRota = rota == null || rota.isBlank() ? null : Long.parseLong(rota);
+                    if (!java.util.Objects.equals(idRota, coleta.getRelacionamentos().getIdRota())) {
+                        coleta.getRelacionamentos().setIdEnderecoRota(null);
+                    }
+                    coleta.getRelacionamentos().setIdRota(idRota);
+                }
+                String responsavel = request.getParameter("idCooperadoResponsavel");
+                coleta.getRelacionamentos().setIdCooperadoResponsavel(
+                        responsavel == null || responsavel.isBlank() ? null : Long.parseLong(responsavel));
                 String data = request.getParameter("dataAgendada");
                 coleta.setDataAgendada(data == null || data.isBlank() ? null : LocalDate.parse(data));
                 coleta.setObservacoes(request.getParameter("observacoes"));
                 if (coleta.getTipo() == TipoColeta.ENTREGA_COOPERATIVA) {
-                    String origem = request.getParameter("origemEntrega");
-                    coleta.setOrigemEntrega(origem == null || origem.isBlank() ? null : origem);
                     coleta.setNomeLocalOrigem(request.getParameter("nomeLocalOrigem"));
                 }
+                String[] idsMateriais = request.getParameterValues("idMaterial");
+                String[] quantidades = request.getParameterValues("quantidadeKg");
+                if (idsMateriais == null && quantidades == null) {
+                    idsMateriais = new String[0];
+                    quantidades = new String[0];
+                }
+                if (idsMateriais == null || quantidades == null || idsMateriais.length != quantidades.length) {
+                    throw new IllegalArgumentException("Confira os materiais e suas quantidades.");
+                }
+                ArrayList<ColetaMaterial> itens = new ArrayList<>();
+                java.util.Set<Long> idsUnicos = new java.util.HashSet<>();
+                for (int i = 0; i < idsMateriais.length; i++) {
+                    ColetaMaterial item = new ColetaMaterial();
+                    item.setIdMaterial(Long.parseLong(idsMateriais[i]));
+                    item.setQuantidadeKg(new BigDecimal(quantidades[i].replace(",", ".")));
+                    if (!idsUnicos.add(item.getIdMaterial())) {
+                        throw new IllegalArgumentException("Não repita o mesmo material na coleta.");
+                    }
+                    itens.add(item);
+                }
+                java.util.Set<Long> catalogo = new java.util.HashSet<>();
+                for (Material material : materialDAO.listarMateriais()) {
+                    catalogo.add(material.getIdMaterial());
+                }
+                if (!catalogo.containsAll(idsUnicos)) {
+                    throw new IllegalArgumentException("Há material que não existe mais no catálogo.");
+                }
+                coleta.getRelacionamentos().setMateriaisColetados(itens);
                 if (coletaDAO.atualizarColeta(coleta) == 0) {
                     mostrarErro(request, response, "Coleta não encontrada.");
+                    return;
+                }
+                try {
+                    coletaDAO.atualizarMateriaisDaColeta(coleta);
+                } catch (RuntimeException e) {
+                    getServletContext().log("Falha ao atualizar materiais da coleta.", e);
+                    mostrarErro(request, response,
+                            "A coleta pode ter sido atualizada parcialmente. Confira os vínculos e materiais antes de tentar novamente.");
                     return;
                 }
                 response.sendRedirect(request.getContextPath()
@@ -260,9 +307,9 @@ public class ColetaServlet extends HttpServlet {
             }
 
         } catch (NumberFormatException | java.time.format.DateTimeParseException e) {
-            mostrarErro(request, response, "Confira os campos numéricos e a data.");
+            reabrirFormulario(request, response, acao, "Confira os campos numéricos e a data.");
         } catch (IllegalArgumentException e) {
-            mostrarErro(request, response, e.getMessage());
+            reabrirFormulario(request, response, acao, e.getMessage());
         } catch (RuntimeException e) {
             getServletContext().log("Erro ao processar a coleta.", e);
             mostrarErro(request, response, "Não foi possível concluir a operação da coleta.");
@@ -274,6 +321,41 @@ public class ColetaServlet extends HttpServlet {
             throws IOException {
         request.getSession().setAttribute("erroColeta", mensagem);
         response.sendRedirect(request.getContextPath() + "/coleta");
+    }
+
+    // Mantém os parâmetros do POST na tela de cadastro ou edição quando a validação falha.
+    private void reabrirFormulario(HttpServletRequest request, HttpServletResponse response,
+                                   String acao, String mensagem) throws ServletException, IOException {
+        request.setAttribute("erroColeta", mensagem);
+        request.setAttribute("dadosEnviados", true);
+        if ("cadastrar".equals(acao)) {
+            request.setAttribute("cooperativas", opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas"));
+            request.setAttribute("cooperados", opcoesOuVazio(coletaDAO::listarCooperados, "cooperados"));
+            request.setAttribute("rotas", opcoesOuVazio(coletaDAO::listarRotas, "rotas"));
+            request.setAttribute("materiaisCatalogo", materialDAO.listarMateriais());
+            request.getRequestDispatcher("/nova-coleta.jsp").forward(request, response);
+            return;
+        }
+        if ("atualizar".equals(acao)) {
+            try {
+                Coleta filtro = new Coleta();
+                filtro.setIdColeta(Long.parseLong(request.getParameter("id")));
+                Coleta coleta = coletaDAO.buscarPorId(filtro);
+                if (coleta != null) {
+                    request.setAttribute("coleta", coleta);
+                    request.setAttribute("cooperativas", opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas"));
+                    request.setAttribute("cooperados", opcoesOuVazio(coletaDAO::listarCooperados, "cooperados"));
+                    request.setAttribute("rotas", opcoesOuVazio(coletaDAO::listarRotas, "rotas"));
+                    request.setAttribute("materiaisCatalogo", materialDAO.listarMateriais());
+                    request.setAttribute("materiaisAtuais", coletaDAO.listarMateriaisDaColeta(coleta));
+                    request.getRequestDispatcher("/editar-coleta.jsp").forward(request, response);
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                // ID ausente ou inválido: a lista mostra a falha.
+            }
+        }
+        mostrarErro(request, response, mensagem);
     }
 
     private void cadastrar(HttpServletRequest request) {
@@ -312,12 +394,10 @@ public class ColetaServlet extends HttpServlet {
         }
 
         if (coleta.getTipo() == TipoColeta.COLETA_EXTERNA) {
-            coleta.setOrigemEntrega(null);
             coleta.setNomeLocalOrigem(null);
         } else if (coleta.getTipo() == TipoColeta.ENTREGA_COOPERATIVA) {
             coleta.getRelacionamentos().setIdRota(null);
             coleta.getRelacionamentos().setIdEnderecoRota(null);
-            coleta.setOrigemEntrega(request.getParameter("origemEntrega"));
             coleta.setNomeLocalOrigem(
                     request.getParameter("nomeLocalOrigem"));
         } else {

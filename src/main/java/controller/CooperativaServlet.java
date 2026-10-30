@@ -149,14 +149,12 @@ public class CooperativaServlet extends HttpServlet {
                 || valor(request, "telefone_whatsapp").isEmpty() || valor(request, "cep").isEmpty()
                 || valor(request, "endereco").isEmpty() || valor(request, "cidade").isEmpty()
                 || valor(request, "estado").isEmpty()) {
-            redirecionarPara(request, response, "cooperativa?pagina=nova", "erro",
-                    "Preencha todos os dados institucionais obrigatórios.");
+            reabrirFormulario(request, response, null, "Preencha todos os dados institucionais obrigatórios.");
             return;
         }
         if (valor(request, "gestor_nome_completo").isEmpty() || valor(request, "gestor_email").isEmpty()
                 || senhaTemporaria.isEmpty()) {
-            redirecionarPara(request, response, "cooperativa?pagina=nova", "erro",
-                    "Preencha nome, e-mail e senha temporária do gestor.");
+            reabrirFormulario(request, response, null, "Preencha nome, e-mail e senha temporária do gestor.");
             return;
         }
 
@@ -180,11 +178,10 @@ public class CooperativaServlet extends HttpServlet {
             if (linhas > 0) {
                 redirecionar(request, response, "mensagem", "Cooperativa e gestor cadastrados com sucesso.");
             } else {
-                redirecionarPara(request, response, "cooperativa?pagina=nova", "erro",
-                        "Não foi possível cadastrar a cooperativa e o gestor.");
+                reabrirFormulario(request, response, null, "Não foi possível cadastrar a cooperativa e o gestor.");
             }
         } catch (IllegalArgumentException e) {
-            redirecionarPara(request, response, "cooperativa?pagina=nova", "erro", e.getMessage());
+            reabrirFormulario(request, response, null, e.getMessage());
         } catch (RuntimeException e) {
             throw new ServletException("Erro ao cadastrar a cooperativa.", e);
         }
@@ -208,8 +205,7 @@ public class CooperativaServlet extends HttpServlet {
                 "telefone_whatsapp", "cep", "endereco", "cidade", "estado"};
         for (String campo : obrigatorios) {
             if (request.getParameter(campo) != null && valor(request, campo).isEmpty()) {
-                redirecionarPara(request, response, "cooperativa?pagina=editar&id=" + id, "erro",
-                        "Preencha todos os dados institucionais obrigatórios.");
+                reabrirFormulario(request, response, id, "Preencha todos os dados institucionais obrigatórios.");
                 return;
             }
         }
@@ -232,11 +228,11 @@ public class CooperativaServlet extends HttpServlet {
             if (linhas > 0) {
                 redirecionar(request, response, "mensagem", "Cooperativa atualizada com sucesso.");
             } else {
-                redirecionar(request, response, "erro",
+                reabrirFormulario(request, response, id,
                         "Não foi possível atualizar: valor inválido ou cooperativa não encontrada.");
             }
         } catch (IllegalArgumentException e) {
-            redirecionar(request, response, "erro", e.getMessage());
+            reabrirFormulario(request, response, id, e.getMessage());
         } catch (RuntimeException e) {
             throw new ServletException("Erro ao atualizar a cooperativa.", e);
         }
@@ -379,11 +375,21 @@ public class CooperativaServlet extends HttpServlet {
         }
     }
 
-    // Guarda a mensagem na sessão e redireciona para o destino informado dentro do contexto da aplicação.
-    private void redirecionarPara(HttpServletRequest request, HttpServletResponse response,
-                                  String destino, String tipo, String texto) throws IOException {
-        request.getSession().setAttribute(tipo, texto);
-        response.sendRedirect(request.getContextPath() + "/" + destino);
+    // Reabre o mesmo formulário após erro, mantendo os parâmetros enviados na requisição.
+    private void reabrirFormulario(HttpServletRequest request, HttpServletResponse response,
+                                   Long id, String erro) throws ServletException, IOException {
+        request.setAttribute("erro", erro);
+        if (id != null) {
+            Cooperativa filtro = new Cooperativa();
+            filtro.setIdCooperativa(id);
+            Cooperativa atual = dao.buscarPorId(filtro);
+            if (atual == null) {
+                redirecionar(request, response, "erro", "Cooperativa não encontrada.");
+                return;
+            }
+            request.setAttribute("cooperativa", atual);
+        }
+        request.getRequestDispatcher(PAGINA_FORM).forward(request, response);
     }
 
     // Guarda a mensagem na sessão e redireciona para a lista de cooperativas.

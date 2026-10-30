@@ -299,7 +299,7 @@
             <a href="${ctx}/coleta?acao=nova" class="btn btn-verde">Nova coleta</a>
         </header>
 
-        <c:if test="${not empty erroColeta}"><div class="aviso erro" role="alert"><c:out value="${erroColeta}"/></div></c:if>
+        <c:if test="${not empty erroColeta}"><div class="operacao-aviso erro" role="alert"><c:out value="${erroColeta}"/></div></c:if>
         <c:if test="${param.sucesso == 'cadastro'}">
             <div class="aviso-sucesso" role="status">Coleta cadastrada com sucesso.</div>
         </c:if>

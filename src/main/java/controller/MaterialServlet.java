@@ -34,12 +34,7 @@ public class MaterialServlet extends HttpServlet {
 
             int linhas;
             if ("cadastrar".equals(acao)) {
-                String origem = request.getParameter("origem");
-                if (origem == null || origem.isBlank()) {
-                    mostrarErro(request, response, "Informe a origem do material.");
-                    return;
-                }
-                linhas = materialDAO.cadastrarMaterial(new Material(nome, categoria, origem));
+                linhas = materialDAO.cadastrarMaterial(new Material(nome, categoria));
             } else if ("editar".equals(acao)) {
                 Long idMaterial = Long.parseLong(request.getParameter("idMaterial"));
                 Material alteracao = new Material();

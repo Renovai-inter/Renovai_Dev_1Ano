@@ -13,15 +13,13 @@ public class Material {
     private Long idMaterial; // PK
     private String nome; // NOT NULL - VARCHAR(100)
     private CategoriaMaterial categoria; // NOT NULL - VARCHAR(20) - CHECK
-    private String origem; // NOT NULL - VARCHAR(10)
 
     public Material() {
     }
 
-    public Material(String nome, String categoria, String origem) {
+    public Material(String nome, String categoria) {
         setNome(nome);
         setCategoria(categoria);
-        setOrigem(origem);
     }
 
     // GETTERS E SETTERS
@@ -63,19 +61,4 @@ public class Material {
         this.categoria = CategoriaMaterial.valueOf(utilitario.normalizarTextoLivre(categoria));
     }
 
-    public String getOrigem() {
-        return origem;
-    }
-
-    // Valida e guarda a origem obrigatória do material.
-    public void setOrigem(String origem) {
-        origem = utilitario.normalizarTextoLivre(origem);
-        if (origem == null || origem.isBlank()) {
-            throw new IllegalArgumentException("origem é obrigatória.");
-        }
-        if (origem.length() > 10) {
-            throw new IllegalArgumentException("origem deve ter no máximo 10 caracteres.");
-        }
-        this.origem = origem;
-    }
 }

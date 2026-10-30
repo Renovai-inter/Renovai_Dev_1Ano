@@ -84,6 +84,7 @@
             </div>
         </header>
 
+        <c:if test="${not empty erroColeta}"><div class="operacao-aviso erro" role="alert"><c:out value="${erroColeta}"/></div></c:if>
         <form method="post" action="${ctx}/coleta" accept-charset="UTF-8" id="formColeta">
             <input type="hidden" name="acao" value="cadastrar">
 
@@ -96,7 +97,7 @@
                         <label for="idCooperativa">Cooperativa</label>
                         <c:choose>
                             <c:when test="${not empty cooperativas}">
-                                <select id="idCooperativa" name="idCooperativa" required>
+                                <select id="idCooperativa" name="idCooperativa" data-posted="<c:out value='${param.idCooperativa}'/>" required>
                                     <option value="" disabled selected>Selecione a cooperativa</option>
                                     <c:forEach items="${cooperativas}" var="op">
                                         <option value="${op.key}"><c:out value="${op.value}"/></option>
@@ -105,14 +106,14 @@
                             </c:when>
                             <c:otherwise>
                                 <input type="number" min="1" id="idCooperativa" name="idCooperativa"
-                                       placeholder="ID da cooperativa" required>
+                                       placeholder="ID da cooperativa" data-posted="<c:out value='${param.idCooperativa}'/>" required>
                             </c:otherwise>
                         </c:choose>
                     </div>
 
                     <div class="campo">
                         <label for="tipo">Tipo de coleta</label>
-                        <select id="tipo" name="tipo" required>
+                        <select id="tipo" name="tipo" data-posted="<c:out value='${param.tipo}'/>" required>
                             <option value="" disabled selected>Selecione o tipo de coleta</option>
                             <option value="COLETA_EXTERNA">Coleta externa</option>
                             <option value="ENTREGA_COOPERATIVA">Entrega na cooperativa</option>
@@ -121,7 +122,7 @@
 
                     <div class="campo">
                         <label for="dataAgendada">Data</label>
-                        <input type="date" id="dataAgendada" name="dataAgendada" required>
+                        <input type="date" id="dataAgendada" name="dataAgendada" data-posted="<c:out value='${param.dataAgendada}'/>" required>
                     </div>
 
                     <!-- Campos que só existem na coleta externa -->
@@ -130,7 +131,7 @@
                             <label for="idRota">Rota</label>
                             <c:choose>
                                 <c:when test="${not empty rotas}">
-                                    <select id="idRota" name="idRota" required>
+                                    <select id="idRota" name="idRota" data-posted="<c:out value='${param.idRota}'/>" required>
                                         <option value="" disabled selected>Selecione a rota</option>
                                         <c:forEach items="${rotas}" var="op">
                                             <option value="${op.key}"><c:out value="${op.value}"/></option>
@@ -139,7 +140,7 @@
                                 </c:when>
                                 <c:otherwise>
                                     <input type="number" min="1" id="idRota" name="idRota"
-                                           placeholder="ID da rota" required>
+                                           placeholder="ID da rota" data-posted="<c:out value='${param.idRota}'/>" required>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -148,7 +149,7 @@
                             <label for="idCooperadoResponsavel">Cooperado responsável</label>
                             <c:choose>
                                 <c:when test="${not empty cooperados}">
-                                    <select id="idCooperadoResponsavel" name="idCooperadoResponsavel" required>
+                                    <select id="idCooperadoResponsavel" name="idCooperadoResponsavel" data-posted="<c:out value='${param.idCooperadoResponsavel}'/>" required>
                                         <option value="" disabled selected>Selecione o cooperado</option>
                                         <c:forEach items="${cooperados}" var="op">
                                             <option value="${op.key}"><c:out value="${op.value}"/></option>
@@ -157,7 +158,7 @@
                                 </c:when>
                                 <c:otherwise>
                                     <input type="number" min="1" id="idCooperadoResponsavel"
-                                           name="idCooperadoResponsavel" placeholder="ID do cooperado" required>
+                                           name="idCooperadoResponsavel" placeholder="ID do cooperado" data-posted="<c:out value='${param.idCooperadoResponsavel}'/>" required>
                                 </c:otherwise>
                             </c:choose>
                         </div>
@@ -166,21 +167,14 @@
                     <!-- Campos que só existem na entrega na cooperativa -->
                     <div class="bloco-tipo" id="blocoEntrega" hidden>
                         <div class="campo">
-                            <label for="origemEntrega">Origem da entrega</label>
-                            <select id="origemEntrega" name="origemEntrega" required>
-                                <option value="" disabled selected>Selecione a origem</option>
-                                <c:forEach items="${origens}" var="origem"><option value="${origem}"><c:out value="${origem}"/></option></c:forEach>
-                            </select>
-                        </div>
-                        <div class="campo">
                             <label for="nomeLocalOrigem">Nome do local de origem</label>
-                            <input type="text" id="nomeLocalOrigem" name="nomeLocalOrigem" maxlength="150">
+                            <input type="text" id="nomeLocalOrigem" name="nomeLocalOrigem" data-posted="<c:out value='${param.nomeLocalOrigem}'/>" maxlength="150">
                         </div>
                     </div>
 
                     <div class="campo cheio">
                         <label for="observacoes">Observações</label>
-                        <textarea id="observacoes" name="observacoes" maxlength="500"></textarea>
+                        <textarea id="observacoes" name="observacoes" maxlength="500"><c:out value="${dadosEnviados ? param.observacoes : ''}"/></textarea>
                     </div>
                 </div>
             </section>
@@ -201,6 +195,7 @@
                     <span>Material</span><span>Peso (kg)</span><span></span>
                 </div>
                 <div id="linhasMateriais"></div>
+                <div id="materiaisEnviados" hidden><c:if test="${dadosEnviados}"><c:forEach items="${paramValues.idMaterial}" var="materialEnviado" varStatus="indice"><span data-material="<c:out value='${materialEnviado}'/>" data-quantidade="<c:out value='${paramValues.quantidadeKg[indice.index]}'/>"></span></c:forEach></c:if></div>
 
                 <c:if test="${empty materiaisCatalogo}">
                     <p class="dica">Nenhum material no catálogo. <a href="${ctx}/material">Cadastre materiais</a> antes de registrar a coleta.</p>
@@ -310,7 +305,18 @@
     $("pesoInformado").addEventListener("input", atualizar);
     $("btnNovoMaterial").addEventListener("click", adicionarLinha);
 
-    adicionarLinha(); // começa com uma linha
+    document.querySelectorAll('[data-posted]').forEach((campo) => { if (campo.dataset.posted) campo.value = campo.dataset.posted; });
+    alternarTipo();
+    const enviados = [...document.querySelectorAll('#materiaisEnviados span')];
+    if (enviados.length === 0) adicionarLinha();
+    enviados.forEach((item) => {
+        adicionarLinha();
+        const linha = linhas.lastElementChild;
+        linha.querySelector('select').value = item.dataset.material;
+        linha.querySelector('input[name=quantidadeKg]').value = item.dataset.quantidade;
+    });
+    atualizar();
+    <c:if test="${not empty erroColeta}">document.querySelector('form input:invalid, form select:invalid, form textarea:invalid, form input:not([type=hidden])').focus();</c:if>
 </script>
 <%@ include file="/operacao-ui.jspf" %>
 </body>
