@@ -20,9 +20,9 @@ public class CooperativaServlet extends HttpServlet {
 
     // ATRIBUTOS
 
-    private static final String PAGINA_LISTA = "/Cooperativa-lista.jsp";
-    private static final String PAGINA_FORM = "/Cooperativa-form.jsp";
-    private static final String PAGINA_DETALHE = "/Cooperativa-detalhe.jsp";
+    private static final String PAGINA_LISTA = "/cooperativa-lista.jsp";
+    private static final String PAGINA_FORM = "/cooperativa-form.jsp";
+    private static final String PAGINA_DETALHE = "/cooperativa-detalhe.jsp";
 
     private final CooperativaDAO dao = new CooperativaDAO();
     private final CooperadoDAO cooperadoDAO = new CooperadoDAO();
