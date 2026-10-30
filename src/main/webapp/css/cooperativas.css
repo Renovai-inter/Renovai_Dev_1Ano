@@ -1,225 +1,879 @@
+.coop-page {
+    margin: 0;
+    background: #f8f7f4;
+    color: #202320;
+    font-family: Poppins, Arial, sans-serif;
+}
+
+.coop-page * {
+    box-sizing: border-box;
+}
+
+.coop-page .layout {
+    gap: 0;
+    padding: 0;
+    min-height: 100vh;
+}
+
+.coop-page .menu {
+    width: 180px;
+    height: min(640px, 100vh);
+    padding: 25px 18px 20px;
+    background: #648e67;
+    border-radius: 0 20px 20px 0;
+}
+
+.coop-page .menu a {
+    font-size: 13px !important;
+    gap: 8px !important;
+    padding: 9px 10px !important;
+    margin-bottom: 6px !important;
+    border-radius: 9px;
+}
+
+.coop-page .menu a svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.coop-page .menu a.ativo {
+    background: #b7cfaa;
+    color: #3e6344;
+}
+
+.coop-page .menu .logo {
+    margin: 0 2px 25px;
+}
+
+.coop-page .menu .usuario {
+    padding: 10px 7px;
+    border-radius: 12px;
+    background: #b7cfaa;
+    color: #456447;
+    gap: 5px;
+}
+
+.coop-page .menu .usuario b {
+    font-size: 10px;
+    font-weight: 400;
+}
+
+.coop-page .menu .usuario small {
+    font-size: 8px;
+}
+
+.coop-page .menu .usuario-avatar {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
 .coop-conteudo {
-    padding:38px 42px;
-    background:#f8f6f3;
-    min-height:100vh;
-    font-family:Poppins,sans-serif;
-    color:#252525
+    padding: 32px 38px;
+    min-height: 100vh;
+    max-width: 1600px;
+    min-width: 0;
+    flex: 1;
 }
 
 .coop-top {
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:16px;
-    margin-bottom:24px
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 27px;
 }
 
 .coop-top h1 {
-    font-size:27px;
-    margin:0;
-    font-weight:700
+    font-size: 30px;
+    letter-spacing: -0.8px;
+    line-height: 1.2;
+    font-weight: 600;
+    margin: 0;
+    color: #111;
 }
 
 .coop-top p {
-    font-size:12px;
-    color:#777;
-    margin:3px 0
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #405f43;
 }
 
-.coop-top a {
-    color:#5c9068;
-    text-decoration:none
+.coop-top p a:hover {
+    text-decoration: underline;
 }
 
 .coop-btn {
-    background:#568b61;
-    border:0;
-    border-radius:8px;
-    color:white!important;
-    padding:11px 17px;
-    text-decoration:none;
-    cursor:pointer;
-    font-family:inherit;
-    font-size:12px
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: #5c9262;
+    color: white !important;
+    font: 500 12px Poppins, Arial, sans-serif;
+    line-height: 1.4;
+    min-height: 34px;
+    padding: 8px 14px;
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.coop-top > .coop-btn {
+    box-shadow: 0 3px 9px #426c4a35;
+}
+
+.coop-btn:hover {
+    background: #477a4d;
+}
+
+.coop-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+.coop-btn.secondary {
+    background: transparent;
+    border-color: #afc5a5;
+    color: #527c54 !important;
+}
+
+.coop-btn.secondary:hover {
+    background: #ecf2e7;
 }
 
 .coop-btn.danger {
-    background:#a83b65
+    background: #942951;
+    color: #fff !important;
 }
 
 .coop-card {
-    background:#fff;
-    border-radius:15px;
-    padding:23px;
-    margin-bottom:20px;
-    box-shadow:0 3px 13px #0000000b
+    background: #fff;
+    border-radius: 18px;
+    padding: 22px 28px 28px;
+    margin-bottom: 27px;
+    box-shadow: 0 4px 20px #333b3210;
 }
 
-.coop-card h3 {
-    color:#a83b65;
-    font-size:15px;
-    margin:0 0 18px
-}
-
-.coop-card p {
-    font-size:12px;
-    color:#666
-}
-
-.coop-search {
-    display:flex;
-    gap:12px;
-    margin-bottom:18px
-}
-
-.coop-search input {
-    max-width:350px
-}
-
-.coop-overflow {
-    overflow-x:auto
-}
-
-.coop-table {
-    width:100%;
-    border-collapse:collapse;
-    font-size:12px;
-    text-align:left
-}
-
-.coop-table th {
-    color:#a83b65;
-    font-size:11px;
-    border-bottom:1px solid #eee;
-    padding:13px
-}
-
-.coop-table td {
-    padding:14px 13px;
-    border-bottom:1px solid #f0f0f0
-}
-
-.coop-table td small {
-    display:block;
-    color:#888
-}
-
-.coop-name {
-    font-weight:600;
-    color:#333;
-    text-decoration:none
-}
-
-.coop-pill {
-    background:#e9f4d8;
-    color:#4e873a;
-    padding:5px 13px;
-    border-radius:20px;
-    font-size:11px
+.coop-card h2 {
+    font-size: 17px;
+    font-weight: 500;
+    color: #a02d54;
+    border-bottom: 1px solid #eeeeeb;
+    padding-bottom: 7px;
+    margin: 0 0 16px;
 }
 
 .coop-grid {
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:16px
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 17px 26px;
 }
 
 .coop-grid label {
-    font-size:12px;
-    font-weight:600
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    font-size: 12px;
+    font-weight: 400;
 }
 
-.coop-grid input,.coop-grid textarea,.coop-search input {
-    box-sizing:border-box;
-    display:block;
-    width:100%;
-    padding:11px;
-    border:1px solid #e9e9e9;
-    border-radius:7px;
-    margin-top:6px;
-    font-family:inherit;
-    font-size:12px
+.coop-grid input,
+.coop-grid textarea,
+.coop-grid select,
+.coop-search input {
+    width: 100%;
+    min-width: 0;
+    padding: 9px 10px;
+    min-height: 34px;
+    border: 1px solid #e3e4e1;
+    border-radius: 6px;
+    background: #fafbf9;
+    color: #202320;
+    font: 400 12px Poppins, Arial, sans-serif;
+    margin: 0;
+}
+
+.coop-grid textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.coop-grid input::placeholder,
+.coop-grid textarea::placeholder,
+.coop-search input::placeholder {
+    font-size: 10px;
+    color: #a1a59e;
+}
+
+.coop-grid small {
+    font-size: 10px;
+    color: #7a8677;
 }
 
 .coop-wide {
-    grid-column:1/-1
+    grid-column: 1 / -1;
+}
+
+.coop-notice {
+    padding: 9px 12px;
+    background: #d6e8c6;
+    color: #52784f;
+    font-size: 11px;
+    border-radius: 7px;
+    margin: -3px 0 18px;
 }
 
 .coop-actions {
-    display:flex;
-    justify-content:flex-end;
-    align-items:center;
-    gap:18px;
-    margin:14px 0 25px
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    margin: 12px 0 0;
 }
 
-.coop-actions a {
-    color:#67816a;
-    text-decoration:none;
-    font-size:12px
-}
-
-.coop-stats {
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    gap:14px;
-    margin-bottom:20px
-}
-
-.coop-stats div {
-    background:white;
-    padding:17px;
-    border-radius:13px;
-    box-shadow:0 3px 9px #00000012;
-    font-size:12px;
-    color:#608b66
-}
-
-.coop-stats strong {
-    display:block;
-    font-size:30px;
-    color:#a5c58b
+.coop-actions .coop-btn {
+    min-height: 30px;
+    padding: 6px 13px;
 }
 
 .coop-alert {
-    padding:12px;
-    background:#e8f4e6;
-    margin-bottom:15px;
-    border-radius:8px
+    border-radius: 9px;
+    padding: 12px 16px;
+    background: #e6f1df;
+    color: #3e663f;
+    margin-bottom: 18px;
 }
 
 .coop-alert.erro {
-    background:#ffe7ec;
-    color:#923b52
+    background: #fbe7ee;
+    color: #922a50;
 }
 
-.coop-modal {
-    border:0;
-    border-radius:14px;
-    padding:24px;
-    max-width:420px;
-    box-shadow:0 20px 70px #0003
+.coop-list-card {
+    padding: 0;
+    border: 1px solid #e3e3df;
+    border-radius: 27px;
+    overflow: hidden;
 }
 
-.coop-modal::backdrop {
-    background:#0006
+.coop-search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 22px;
 }
 
-@media(max-width:800px) {
-    .coop-conteudo {
-    padding:20px
+.coop-search label {
+    width: min(100%, 300px);
 }
 
-.coop-grid {
-    grid-template-columns:1fr
+.coop-search input {
+    background: white;
+    border-radius: 25px;
+    padding: 9px 15px;
+}
+
+.coop-search .coop-btn {
+    border-radius: 20px;
+    font-size: 10px;
+}
+
+.coop-overflow {
+    overflow-x: auto;
+}
+
+.coop-table {
+    border-collapse: collapse;
+    width: 100%;
+    text-align: left;
+    font-size: 12px;
+}
+
+.coop-table thead {
+    background: #f5f5f5;
+}
+
+.coop-table th {
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: uppercase;
+    color: #92264f;
+    padding: 11px 18px;
+    white-space: nowrap;
+    position: relative;
+}
+
+.coop-table td {
+    padding: 11px 18px;
+    height: 54px;
+    border-top: 1px solid #e8e8e5;
+    white-space: nowrap;
+}
+
+.coop-table th:first-child,
+.coop-table td:first-child {
+    padding-left: 27px;
+}
+
+.coop-table th:last-child,
+.coop-table td:last-child {
+    padding-right: 27px;
+}
+
+.coop-table tbody tr:hover {
+    background: #fbfcf9;
+}
+
+.coop-identity {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.coop-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #54975c;
+    color: white;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border-radius: 50%;
+}
+
+.coop-avatar svg {
+    width: 20px;
+    height: 20px;
+}
+
+.coop-avatar.member {
+    background: #ae3760;
+    font-size: 23px;
+}
+
+.coop-name {
+    font-weight: 500;
+    color: #171b17;
+}
+
+.coop-name:hover {
+    text-decoration: underline;
+}
+
+.coop-identity small {
+    display: block;
+    font-size: 9px;
+    color: #a0a59d;
+    line-height: 1.3;
+}
+
+.coop-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    background: #ebf3cf;
+    color: #4e7147;
+    padding: 3px 12px;
+    min-width: 78px;
+    border-radius: 20px;
+    font-size: 10px;
+    line-height: 1.4;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.coop-pill::before {
+    content: "";
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.coop-pill.negative {
+    background: #f5bed1;
+    color: #962951;
+}
+
+.coop-pill.pending {
+    background: #ffedaf;
+    color: #a17b23;
+}
+
+.coop-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.coop-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 25px;
+    height: 28px;
+    color: #8caf8d;
+    border-radius: 5px;
+}
+
+.coop-icon svg {
+    width: 16px;
+    height: 16px;
+}
+
+.coop-icon.danger {
+    color: #952c52;
+}
+
+.coop-icon:hover {
+    background: #edf3e8;
+}
+
+.coop-empty {
+    text-align: center;
+    color: #7f897a;
+    padding: 30px 20px !important;
+}
+
+.coop-code {
+    color: #a5a8a2;
+}
+
+.coop-detail-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.coop-back {
+    font-size: 40px;
+    color: #b0c59e;
+    line-height: 1;
+}
+
+.coop-detail-title .coop-pill {
+    margin-left: 8px;
 }
 
 .coop-stats {
-    grid-template-columns:repeat(2,1fr)
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 22px;
+    margin: 0 0 28px;
 }
 
-.coop-top {
-    flex-wrap:wrap
-}
+.coop-stats > div {
+    background: #fff;
+    border-radius: 16px;
+    padding: 14px 18px;
+    box-shadow: 0 2px 9px #0003;
+    color: #4d7350;
+    font-size: 14px;
 }
 
+.coop-stats > div > span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.coop-stats svg {
+    width: 17px;
+    height: 17px;
+    flex-shrink: 0;
+}
+
+.coop-stats strong {
+    display: block;
+    color: #b5cba4;
+    font-size: 48px;
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+.coop-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.coop-detail-grid .coop-card {
+    padding: 19px 24px 23px;
+}
+
+.coop-edit-grid {
+    gap: 12px 16px;
+}
+
+.coop-edit-grid label,
+.coop-data > span {
+    font-size: 9px;
+    text-transform: uppercase;
+    color: #7c8a79;
+}
+
+.coop-edit-grid input,
+.coop-edit-grid textarea,
+.coop-edit-grid select {
+    border-color: transparent;
+    background: transparent;
+    padding: 3px 0;
+    min-height: 26px;
+    font-size: 12px;
+    color: #202320;
+    border-radius: 3px;
+}
+
+.coop-edit-grid textarea {
+    min-height: 65px;
+}
+
+.coop-edit-grid :is(input, textarea, select):hover {
+    border-color: #dce5d6;
+}
+
+.coop-edit-grid :is(input, textarea, select):focus {
+    background: #fafbf8;
+    border-color: #9fba92;
+    padding-left: 5px;
+}
+
+.coop-data p {
+    margin: 4px 0;
+    font-size: 12px;
+}
+
+.coop-tabs {
+    display: flex;
+    gap: 7px;
+    margin: 14px 28px;
+    background: #f5f6f3;
+    border-radius: 30px;
+    padding: 4px;
+}
+
+.coop-tabs a {
+    flex: 1;
+    border: 0;
+    background: transparent;
+    color: #68946b;
+    border-radius: 24px;
+    font: 400 12px Poppins, Arial, sans-serif;
+    padding: 5px 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+}
+
+.coop-tabs a[aria-current="page"] {
+    background: #779f78;
+    color: white;
+}
+
+.coop-table-note {
+    font-size: 10px;
+    color: #71816b;
+    margin: 0;
+    padding: 0 26px 12px;
+}
+
+.coop-modal {
+    position: relative;
+    width: min(430px, calc(100% - 30px));
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    padding: 22px;
+    border: 1px solid #e2e3df;
+    border-radius: 15px;
+    background: #f9f8f5;
+    color: #252a24;
+    font-family: Poppins, Arial, sans-serif;
+    box-shadow: 0 20px 70px #0003;
+}
+
+.coop-modal h2 {
+    font-size: 17px;
+    color: #9b2e55;
+    margin: 0 28px 4px 0;
+}
+
+.coop-modal > p {
+    font-size: 11px;
+    color: #7a7d75;
+    margin: 0 0 16px;
+}
+
+.coop-modal h3 {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #8a8c84;
+    font-weight: 400;
+    margin: 0 0 5px;
+}
+
+.coop-modal-close {
+    position: absolute;
+    right: 13px;
+    top: 9px;
+    border: 0;
+    background: transparent;
+    color: #a93960;
+    font-size: 27px;
+    cursor: pointer;
+}
+
+.coop-impact {
+    margin: 0 0 14px;
+    padding: 9px 12px;
+    background: white;
+    border: 1px solid #e6e7e1;
+    border-radius: 8px;
+    font-size: 11px;
+}
+
+.coop-impact > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.coop-impact dd {
+    margin: 0;
+}
+
+.coop-delete-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: white;
+    border: 1px solid #dce0d6;
+    padding: 12px;
+    margin: 9px 0;
+    border-radius: 10px;
+    cursor: pointer;
+    color: #5d895c;
+}
+
+.coop-delete-option:has(input:checked) {
+    border-color: #57975d;
+    box-shadow: 0 0 0 1px #57975d;
+}
+
+.coop-delete-option input {
+    accent-color: #57975d;
+}
+
+.coop-delete-option strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.coop-delete-option small {
+    display: block;
+    font-size: 10px;
+    color: #898d83;
+    line-height: 1.5;
+}
+
+.coop-delete-option.permanent {
+    color: #a42e54;
+}
+
+.coop-delete-option.permanent input {
+    accent-color: #a42e54;
+}
+
+.coop-delete-option.permanent:has(input:checked) {
+    border-color: #a42e54;
+    box-shadow: 0 0 0 1px #a42e54;
+}
+
+.coop-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    background: #1b281c66;
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.coop-modal-overlay .coop-modal {
+    width: min(430px, 100%);
+    margin: auto;
+}
+
+.coop-page :is(a, button, input, textarea, select):focus-visible {
+    outline: 3px solid #9db98d;
+    outline-offset: 3px;
+}
+
+.coop-page [hidden] {
+    display: none !important;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+@media (min-width: 1500px) {
+    .coop-conteudo {
+        padding: 40px 55px;
+    }
+
+    .coop-page .menu {
+        width: 205px;
+    }
+}
+
+@media (max-width: 1050px) {
+    .coop-conteudo {
+        padding: 28px 24px;
+    }
+
+    .coop-page .menu {
+        width: 160px;
+        padding: 22px 13px;
+    }
+
+    .coop-page .menu a {
+        font-size: 11px !important;
+    }
+
+    .coop-detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .coop-stats {
+        gap: 14px;
+    }
+
+    .coop-stats > div {
+        font-size: 11px;
+        padding: 12px;
+    }
+
+    .coop-stats strong {
+        font-size: 36px;
+    }
+}
+
+@media (max-width: 860px) {
+    .coop-page .menu a span {
+        display: inline;
+    }
+}
+
+@media (max-width: 700px) {
+    .coop-page .layout {
+        display: block;
+    }
+
+    .coop-page .menu {
+        position: relative;
+        width: 100%;
+        height: auto;
+        max-height: none;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        border-radius: 0;
+        padding: 12px;
+        gap: 5px;
+    }
+
+    .coop-page .menu .logo {
+        width: 115px;
+        margin: 0 10px 8px 0;
+    }
+
+    .coop-page .menu a {
+        margin: 0 !important;
+        padding: 8px !important;
+    }
+
+    .coop-page .menu .usuario {
+        display: none;
+    }
+
+    .coop-conteudo {
+        padding: 25px 16px;
+    }
+
+    .coop-top {
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .coop-top h1 {
+        font-size: 26px;
+    }
+
+    .coop-card {
+        padding: 20px 17px;
+    }
+
+    .coop-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .coop-list-card {
+        padding: 0;
+        border-radius: 20px;
+    }
+
+    .coop-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .coop-detail-grid .coop-card {
+        padding: 20px 17px;
+    }
+
+    .coop-tabs {
+        margin: 12px;
+        gap: 1px;
+    }
+
+    .coop-tabs a {
+        font-size: 10px;
+        padding: 6px;
+    }
+
+    .coop-search {
+        padding: 16px;
+    }
+
+    .coop-search label {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .coop-table td,
+    .coop-table th {
+        padding: 11px 13px;
+    }
+
+    .coop-detail-title p {
+        font-size: 10px;
+    }
+
+    .coop-edit-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
