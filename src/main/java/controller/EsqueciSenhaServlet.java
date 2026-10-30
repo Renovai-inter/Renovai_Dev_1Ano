@@ -50,7 +50,7 @@ public class EsqueciSenhaServlet extends HttpServlet {
         if (!email.isEmpty()) {
             Usuario usuario = buscarAdministrador(email);
             if (usuario != null) {
-                enviarLink(usuario);
+                enviarLink(usuario, request);
             }
         }
 
@@ -86,10 +86,10 @@ public class EsqueciSenhaServlet extends HttpServlet {
     }
 
     // Gera o token e envia o e-mail. Falhas de envio vão só para o log.
-    private void enviarLink(Usuario usuario) {
+    private void enviarLink(Usuario usuario, HttpServletRequest request) {
         String token = TokenRecuperacao.gerar(
                 usuario.getEmail(), usuario.getSenhaHash(), MINUTOS_DE_VALIDADE);
-        String link = baseUrl() + "/redefinir-senha?token=" + token;
+        String link = baseUrl(request) + "/redefinir-senha?token=" + token;
 
         try {
             EmailService.enviarRecuperacao(usuario.getEmail(), usuario.getNomeCompleto(), link);
@@ -98,12 +98,15 @@ public class EsqueciSenhaServlet extends HttpServlet {
         }
     }
 
-    // Endereço do site usado no link. Em produção, defina RENOVAI_BASE_URL.
-    private String baseUrl() {
+    // Endereço do site usado no link. Em produção, defina RENOVAI_BASE_URL;
+    // sem ela, usa o mesmo endereço e contexto da página que pediu a redefinição.
+    private String baseUrl(HttpServletRequest request) {
         String definido = System.getenv("RENOVAI_BASE_URL");
-        if (definido == null || definido.isBlank()) {
-            return "http://localhost:8080/Renovai_Dev_1Ano_war_exploded";
+        if (definido != null && !definido.isBlank()) {
+            return definido.trim().replaceAll("/+$", "");
         }
-        return definido.trim();
+        String url = request.getRequestURL().toString();
+        return url.substring(0, url.length() - request.getRequestURI().length())
+                + request.getContextPath();
     }
 }

@@ -1,70 +1,3 @@
-<link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=3">
-<link rel="icon" href="${ctx}/images/Nimo.svg" type="image/svg+xml">
-<style>
-
-    html body .conteudo form .rodape-form a.botao.botao-form.botao-contorno {
-        background: transparent !important;
-        color: #6b9065 !important;
-        border: 1px solid #8fb894 !important;
-        border-radius: 8px !important;
-        box-shadow: none !important;
-        text-decoration: none !important;
-        opacity: 1 !important;
-    }
-
-    html body .conteudo form .rodape-form button.botao.botao-form.botao-escuro {
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background: #579660 !important;
-        background-color: #579660 !important;
-        color: #ffffff !important;
-        border: 1px solid #579660 !important;
-        border-radius: 12px !important;
-        box-shadow: none !important;
-        filter: none !important;
-        opacity: 1 !important;
-        font-family: 'Poppins', Arial, sans-serif !important;
-        font-size: 14px !important;
-        font-weight: 500 !important;
-        padding: 6px 13px !important;
-        cursor: pointer !important;
-    }
-
-    html body .conteudo form .rodape-form button.botao.botao-form.botao-escuro:hover {
-        background: #478451 !important;
-        background-color: #478451 !important;
-        border-color: #478451 !important;
-        color: #ffffff !important;
-    }
-
-    /* Aviso sobre usuário e senha temporária */
-    html body .conteudo form .aviso-info {
-        background: #E5EEDC !important;
-        background-color: #E5EEDC !important;
-        color: #456B4D !important;
-        border: 1px solid #D5E4CE !important;
-        border-radius: 10px !important;
-        padding: 14px 16px !important;
-        display: flex !important;
-        align-items: center !important;
-        gap: 10px !important;
-        width: 100% !important;
-        box-sizing: border-box !important;
-        font-family: 'Poppins', Arial, sans-serif !important;
-        font-size: 13px !important;
-        line-height: 1.5 !important;
-        margin: 0 0 22px 0 !important;
-        box-shadow: none !important;
-    }
-
-    /* Ícone da mensagem */
-    html body .conteudo form .aviso-info svg {
-        color: #456B4D !important;
-        stroke: #456B4D !important;
-        flex-shrink: 0 !important;
-    }
-</style>
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*" %>
@@ -161,8 +94,10 @@
     <title>Novo cooperado</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=3">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/v2.css?v=1">
+    <link rel="icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
 </head>
-<body>
+<body class="pagina-v2">
 <div class="layout">
 
     <%@ include file="menu.jspf" %>
@@ -269,7 +204,7 @@
 
             <div class="rodape-form">
                 <a href="cooperado" class="botao botao-form botao-contorno">Cancelar</a>
-                <button type="submit" class="botao botao-form botao-escuro">Criar cooperado</button>
+                <button type="submit" class="botao botao-form botao-escuro">Confirmar</button>
             </div>
 
         </form>

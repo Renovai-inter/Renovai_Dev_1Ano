@@ -22,8 +22,9 @@
     <title>Cooperados</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=2">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/v2.css?v=1">
 </head>
-<body>
+<body class="pagina-v2">
 <div class="layout">
 
     <%@ include file="menu.jspf" %>
@@ -39,7 +40,7 @@
                     <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
                     <line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/>
                 </svg>
-                Cadastrar cooperado
+                Novo cooperado
             </a>
         </div>
 
@@ -93,7 +94,7 @@
                                         </svg>
                                     </span>
                                     <div>
-                                        <b><%= esc(nome) %></b>
+                                        <b><%= esc(nomeBonito(nome)) %></b>
                                         <small><%= esc(c.getEmail()) %></small>
                                     </div>
                                 </div>
@@ -105,6 +106,11 @@
                                 <a href="cooperado?acao=editar&id=<%= c.getIdCooperado() %>" class="editar" title="Editar" aria-label="Editar cooperado" onclick="event.stopPropagation()">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                         <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>
+                                    </svg>
+                                </a>
+                                <a href="cooperado?acao=ver&id=<%= c.getIdCooperado() %>#excluir" class="excluir" title="Excluir" aria-label="Excluir cooperado" onclick="event.stopPropagation()">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                        <path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
                                     </svg>
                                 </a>
                             </td>

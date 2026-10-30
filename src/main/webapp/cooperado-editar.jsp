@@ -91,8 +91,9 @@
     <link rel="icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=5">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/v2.css?v=1">
 </head>
-<body>
+<body class="pagina-v2">
 <div class="layout">
 
     <%@ include file="menu.jspf" %>
@@ -107,7 +108,7 @@
                 <div class="titulo-volta">
                     <a href="cooperado?acao=ver&id=<%= c.getIdCooperado() %>" class="seta">&lsaquo;</a>
                     <div>
-                        <h1>Editar cooperado <%= esc(c.getNomeCompleto()) %></h1>
+                        <h1>Editar cooperado <%= esc(nomeBonito(c.getNomeCompleto())) %></h1>
                         <p>Cooperados - <%= esc(c.getCodigoCooperado()) %></p>
                     </div>
                 </div>

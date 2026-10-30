@@ -14,22 +14,6 @@
     <link rel="stylesheet" href="${ctx}/css/renovai.css">
 
     <style>
-        .layout > .menu {
-            width: 240px;
-            height: 100vh;
-            min-height: 100vh;
-            padding: 28px 16px;
-            background: var(--verde-menu);
-            border-radius: 0;
-        }
-        .layout > .menu .logo { margin: 0 0 28px 12px; }
-        .layout > .menu .logo img { width: 150px; }
-        .layout > .menu a { height: auto; color: #fff; text-decoration: none; border-radius: 10px; }
-        .layout > .menu a.ativo { background: var(--verde-ativo); color: #2f4d33; }
-        .layout > .menu .usuario { margin-top: auto; }
-        .layout > .menu .usuario b { display: block; font-size: .9rem; }
-        .layout > .menu .usuario small { display: block; font-size: .75rem; }
-
         .eyebrow { margin: 0; color: var(--texto-suave); font-size: .95rem; text-transform: uppercase; }
         .topo h1 { margin-top: 2px; }
 

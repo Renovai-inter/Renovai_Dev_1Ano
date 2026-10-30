@@ -80,7 +80,7 @@ private String campo(jakarta.servlet.http.HttpServletRequest request, String nom
             </section>
             <% if (!edicao) { %><section class="coop-card">
                 <h3>Gestor responsável</h3>
-                <p>Informe os dados do gestor que terá acesso à cooperativa.</p>
+                <p class="coop-info">Informe os dados do gestor que terá acesso à cooperativa.</p>
                 <div class="coop-grid">
                     <label>Nome completo *<input type="text" name="gestor_nome_completo" value="<%= campo(request, "gestor_nome_completo", null) %>" required>
                     </label>
@@ -94,8 +94,8 @@ private String campo(jakarta.servlet.http.HttpServletRequest request, String nom
             </section>
             <% } %>
             <div class="coop-actions">
-                <a href="cooperativa">Cancelar</a>
-                <button class="coop-btn" type="submit"><%= edicao ? "Salvar alterações" : "Criar cooperativa" %></button>
+                <a class="coop-btn claro" href="cooperativa">Cancelar</a>
+                <button class="coop-btn" type="submit"><%= edicao ? "Salvar alterações" : "Confirmar" %></button>
             </div>
         </form>
         <% if (request.getAttribute("erro") != null) { %><script>

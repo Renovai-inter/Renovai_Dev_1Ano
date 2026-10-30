@@ -36,7 +36,7 @@ return value.toString()
                 </span>
             </p>
         </div>
-        <div class="coop-actions"><a class="coop-btn" href="cooperativa?pagina=editar&id=<%=c.getIdCooperativa()%>">Editar</a><button class="coop-btn danger" type="button" onclick="document.getElementById('excluirModal').showModal()">Excluir</button></div>
+        <div class="coop-actions"><a class="coop-btn claro" href="cooperativa?pagina=editar&id=<%=c.getIdCooperativa()%>">Editar</a><button class="coop-btn danger" type="button" onclick="document.getElementById('excluirModal').showModal()">Excluir</button></div>
     </header>
     <% if(request.getAttribute("erro")!=null){ %>
     <div class="coop-alert erro">
@@ -144,7 +144,7 @@ return value.toString()
         <input type="hidden" name="acao" value="excluir">
         <input type="hidden" name="id_cooperativa" value="<%=c.getIdCooperativa()%>">
         <div class="coop-actions">
-            <button type="button" onclick="document.getElementById('excluirModal').close()">Cancelar</button>
+            <button class="coop-btn claro" type="button" onclick="document.getElementById('excluirModal').close()">Cancelar</button>
             <button class="coop-btn danger" type="submit">Excluir</button>
         </div>
     </form>

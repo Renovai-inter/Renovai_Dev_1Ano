@@ -40,39 +40,6 @@
 
         .layout { display: flex; min-height: 100vh; }
 
-        /* ---------- Menu lateral ---------- */
-        .sidebar {
-            width: 240px;
-            flex-shrink: 0;
-            background: var(--verde-menu);
-            color: #fff;
-            padding: 28px 16px;
-            display: flex;
-            flex-direction: column;
-        }
-        .sidebar .marca { padding: 0 12px 28px; }
-        .sidebar .marca strong { display: block; font-size: 1.6rem; letter-spacing: -.5px; }
-        .sidebar .marca span { font-size: .72rem; opacity: .85; }
-        .sidebar nav { display: flex; flex-direction: column; gap: 6px; }
-        .sidebar nav a {
-            color: #fff;
-            text-decoration: none;
-            padding: 12px 14px;
-            border-radius: 10px;
-            font-size: .95rem;
-        }
-        .sidebar nav a:hover { background: rgba(255, 255, 255, .12); }
-        .sidebar nav a.ativo { background: var(--verde-ativo); color: #2f4d33; font-weight: 500; }
-        .sidebar .usuario {
-            margin-top: auto;
-            background: var(--verde-ativo);
-            color: #2f4d33;
-            border-radius: 14px;
-            padding: 12px 14px;
-            font-size: .85rem;
-            font-weight: 500;
-        }
-        .sidebar .usuario small { display: block; font-weight: 400; font-size: .7rem; }
 
         /* ---------- Conteúdo ---------- */
         main { flex: 1; padding: 36px 48px; min-width: 0; }
@@ -258,9 +225,6 @@
 
         @media (max-width: 820px) {
             .layout { flex-direction: column; }
-            .sidebar { width: 100%; padding: 16px; }
-            .sidebar nav { flex-direction: row; flex-wrap: wrap; }
-            .sidebar .usuario { display: none; }
             main { padding: 24px 16px; }
             .filtros { padding: 16px; }
         }
@@ -269,25 +233,7 @@
 <body>
 <div class="layout">
 
-    <!-- ===== MENU LATERAL (ajuste os hrefs conforme suas rotas) ===== -->
-    <aside class="sidebar">
-        <div class="marca">
-            <strong>Renovaí</strong>
-            <span>Área Administrativa</span>
-        </div>
-        <nav>
-            <a href="${ctx}/dashboard">Dashboard</a>
-            <a href="${ctx}/cooperativa">Cooperativas</a>
-            <a href="${ctx}/cooperado">Cooperados</a>
-            <a href="${ctx}/coleta" class="ativo" aria-current="page">Coletas</a>
-            <a href="${ctx}/material">Materiais</a>
-            <a href="${ctx}/negociacao">Negociações</a>
-        </nav>
-        <div class="usuario">
-            <b><c:out value="${empty sessionScope.nomeUsuario ? 'Usuário' : sessionScope.nomeUsuario}"/></b>
-            <small>Administrador</small>
-        </div>
-    </aside>
+    <%@ include file="/menu.jspf" %>
 
     <!-- ===== CONTEÚDO ===== -->
     <main>

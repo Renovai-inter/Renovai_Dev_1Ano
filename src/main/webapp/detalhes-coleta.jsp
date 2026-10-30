@@ -53,24 +53,7 @@
 <body>
 <div class="layout">
 
-    <aside class="sidebar">
-        <div class="marca">
-            <strong>Renovaí</strong>
-            <span>Área Administrativa</span>
-        </div>
-        <nav>
-            <a href="${ctx}/dashboard">Dashboard</a>
-            <a href="${ctx}/cooperativa">Cooperativas</a>
-            <a href="${ctx}/cooperado">Cooperados</a>
-            <a href="${ctx}/coleta" class="ativo" aria-current="page">Coletas</a>
-            <a href="${ctx}/material">Materiais</a>
-            <a href="${ctx}/negociacao">Negociações</a>
-        </nav>
-        <div class="usuario">
-            <b><c:out value="${empty sessionScope.nomeUsuario ? 'Usuário' : sessionScope.nomeUsuario}"/></b>
-            <small>Administrador</small>
-        </div>
-    </aside>
+    <%@ include file="/menu.jspf" %>
 
     <main>
         <header class="topo">
