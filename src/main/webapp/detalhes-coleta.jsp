@@ -148,8 +148,8 @@
                                 <dt>Endereço</dt>
                                 <dd>
                                     <c:choose>
-                                        <c:when test="${empty coleta.idEnderecoRota}"><span class="suave">(definido pela rota)</span></c:when>
-                                        <c:otherwise>Endereço #<c:out value="${coleta.idEnderecoRota}"/></c:otherwise>
+                                        <c:when test="${empty coleta.relacionamentos.idEnderecoRota}"><span class="suave">(definido pela rota)</span></c:when>
+                                        <c:otherwise>Endereço #<c:out value="${coleta.relacionamentos.idEnderecoRota}"/></c:otherwise>
                                     </c:choose>
                                 </dd>
                             </div>

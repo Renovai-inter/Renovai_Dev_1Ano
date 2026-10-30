@@ -335,15 +335,15 @@
                         <fmt:formatNumber value="${coleta.pesoTotalKg}" maxFractionDigits="2" var="pesoFmt"/>
 
                         <%-- NOVO: nome da cooperativa (cai para "Cooperativa #id" se não achar) --%>
-                        <c:set var="nomeCoop" value="${cooperativas[coleta.idCooperativa]}"/>
+                        <c:set var="nomeCoop" value="${cooperativas[coleta.relacionamentos.idCooperativa]}"/>
                         <c:if test="${empty nomeCoop}">
-                            <c:set var="nomeCoop" value="Cooperativa #${coleta.idCooperativa}"/>
+                            <c:set var="nomeCoop" value="Cooperativa #${coleta.relacionamentos.idCooperativa}"/>
                         </c:if>
 
                         <%-- NOVO: nome do responsável (cai para "Cooperado #id", ou "—" se não houver) --%>
-                        <c:set var="nomeResp" value="${empty coleta.idCooperadoResponsavel ? '—' : cooperados[coleta.idCooperadoResponsavel]}"/>
+                        <c:set var="nomeResp" value="${empty coleta.relacionamentos.idCooperadoResponsavel ? '—' : cooperados[coleta.relacionamentos.idCooperadoResponsavel]}"/>
                         <c:if test="${empty nomeResp}">
-                            <c:set var="nomeResp" value="Cooperado #${coleta.idCooperadoResponsavel}"/>
+                            <c:set var="nomeResp" value="Cooperado #${coleta.relacionamentos.idCooperadoResponsavel}"/>
                         </c:if>
 
                         <tr>
