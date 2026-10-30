@@ -1,0 +1,82 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="java.util.*,java.time.format.DateTimeFormatter,model.principais.*,model.enums.StatusCooperativa" %>
+
+<%!
+private String h(Object value) {
+    if (value == null) {
+        return "";
+    }
+
+    return value.toString()
+            .replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&#39;");
+}
+
+private String rotulo(Object value) {
+    if (value == null) {
+        return "Não informado";
+    }
+
+    String texto = value.toString();
+
+    if (texto.equals("ATIVA") || texto.equals("ATIVO")) {
+        return "Ativo";
+    }
+
+    if (texto.equals("INATIVA") || texto.equals("INATIVO")) {
+        return "Inativo";
+    }
+
+    if (texto.equals("COLETA_EXTERNA")) {
+        return "Externa";
+    }
+
+    if (texto.equals("ENTREGA_COOPERATIVA")) {
+        return "Entrega na cooperativa";
+    }
+
+    if (texto.equals("CONCLUIDA")) {
+        return "Concluída";
+    }
+
+    if (texto.equals("EM_NEGOCIACAO")) {
+        return "Em negociação";
+    }
+
+    String lower = texto
+            .toLowerCase(new Locale("pt", "BR"))
+            .replace('_', ' ');
+
+    if (lower.isEmpty()) {
+        return "Não informado";
+    }
+
+    return lower.substring(0, 1)
+            .toUpperCase(new Locale("pt", "BR"))
+            + lower.substring(1);
+}
+
+private String selo(Object value) {
+    String codigo = String.valueOf(value)
+            .toUpperCase(Locale.ROOT);
+
+    if (codigo.equals("INATIVA")
+            || codigo.equals("INATIVO")
+            || codigo.equals("RECUSADA")
+            || codigo.equals("CANCELADA")) {
+        return "coop-pill negative";
+    }
+
+    if (codigo.equals("EM_ANDAMENTO")
+            || codigo.equals("AGENDADA")
+            || codigo.equals("EM_NEGOCIACAO")
+            || codigo.equals("AGUARDANDO_RESPOSTA")) {
+        return "coop-pill pending";
+    }
+
+    return "coop-pill";
+}
+%>
