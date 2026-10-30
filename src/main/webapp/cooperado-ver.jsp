@@ -75,6 +75,7 @@
     <link rel="icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=8">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/v2.css?v=1">
 
     <style>
         .permissoes .perm-leitura {
@@ -115,7 +116,7 @@
         .permissoes .perm-off .perm-caixa svg { display: none; }
     </style>
 </head>
-<body>
+<body class="pagina-v2">
 <div class="layout">
 
     <%@ include file="menu.jspf" %>
@@ -125,7 +126,7 @@
             <div class="titulo-volta">
                 <a href="cooperado" class="seta">&lsaquo;</a>
                 <div>
-                    <h1><%= esc(c.getNomeCompleto()) %></h1>
+                    <h1><%= esc(nomeBonito(c.getNomeCompleto())) %></h1>
                     <p>Cooperados - <%= esc(c.getCodigoCooperado()) %></p>
                 </div>
             </div>

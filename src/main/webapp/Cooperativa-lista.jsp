@@ -30,7 +30,7 @@ return value.toString()
                         <h1>Cooperativas</h1>
                         <p>Cooperativas de reciclagem cadastradas na plataforma</p>
                     </div>
-                    <a class="coop-btn" href="cooperativa?pagina=nova">▦ &nbsp; Cadastrar cooperativa</a>
+                    <a class="coop-btn" href="cooperativa?pagina=nova">Nova cooperativa</a>
                 </header>
                 <% if(request.getAttribute("erro")!=null){ %>
                 <div class="coop-alert erro">

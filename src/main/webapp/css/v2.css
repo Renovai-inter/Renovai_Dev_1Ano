@@ -1,0 +1,255 @@
+/* =====================================================================
+   Renovaí v2 - ajustes de escala das telas que ainda usam o estilo.css
+   Vale só para páginas com <body class="pagina-v2">: cooperados.
+   Mantém o mesmo tamanho de título, botões, cartões e tabelas do
+   dashboard, das coletas e dos materiais (renovai.css).
+   Carregue DEPOIS do estilo.css.
+   ===================================================================== */
+
+.pagina-v2 { font-size: 15px; background: #f6f5f1; }
+
+/* ---------- Conteúdo e topo ---------- */
+.pagina-v2 .layout > .conteudo { flex: 1; min-width: 0; padding: 36px 48px 40px; }
+
+.pagina-v2 .topo {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 28px;
+    padding: 0;
+}
+.pagina-v2 .topo h1 { font-size: 2.2rem; font-weight: 600; line-height: 1.25; }
+.pagina-v2 .topo p { margin-top: 4px; font-size: .95rem; color: #333; }
+.pagina-v2 .voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: .95rem;
+    color: #333;
+}
+.pagina-v2 .voltar svg { width: 16px; height: 16px; }
+.pagina-v2 .voltar:hover { text-decoration: underline; }
+.pagina-v2 .seta { font-size: 2.2rem; }
+.pagina-v2 .acoes { gap: 12px; }
+
+/* ---------- Botões ---------- */
+.pagina-v2 .botao {
+    height: auto;
+    padding: 10px 22px;
+    gap: 10px;
+    border-radius: 10px;
+    border-width: 1.5px;
+    font-size: .95rem;
+}
+.pagina-v2 .botao-icone { height: auto; padding: 10px 22px; border-radius: 10px; }
+.pagina-v2 .botao-icone svg { width: 20px; height: 20px; }
+.pagina-v2 .verde,
+.pagina-v2 .botao-escuro { background: #4d8a57; border-color: #4d8a57; color: #fff; }
+.pagina-v2 .verde:hover,
+.pagina-v2 .botao-escuro:hover { background: #3f7648; border-color: #3f7648; filter: none; }
+.pagina-v2 .claro,
+.pagina-v2 .botao-contorno { background: transparent; border-color: #4d8a57; color: #4d8a57; }
+.pagina-v2 .claro:hover,
+.pagina-v2 .botao-contorno:hover { background: #eef4ec; border-color: #4d8a57; color: #3f7648; filter: none; }
+.pagina-v2 .vinho { background: #8a2450; border-color: #8a2450; color: #fff; }
+.pagina-v2 .vinho:hover { background: #701c40; border-color: #701c40; filter: none; }
+.pagina-v2 .botao:focus-visible,
+.pagina-v2 .editar:focus-visible,
+.pagina-v2 .excluir:focus-visible,
+.pagina-v2 input:focus-visible,
+.pagina-v2 select:focus-visible { outline: 3px solid #f0c24b; outline-offset: 2px; }
+
+/* ---------- Cartões ---------- */
+.pagina-v2 .cartao {
+    margin-bottom: 24px;
+    padding: 24px 28px;
+    border: 1px solid #e4e2dc;
+    border-radius: 20px;
+    box-shadow: none;
+}
+.pagina-v2 .cartao h2 { margin-bottom: 18px; font-size: 1.25rem; color: #8a2450; }
+.pagina-v2 .cartao h2.linha { padding-bottom: 12px; border-bottom: 1px solid #ececec; }
+.pagina-v2 .cartao h2 small { font-size: .7rem; margin-left: 6px; }
+.pagina-v2 .duas-colunas { gap: 24px; }
+.pagina-v2 .duas-colunas > .cartao { margin-bottom: 0; }
+.pagina-v2 .duas-colunas { margin-bottom: 24px; }
+
+/* ---------- Lista ---------- */
+.pagina-v2 .cartao-lista { min-height: 0; padding: 0; margin-bottom: 0; border-radius: 28px; }
+.pagina-v2 .busca-caixa { width: 360px; max-width: calc(100% - 64px); margin: 24px 0 24px 32px; }
+.pagina-v2 .busca-caixa svg { left: 16px; width: 18px; height: 18px; }
+.pagina-v2 .busca {
+    height: 46px;
+    padding: 0 16px 0 46px;
+    border: 1px solid #e4e2dc;
+    border-radius: 12px;
+    background: #fbfbf8;
+    font-size: .95rem;
+}
+.pagina-v2 .busca:focus { border-color: #4d8a57; }
+
+.pagina-v2 .tabela { table-layout: auto; }
+.pagina-v2 .tabela th:nth-child(n) { width: auto; }
+.pagina-v2 .tabela th {
+    height: auto;
+    padding: 12px 32px;
+    background: #f1f0ec;
+    border-top: 1px solid #e4e2dc;
+    border-bottom: 1px solid #e4e2dc;
+    color: #8a2450;
+    font-size: .72rem;
+    text-align: left;
+}
+.pagina-v2 .tabela td {
+    height: auto;
+    padding: 14px 32px;
+    border-bottom: 1px solid #e4e2dc;
+    font-size: .95rem;
+    text-align: left;
+}
+.pagina-v2 .tabela th:first-child,
+.pagina-v2 .tabela td:first-child,
+.pagina-v2 .tabela th:nth-child(2),
+.pagina-v2 .tabela td:nth-child(2) { padding-left: 32px; text-align: left; }
+.pagina-v2 .tabela tbody tr:last-child td { border-bottom: 0; }
+.pagina-v2 .tabela .sem-dados td { height: auto; padding: 48px 16px; text-align: center; }
+.pagina-v2 .tabela td:last-child { width: 1%; text-align: right; }
+.pagina-v2 .linha-cooperado:hover td { background: #f7f8f5; }
+
+.pagina-v2 .usuario-celula { gap: 14px; }
+.pagina-v2 .usuario-celula b { font-size: .95rem; }
+.pagina-v2 .usuario-celula small { margin-top: 1px; font-size: .75rem; }
+.pagina-v2 .avatar { width: 40px; height: 40px; background: #a33962; }
+.pagina-v2 .avatar svg { width: 20px; height: 20px; }
+
+.pagina-v2 .selo {
+    min-width: 0;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: #d8e8cf;
+    color: #3f6a3a;
+    font-size: .8rem;
+    font-weight: 600;
+}
+.pagina-v2 .selo::before { width: 6px; height: 6px; }
+.pagina-v2 .selo-afastado { background: #fbe9a8; color: #8a6a10; }
+.pagina-v2 .selo-inativo { background: #e2e0dc; color: #55524c; }
+
+/* ícones de editar e excluir */
+.pagina-v2 .editar,
+.pagina-v2 .excluir {
+    display: inline-flex;
+    padding: 6px;
+    border-radius: 8px;
+    line-height: 0;
+    vertical-align: middle;
+}
+.pagina-v2 .editar { color: #8bb08a; }
+.pagina-v2 .editar:hover { background: #f1f0ec; color: #4d8a57; }
+.pagina-v2 .excluir { color: #8a2450; }
+.pagina-v2 .excluir:hover { background: #f6e6ec; }
+.pagina-v2 .editar svg,
+.pagina-v2 .excluir svg { width: 20px; height: 20px; }
+
+/* ---------- Formulários ---------- */
+.pagina-v2 .grade { gap: 20px 40px; }
+.pagina-v2 .grade-form { gap: 20px 40px; grid-template-columns: 1fr 1fr; }
+.pagina-v2 .campo label { margin-bottom: 6px; font-size: .9rem; font-weight: 500; }
+.pagina-v2 .campo input,
+.pagina-v2 .campo select {
+    padding: 11px 16px;
+    border: 1px solid #e4e2dc;
+    border-radius: 12px;
+    background: #fbfbf8;
+    color: #1c1c1c;
+    font-size: .95rem;
+}
+.pagina-v2 .campo select { background: #fbfbf8; }
+.pagina-v2 .campo input[readonly],
+.pagina-v2 .campo input:disabled { background: #f1f0ec; color: #6f6f6f; }
+
+/* dados somente leitura (tela Ver) */
+.pagina-v2 .dado small { margin-bottom: 4px; font-size: .72rem; }
+.pagina-v2 .dado span { font-size: 1rem; }
+.pagina-v2 .dado span.selo { font-size: .8rem; }
+
+/* chips de atividades */
+.pagina-v2 .chips { gap: 12px; }
+.pagina-v2 .chips label {
+    padding: 8px 18px;
+    border: 1px solid #cfcdc6;
+    border-radius: 8px;
+    font-size: .9rem;
+}
+.pagina-v2 .chips input:checked + label { background: #d8e8cf; border-color: #4d8a57; color: #2f4d33; }
+.pagina-v2 .chips.so-leitura label { padding: 6px 14px; font-size: .85rem; }
+
+/* permissões por módulo */
+.pagina-v2 .permissoes { gap: 14px 18px; }
+.pagina-v2 .perm {
+    padding: 12px 20px;
+    border: 1px solid #e4e2dc;
+    border-radius: 999px;
+    background: #f1f0ec;
+    font-size: .95rem;
+}
+.pagina-v2 .chave { width: 44px; height: 24px; border-radius: 12px; }
+.pagina-v2 .chave::after { width: 20px; height: 20px; }
+.pagina-v2 .perm input:checked + .chave::after { left: 22px; }
+.pagina-v2 .perm input:checked + .chave { background: #4d8a57; }
+
+/* conta de acesso */
+.pagina-v2 .senha-temp { padding: 4px 12px; border-radius: 8px; background: #fbe9a8; color: #8a6a10; font-size: .8rem; }
+.pagina-v2 .aviso { margin-top: 16px; font-size: .8rem; }
+
+/* faixas de aviso */
+.pagina-v2 .aviso-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 24px;
+    padding: 12px 18px;
+    border-radius: 10px;
+    background: #d8e8cf;
+    color: #2f5a35;
+    font-size: .95rem;
+    line-height: 1.5;
+}
+.pagina-v2 .aviso-info svg { width: 20px; height: 20px; flex-shrink: 0; }
+.pagina-v2 .erro,
+.pagina-v2 .sucesso { padding: 12px 18px; margin-bottom: 20px; border-radius: 10px; font-size: .95rem; }
+.pagina-v2 .rodape-form { gap: 12px; margin-bottom: 0; }
+
+/* ---------- Modal de exclusão ---------- */
+.pagina-v2 .modal-fundo { background: rgba(30, 30, 30, .45); backdrop-filter: none; }
+.pagina-v2 .modal {
+    position: relative;
+    width: 480px;
+    padding: 28px 32px;
+    border-radius: 24px;
+    background: #f6f5f1;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .25);
+}
+.pagina-v2 .modal h3 { font-size: 1.5rem; font-weight: 600; color: #8a2450; }
+.pagina-v2 .modal .sub { margin: 2px 0 18px; font-size: .85rem; color: #444; }
+.pagina-v2 .modal .mini { font-size: .72rem; }
+.pagina-v2 .registros { padding: 10px 16px; border: 1px solid #e4e2dc; border-radius: 12px; background: #fff; }
+.pagina-v2 .registros div { font-size: .85rem; }
+.pagina-v2 .opcao { padding: 12px 16px; border: 1px solid #e4e2dc; border-radius: 12px; background: #fff; font-size: .85rem; }
+.pagina-v2 .opcao b { font-size: .95rem; }
+.pagina-v2 .opcao:has(input:checked) { border-color: #4d8a57; background: #eef4ec; }
+.pagina-v2 .opcao.perigo:has(input:checked) { border-color: #8a2450; background: #f6e6ec; }
+.pagina-v2 .modal .rodape { gap: 12px; margin-top: 24px; }
+
+/* ---------- Telas estreitas ---------- */
+@media (max-width: 820px) {
+    .pagina-v2 .layout > .conteudo { padding: 24px 16px; }
+    .pagina-v2 .grade,
+    .pagina-v2 .grade-form,
+    .pagina-v2 .duas-colunas,
+    .pagina-v2 .permissoes { grid-template-columns: 1fr; }
+    .pagina-v2 .busca-caixa { margin-left: 16px; }
+    .pagina-v2 .tabela th,
+    .pagina-v2 .tabela td { padding-left: 16px; padding-right: 16px; }
+}
