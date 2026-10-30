@@ -1,12 +1,21 @@
-FROM maven:3.9-eclipse-temurin-21 AS build
-WORKDIR /app
-COPY pom.xml .
-RUN mvn -q dependency:go-offline
-COPY src ./src
-RUN mvn -q -DskipTests package
 
-FROM tomcat:11.0-jdk21-temurin
+# Etapa 1: Compilar o projeto Java
+FROM maven:3.9-eclipse-temurin-17 AS build
+
+WORKDIR /app
+
+COPY pom.xml .
+COPY src ./src
+
+RUN mvn -B clean package -DskipTests
+
+# Etapa 2: Executar no Tomcat 11
+FROM tomcat:11.0-jdk17-temurin
+
 RUN rm -rf /usr/local/tomcat/webapps/*
+
 COPY --from=build /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
+
 EXPOSE 8080
-CMD sed -i "s/Connector port=\"8080\"/Connector port=\"${PORT:-8080}\"/" conf/server.xml && exec catalina.sh run
+
+CMD ["catalina.sh", "run"]
