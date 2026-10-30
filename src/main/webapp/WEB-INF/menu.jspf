@@ -1,19 +1,22 @@
 <%!
-    // Evita que um texto com < > " quebre a pagina
+    // Evita que um texto com < > " quebre a página
     private String esc(Object o) {
         if (o == null) return "";
         return o.toString().replace("&", "&amp;").replace("<", "&lt;")
                 .replace(">", "&gt;").replace("\"", "&quot;");
     }
 %>
+
 <div class="menu">
     <div class="logo">Renovaí</div>
+
     <a href="#">Dashboard</a>
-    <a href="#">Cooperativas</a>
+    <a href="${pageContext.request.contextPath}/cooperativa">Cooperativas</a>
     <a href="cooperado" class="ativo">Cooperados</a>
     <a href="#">Coletas</a>
     <a href="#">Materiais</a>
     <a href="#">Negociações</a>
+
     <div class="usuario">
         <b>Nome usuário</b>
         <small>Administrador</small>
