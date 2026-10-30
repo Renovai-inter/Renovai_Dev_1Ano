@@ -20,9 +20,9 @@ public class CooperativaServlet extends HttpServlet {
 
     // ATRIBUTOS
 
-    private static final String PAGINA_LISTA = "/WEB-INF/Cooperativa-lista.jsp";
-    private static final String PAGINA_FORM = "/WEB-INF/Cooperativa-form.jsp";
-    private static final String PAGINA_DETALHE = "/WEB-INF/Cooperativa-detalhe.jsp";
+    private static final String PAGINA_LISTA = "/Cooperativa-lista.jsp";
+    private static final String PAGINA_FORM = "/Cooperativa-form.jsp";
+    private static final String PAGINA_DETALHE = "/Cooperativa-detalhe.jsp";
 
     private final CooperativaDAO dao = new CooperativaDAO();
     private final CooperadoDAO cooperadoDAO = new CooperadoDAO();
@@ -240,7 +240,7 @@ public class CooperativaServlet extends HttpServlet {
         }
     }
 
-    // Preenche a Model pelos setters; no modo parcial, aplica somente os parâmetros presentes na requisição.
+    // Preenche a cooperativa pelos setters; na atualização, aplica apenas os campos enviados.
     private void montarCooperativa(HttpServletRequest request, Cooperativa coop, boolean parcial) {
         if (!parcial || request.getParameter("nome") != null) {
             coop.setNome(valor(request, "nome"));

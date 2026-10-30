@@ -73,7 +73,7 @@ public class MaterialServlet extends HttpServlet {
 
             // Encaminhamento
 
-            response.sendRedirect(request.getContextPath() + "/material");
+            response.sendRedirect(request.getContextPath() + "/material?sucesso=" + acao);
         } catch (IllegalArgumentException e) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
         } catch (RuntimeException e) {

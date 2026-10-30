@@ -169,7 +169,7 @@ public class ColetaServlet extends HttpServlet {
                     return;
                 }
                 response.sendRedirect(request.getContextPath()
-                        + "/coleta?acao=detalhes&id=" + id);
+                        + "/coleta?acao=detalhes&id=" + id + "&sucesso=iniciada");
 
             } else if ("finalizar".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));
@@ -182,7 +182,7 @@ public class ColetaServlet extends HttpServlet {
                     return;
                 }
                 response.sendRedirect(request.getContextPath()
-                        + "/coleta?acao=detalhes&id=" + id);
+                        + "/coleta?acao=detalhes&id=" + id + "&sucesso=finalizada");
 
             } else if ("cancelar".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));
@@ -194,7 +194,7 @@ public class ColetaServlet extends HttpServlet {
                     return;
                 }
                 response.sendRedirect(request.getContextPath()
-                        + "/coleta");
+                        + "/coleta?sucesso=cancelamento");
 
             } else if ("excluir".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));

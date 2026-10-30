@@ -34,8 +34,8 @@ public class CooperativaDAO {
 
     // === METODOS CREATE ==============================================================================================
 
-    // Cadastra a cooperativa e o gestor vinculado a ela; devolve o total de linhas gravadas nas duas etapas.
-    // Sem transação: se o gestor falhar, a cooperativa gravada é excluída em seguida (compensação manual).
+    // Grava a cooperativa e o gestor em etapas e devolve o total de linhas afetadas.
+    // Se o gestor falhar, tenta excluir a cooperativa já gravada como compensação manual.
     public int cadastrarCooperativa(Cooperativa coop, Cooperado gestor) {
 
         // Declaração

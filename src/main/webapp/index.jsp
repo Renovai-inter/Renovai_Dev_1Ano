@@ -133,11 +133,11 @@
         </div>
         <nav>
             <a href="${ctx}/dashboard" class="ativo" aria-current="page">Dashboard</a>
-            <a href="#">Cooperativas</a>
-            <a href="#">Cooperados</a>
+            <a href="${ctx}/cooperativa">Cooperativas</a>
+            <a href="${ctx}/cooperado">Cooperados</a>
             <a href="${ctx}/coleta">Coletas</a>
             <a href="${ctx}/material">Materiais</a>
-            <a href="#">Negociações</a>
+            <a href="${ctx}/negociacao">Negociações</a>
         </nav>
         <div class="usuario">
             <c:out value="${empty nomeUsuario ? 'Nome usuário' : nomeUsuario}"/>
@@ -253,11 +253,11 @@
         <section class="painel-dash secao" aria-labelledby="tAcoes">
             <h2 id="tAcoes">Ações rápidas</h2>
             <div class="acoes-rapidas">
-                <a class="btn-acao" href="#"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-building"/></svg>Cadastrar cooperativa</a>
+                <a class="btn-acao" href="${ctx}/cooperativa?pagina=nova"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-building"/></svg>Cadastrar cooperativa</a>
                 <a class="btn-acao" href="${ctx}/coleta?acao=nova"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-truck"/></svg>Nova coleta</a>
-                <a class="btn-acao" href="#"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-swap"/></svg>Nova negociação</a>
+                <a class="btn-acao" href="${ctx}/negociacao?acao=novo"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-swap"/></svg>Nova negociação</a>
                 <a class="btn-acao" href="${ctx}/material?novo=1"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-box"/></svg>Novo material</a>
-                <a class="btn-acao" href="#"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-person-add"/></svg>Cadastrar cooperado</a>
+                <a class="btn-acao" href="${ctx}/cooperado?acao=novo"><svg width="22" height="22" fill="currentColor" aria-hidden="true"><use href="#i-person-add"/></svg>Cadastrar cooperado</a>
             </div>
         </section>
     </main>

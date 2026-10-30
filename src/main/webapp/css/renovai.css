@@ -239,3 +239,4 @@ dialog .fechar {
     .sidebar .usuario { display: none; }
     main { padding: 24px 16px; }
 }
+.aviso-sucesso { background: #d8e8cf; color: #2f5a35; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-size: .9rem; }

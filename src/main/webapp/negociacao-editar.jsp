@@ -149,7 +149,7 @@
 
 <%@ include file="modal-proposta.jspf" %>
 <%@ include file="modal-excluir-negociacao.jspf" %>
-<%@ include file="negociacao-notificacoes.jsp" %>
+<%@ include file="notificacao.jspf" %>
 
 <script>
         // 1) Envia o formulario sem sair da tela. Se o servlet aceitar a alteracao, abre a pagina de destino,

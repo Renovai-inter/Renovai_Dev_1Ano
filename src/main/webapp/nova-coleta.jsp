@@ -63,12 +63,12 @@
             <span>Área Administrativa</span>
         </div>
         <nav>
-            <a href="#">Dashboard</a>
-            <a href="#">Cooperativas</a>
-            <a href="#">Cooperados</a>
+            <a href="${ctx}/dashboard">Dashboard</a>
+            <a href="${ctx}/cooperativa">Cooperativas</a>
+            <a href="${ctx}/cooperado">Cooperados</a>
             <a href="${ctx}/coleta" class="ativo" aria-current="page">Coletas</a>
             <a href="${ctx}/material">Materiais</a>
-            <a href="#">Negociações</a>
+            <a href="${ctx}/negociacao">Negociações</a>
         </nav>
         <div class="usuario">
             Nome usuário

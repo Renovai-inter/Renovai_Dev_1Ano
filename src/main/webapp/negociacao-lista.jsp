@@ -122,7 +122,6 @@
             </div>
         </div>
     </div>
-<%@ include file="negociacao-notificacoes.jsp" %>
 </div>
 <script>
     // Tira acentos e deixa minusculo, para a busca nao depender de maiusculas/acentos

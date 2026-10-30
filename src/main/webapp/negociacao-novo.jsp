@@ -242,7 +242,6 @@
         </form>
     </div>
 </div>
-<%@ include file="negociacao-notificacoes.jsp" %>
 <script>
     // 1) Setinhas de subir/descer em Quantidade e Valor (so visual: o campo continua texto, formato 0,00)
     (function () {

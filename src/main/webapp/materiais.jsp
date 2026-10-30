@@ -23,6 +23,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        .aviso-sucesso { background: #d8e8cf; color: #2f5a35; border-radius: 12px; padding: 12px 18px; margin-bottom: 20px; font-size: .9rem; }
         :root {
             --verde-menu: #618c66;
             --verde-ativo: #b3cca9;
@@ -231,12 +232,12 @@
             <span>Área Administrativa</span>
         </div>
         <nav>
-            <a href="#">Dashboard</a>
-            <a href="#">Cooperativas</a>
-            <a href="#">Cooperados</a>
-            <a href="#">Coletas</a>
+            <a href="${ctx}/dashboard">Dashboard</a>
+            <a href="${ctx}/cooperativa">Cooperativas</a>
+            <a href="${ctx}/cooperado">Cooperados</a>
+            <a href="${ctx}/coleta">Coletas</a>
             <a href="${ctx}/material" class="ativo" aria-current="page">Materiais</a>
-            <a href="#">Negociações</a>
+            <a href="${ctx}/negociacao">Negociações</a>
         </nav>
         <div class="usuario">
             Nome usuário
@@ -253,6 +254,16 @@
             </div>
             <button type="button" class="btn btn-verde" id="btnNovo">Novo material</button>
         </header>
+
+        <c:if test="${param.sucesso == 'cadastrar'}">
+            <div class="aviso-sucesso" role="status">Material cadastrado com sucesso.</div>
+        </c:if>
+        <c:if test="${param.sucesso == 'editar'}">
+            <div class="aviso-sucesso" role="status">Material atualizado com sucesso.</div>
+        </c:if>
+        <c:if test="${param.sucesso == 'excluir'}">
+            <div class="aviso-sucesso" role="status">Material excluído com sucesso.</div>
+        </c:if>
 
         <section class="painel">
             <div class="filtros">

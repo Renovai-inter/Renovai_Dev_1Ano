@@ -70,7 +70,6 @@
     </div>
 </div>
 
-<%@ include file="negociacao-notificacoes.jsp" %>
 <script>
     // So visual: o botao mostra "Alterar status" (verde) ou "Excluir" (vinho) conforme a opcao marcada.
     // O envio continua igual: acao = cancelar ou excluir.
