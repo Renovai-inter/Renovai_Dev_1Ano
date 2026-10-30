@@ -19,6 +19,8 @@
     <title>Negociação <%= esc(negociacao.getCodigo()) %></title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=6">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
+
 </head>
 <body>
 <div class="layout">

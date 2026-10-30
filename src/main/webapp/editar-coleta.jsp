@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Editar coleta CO-<c:out value="${coleta.idColeta}"/> | Renovaí</title>
     <link rel="stylesheet" href="${ctx}/css/renovai.css">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
     <style>
         .edicao { max-width: 850px; }
         .edicao .card { display: grid; gap: 18px; }
