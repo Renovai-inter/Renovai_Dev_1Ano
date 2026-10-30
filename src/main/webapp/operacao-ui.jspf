@@ -1,0 +1,43 @@
+<style>
+  #operacao-progresso { position: fixed; inset: 0 0 auto; height: 4px; z-index: 10000; background: #d8e8cf; opacity: 0; pointer-events: none; transition: opacity .15s; }
+  #operacao-progresso.ativo { opacity: 1; }
+  #operacao-progresso::after { content: ""; display: block; width: 0; height: 100%; background: #568b61; }
+  #operacao-progresso.ativo::after { animation: operacao-avanco 10s ease-out forwards; }
+  @keyframes operacao-avanco { to { width: 92%; } }
+  #operacao-avisos { position: fixed; top: 20px; right: 20px; width: min(380px, calc(100vw - 40px)); z-index: 9999; display: grid; gap: 10px; }
+  #operacao-avisos > * { position: relative; margin: 0; padding: 15px 42px 15px 18px; background: #e5efdf; color: #264a30; border: 1px solid #b4d0ab; border-radius: 12px; box-shadow: 0 8px 28px #0002; font: 500 14px/1.5 Poppins, sans-serif; }
+  #operacao-avisos > .erro, #operacao-avisos > [role="alert"] { background: #fbe9ed; color: #84304e; border-color: #e8b7c5; }
+  #operacao-avisos button { position: absolute; top: 7px; right: 8px; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; padding: 5px; }
+  :where(a, button, input, select, textarea):focus-visible { outline: 3px solid #315d3c; outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) { #operacao-progresso.ativo::after { animation-duration: .01s; } }
+</style>
+<div id="operacao-progresso" role="progressbar" aria-label="Carregando operação" aria-hidden="true"></div>
+<div id="operacao-avisos" aria-live="polite"></div>
+<script>
+(() => {
+  const barra = document.getElementById('operacao-progresso');
+  const avisos = document.getElementById('operacao-avisos');
+  function iniciar() { barra.classList.add('ativo'); barra.removeAttribute('aria-hidden'); }
+  window.addEventListener('pageshow', () => { barra.classList.remove('ativo'); barra.setAttribute('aria-hidden', 'true'); });
+  document.addEventListener('submit', event => {
+    const form = event.target;
+    setTimeout(() => { if (!event.defaultPrevented && form.checkValidity()) iniciar(); }, 0);
+  }, true);
+  document.addEventListener('click', event => {
+    const link = event.target.closest('a[href]');
+    if (!link || link.target || link.hasAttribute('download') || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    const destino = link.getAttribute('href');
+    if (!destino || destino.startsWith('#') || destino.startsWith('javascript:')) return;
+    const url = new URL(destino, location.href);
+    if (url.origin !== location.origin) return;
+    setTimeout(() => { if (!event.defaultPrevented) iniciar(); }, 0);
+  }, true);
+  document.querySelectorAll('.coop-alert, .aviso-sucesso, .aviso.sucesso, .erro').forEach(aviso => {
+    avisos.appendChild(aviso);
+    const fechar = document.createElement('button');
+    fechar.type = 'button'; fechar.textContent = '×'; fechar.setAttribute('aria-label', 'Fechar mensagem');
+    fechar.addEventListener('click', () => aviso.remove());
+    aviso.appendChild(fechar);
+  });
+})();
+</script>

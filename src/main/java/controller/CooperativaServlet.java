@@ -49,6 +49,30 @@ public class CooperativaServlet extends HttpServlet {
             request.getRequestDispatcher(PAGINA_FORM).forward(request, response);
             return;
         }
+        if ("editar".equals(pagina)) {
+            long id;
+            try {
+                id = Long.parseLong(request.getParameter("id"));
+            } catch (NumberFormatException e) {
+                redirecionar(request, response, "erro", "Cooperativa não encontrada.");
+                return;
+            }
+            Cooperativa filtro = new Cooperativa();
+            filtro.setIdCooperativa(id);
+            Cooperativa cooperativa;
+            try {
+                cooperativa = dao.buscarPorId(filtro);
+            } catch (RuntimeException e) {
+                throw new ServletException("Erro ao consultar a cooperativa.", e);
+            }
+            if (cooperativa == null) {
+                redirecionar(request, response, "erro", "Cooperativa não encontrada.");
+                return;
+            }
+            request.setAttribute("cooperativa", cooperativa);
+            request.getRequestDispatcher(PAGINA_FORM).forward(request, response);
+            return;
+        }
         if ("detalhe".equals(pagina)) {
             mostrarDetalhe(request, response);
             return;
@@ -121,9 +145,12 @@ public class CooperativaServlet extends HttpServlet {
         // Validação dos dados
 
         if (valor(request, "nome").isEmpty() || valor(request, "nome_publico").isEmpty()
-                || valor(request, "cidade").isEmpty()) {
+                || valor(request, "cnpj").isEmpty() || valor(request, "email_institucional").isEmpty()
+                || valor(request, "telefone_whatsapp").isEmpty() || valor(request, "cep").isEmpty()
+                || valor(request, "endereco").isEmpty() || valor(request, "cidade").isEmpty()
+                || valor(request, "estado").isEmpty()) {
             redirecionarPara(request, response, "cooperativa?pagina=nova", "erro",
-                    "Preencha nome, nome público e cidade.");
+                    "Preencha todos os dados institucionais obrigatórios.");
             return;
         }
         if (valor(request, "gestor_nome_completo").isEmpty() || valor(request, "gestor_email").isEmpty()
@@ -176,6 +203,15 @@ public class CooperativaServlet extends HttpServlet {
         if (id <= 0L) {
             redirecionar(request, response, "erro", "Informe a cooperativa e os novos valores.");
             return;
+        }
+        String[] obrigatorios = {"nome", "nome_publico", "cnpj", "email_institucional",
+                "telefone_whatsapp", "cep", "endereco", "cidade", "estado"};
+        for (String campo : obrigatorios) {
+            if (request.getParameter(campo) != null && valor(request, campo).isEmpty()) {
+                redirecionarPara(request, response, "cooperativa?pagina=editar&id=" + id, "erro",
+                        "Preencha todos os dados institucionais obrigatórios.");
+                return;
+            }
         }
 
         try {

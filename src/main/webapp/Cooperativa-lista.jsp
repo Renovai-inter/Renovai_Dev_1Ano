@@ -88,7 +88,7 @@ return value.toString()
                             <%=c.getDataCadastro()==null?"—":h(c.getDataCadastro().toLocalDate())%>
                         </td>
                         <td>
-                            <a title="Ver detalhes" href="cooperativa?pagina=detalhe&id=<%=c.getIdCooperativa()%>">✎</a>
+                            <a title="Editar cooperativa" aria-label="Editar cooperativa" href="cooperativa?pagina=editar&id=<%=c.getIdCooperativa()%>">✎</a>
                         </td>
                     </tr>
                     <% }} %>
@@ -98,5 +98,6 @@ return value.toString()
     </section>
 </main>
 </div>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

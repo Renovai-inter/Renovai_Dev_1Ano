@@ -156,6 +156,7 @@
         <% if (erro != null) { %>
             <div class="erro"><%= esc(erro) %></div>
         <% } %>
+        <% if ("atualizacao".equals(request.getParameter("sucesso"))) { %><div class="aviso-sucesso" role="status">Cooperado atualizado com sucesso.</div><% } %>
 
         <div class="duas-colunas">
             <div class="cartao cartao-form">
@@ -233,5 +234,6 @@
 </div>
 
 <%@ include file="modal-excluir.jspf" %>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

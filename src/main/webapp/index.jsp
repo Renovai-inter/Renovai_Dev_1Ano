@@ -381,5 +381,6 @@
         });
     })();
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

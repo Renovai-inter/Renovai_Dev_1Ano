@@ -85,5 +85,6 @@
     senha.addEventListener("input", conferir);
     confirmar.addEventListener("input", conferir);
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

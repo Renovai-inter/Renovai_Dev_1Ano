@@ -94,6 +94,7 @@
             </div>
 
             <div class="acoes-topo">
+                <a class="btn btn-contorno" href="${ctx}/coleta?acao=editar&id=${coleta.idColeta}">Editar</a>
                 <c:if test="${coleta.status == 'AGENDADA'}">
                     <form method="post" action="${ctx}/coleta" accept-charset="UTF-8">
                         <input type="hidden" name="acao" value="iniciar">
@@ -123,6 +124,7 @@
             </div>
         </header>
 
+        <c:if test="${param.sucesso == 'atualizada'}"><div class="aviso-sucesso" role="status">Coleta atualizada com sucesso.</div></c:if>
         <c:if test="${param.sucesso == 'iniciada'}">
             <div class="aviso-sucesso" role="status">Coleta iniciada com sucesso.</div>
         </c:if>
@@ -302,5 +304,6 @@
         el.addEventListener("click", () => modal.close());
     });
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

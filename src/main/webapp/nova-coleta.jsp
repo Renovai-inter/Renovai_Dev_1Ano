@@ -167,7 +167,10 @@
                     <div class="bloco-tipo" id="blocoEntrega" hidden>
                         <div class="campo">
                             <label for="origemEntrega">Origem da entrega</label>
-                            <input type="text" id="origemEntrega" name="origemEntrega" maxlength="100" required>
+                            <select id="origemEntrega" name="origemEntrega" required>
+                                <option value="" disabled selected>Selecione a origem</option>
+                                <c:forEach items="${origens}" var="origem"><option value="${origem}"><c:out value="${origem}"/></option></c:forEach>
+                            </select>
                         </div>
                         <div class="campo">
                             <label for="nomeLocalOrigem">Nome do local de origem</label>
@@ -309,5 +312,6 @@
 
     adicionarLinha(); // começa com uma linha
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

@@ -8,6 +8,7 @@ import dao.MaterialDAO;
 import model.principais.Material;
 import model.enums.StatusColeta;
 import model.enums.TipoColeta;
+import model.enums.OrigemEntrega;
 import java.util.Objects;
 import java.util.function.Supplier;
 import jakarta.servlet.ServletException;
@@ -34,18 +35,35 @@ public class ColetaServlet extends HttpServlet {
                          HttpServletResponse response)
             throws ServletException, IOException {
 
+        Object erro = request.getSession().getAttribute("erroColeta");
+        if (erro != null) {
+            request.setAttribute("erroColeta", erro);
+            request.getSession().removeAttribute("erroColeta");
+        }
         String acao = request.getParameter("acao");
 
         try {
-            if ("detalhes".equals(acao)) {
+            if ("editar".equals(acao)) {
+                Long id = Long.parseLong(request.getParameter("id"));
+                Coleta filtro = new Coleta();
+                filtro.setIdColeta(id);
+                Coleta coleta = coletaDAO.buscarPorId(filtro);
+                if (coleta == null) {
+                    mostrarErro(request, response, "Coleta não encontrada.");
+                    return;
+                }
+                request.setAttribute("coleta", coleta);
+                request.setAttribute("origens", java.util.Arrays.stream(OrigemEntrega.values())
+                        .map(Enum::name).toList());
+                request.getRequestDispatcher("/editar-coleta.jsp").forward(request, response);
+            } else if ("detalhes".equals(acao)) {
                 Long id = Long.parseLong(request.getParameter("id"));
                 Coleta filtro = new Coleta();
                 filtro.setIdColeta(id);
                 Coleta coleta = coletaDAO.buscarPorId(filtro);
 
                 if (coleta == null) {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                            "Coleta não encontrada.");
+                    mostrarErro(request, response, "Coleta não encontrada.");
                     return;
                 }
 
@@ -84,6 +102,8 @@ public class ColetaServlet extends HttpServlet {
                         .forward(request, response);
 
             } else if ("nova".equals(acao)) {
+                request.setAttribute("origens", java.util.Arrays.stream(OrigemEntrega.values())
+                        .map(Enum::name).toList());
                 request.setAttribute("cooperativas",
                         opcoesOuVazio(coletaDAO::listarCooperativas, "cooperativas"));
                 request.setAttribute("cooperados",
@@ -108,7 +128,7 @@ public class ColetaServlet extends HttpServlet {
             }
 
         } catch (IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ID inválido.");
+            mostrarErro(request, response, "ID inválido.");
         } catch (RuntimeException e) {
             throw new ServletException("Erro ao consultar coletas.", e);
         }
@@ -153,7 +173,30 @@ public class ColetaServlet extends HttpServlet {
         String acao = request.getParameter("acao");
 
         try {
-            if ("cadastrar".equals(acao)) {
+            if ("atualizar".equals(acao)) {
+                Long id = Long.parseLong(request.getParameter("id"));
+                Coleta filtro = new Coleta();
+                filtro.setIdColeta(id);
+                Coleta coleta = coletaDAO.buscarPorId(filtro);
+                if (coleta == null) {
+                    mostrarErro(request, response, "Coleta não encontrada.");
+                    return;
+                }
+                String data = request.getParameter("dataAgendada");
+                coleta.setDataAgendada(data == null || data.isBlank() ? null : LocalDate.parse(data));
+                coleta.setObservacoes(request.getParameter("observacoes"));
+                if (coleta.getTipo() == TipoColeta.ENTREGA_COOPERATIVA) {
+                    String origem = request.getParameter("origemEntrega");
+                    coleta.setOrigemEntrega(origem == null || origem.isBlank() ? null : origem);
+                    coleta.setNomeLocalOrigem(request.getParameter("nomeLocalOrigem"));
+                }
+                if (coletaDAO.atualizarColeta(coleta) == 0) {
+                    mostrarErro(request, response, "Coleta não encontrada.");
+                    return;
+                }
+                response.sendRedirect(request.getContextPath()
+                        + "/coleta?acao=detalhes&id=" + id + "&sucesso=atualizada");
+            } else if ("cadastrar".equals(acao)) {
                 cadastrar(request);
                 response.sendRedirect(request.getContextPath()
                         + "/coleta?sucesso=cadastro");
@@ -164,8 +207,7 @@ public class ColetaServlet extends HttpServlet {
                 alteracao.setIdColeta(id);
                 alteracao.setStatus(StatusColeta.EM_ANDAMENTO);
                 if (coletaDAO.atualizarStatus(alteracao) == 0) {
-                    response.sendError(HttpServletResponse.SC_CONFLICT,
-                            "Não foi possível iniciar esta coleta.");
+                    mostrarErro(request, response, "Não foi possível iniciar esta coleta.");
                     return;
                 }
                 response.sendRedirect(request.getContextPath()
@@ -177,8 +219,7 @@ public class ColetaServlet extends HttpServlet {
                 alteracao.setIdColeta(id);
                 alteracao.setStatus(StatusColeta.CONCLUIDA);
                 if (coletaDAO.atualizarStatus(alteracao) == 0) {
-                    response.sendError(HttpServletResponse.SC_CONFLICT,
-                            "Não foi possível finalizar esta coleta.");
+                    mostrarErro(request, response, "Não foi possível finalizar esta coleta.");
                     return;
                 }
                 response.sendRedirect(request.getContextPath()
@@ -189,8 +230,7 @@ public class ColetaServlet extends HttpServlet {
                 Coleta cancelamento = new Coleta();
                 cancelamento.setIdColeta(id);
                 if (coletaDAO.excluirColeta(cancelamento) == 0) {
-                    response.sendError(HttpServletResponse.SC_CONFLICT,
-                            "Não foi possível cancelar esta coleta.");
+                    mostrarErro(request, response, "Não foi possível cancelar esta coleta.");
                     return;
                 }
                 response.sendRedirect(request.getContextPath()
@@ -201,16 +241,14 @@ public class ColetaServlet extends HttpServlet {
                 String confirmacao = request.getParameter("confirmacao");
 
                 if (!String.valueOf(id).equals(confirmacao)) {
-                    response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                            "Digite o código correto da coleta.");
+                    mostrarErro(request, response, "Digite o código correto da coleta.");
                     return;
                 }
 
                 Coleta exclusao = new Coleta();
                 exclusao.setIdColeta(id);
                 if (coletaDAO.apagarColeta(exclusao) == 0) {
-                    response.sendError(HttpServletResponse.SC_NOT_FOUND,
-                            "Coleta não encontrada.");
+                    mostrarErro(request, response, "Coleta não encontrada.");
                     return;
                 }
 
@@ -218,18 +256,24 @@ public class ColetaServlet extends HttpServlet {
                         + "/coleta?sucesso=exclusao");
 
             } else {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                        "Ação inválida.");
+                mostrarErro(request, response, "Ação inválida.");
             }
 
         } catch (NumberFormatException | java.time.format.DateTimeParseException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST,
-                    "Confira os campos numéricos e a data.");
+            mostrarErro(request, response, "Confira os campos numéricos e a data.");
         } catch (IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+            mostrarErro(request, response, e.getMessage());
         } catch (RuntimeException e) {
-            throw new ServletException("Erro ao processar a coleta.", e);
+            getServletContext().log("Erro ao processar a coleta.", e);
+            mostrarErro(request, response, "Não foi possível concluir a operação da coleta.");
         }
+    }
+
+    // Mostra a falha na lista após um redirecionamento, sem confundir erro com sucesso.
+    private void mostrarErro(HttpServletRequest request, HttpServletResponse response, String mensagem)
+            throws IOException {
+        request.getSession().setAttribute("erroColeta", mensagem);
+        response.sendRedirect(request.getContextPath() + "/coleta");
     }
 
     private void cadastrar(HttpServletRequest request) {

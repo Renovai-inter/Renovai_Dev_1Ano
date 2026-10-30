@@ -299,6 +299,7 @@
             <a href="${ctx}/coleta?acao=nova" class="btn btn-verde">Nova coleta</a>
         </header>
 
+        <c:if test="${not empty erroColeta}"><div class="aviso erro" role="alert"><c:out value="${erroColeta}"/></div></c:if>
         <c:if test="${param.sucesso == 'cadastro'}">
             <div class="aviso-sucesso" role="status">Coleta cadastrada com sucesso.</div>
         </c:if>
@@ -384,7 +385,7 @@
                             </td>
 
                             <td class="acoes">
-                                <a class="icone editar" href="${ctx}/coleta?acao=detalhes&id=${coleta.idColeta}"
+                                <a class="icone editar" href="${ctx}/coleta?acao=editar&id=${coleta.idColeta}"
                                    aria-label="Ver detalhes da coleta CO-${coleta.idColeta}">
                                     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zm17.7-10.2a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
                                 </a>
@@ -496,5 +497,6 @@
         $("semResultado").hidden = !(linhas.length > 0 && visiveis === 0);
     });
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

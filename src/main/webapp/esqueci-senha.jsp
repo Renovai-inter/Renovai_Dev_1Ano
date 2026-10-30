@@ -44,5 +44,6 @@
         <img src="${ctx}/img/mascote.png" alt="" onerror="this.style.display='none'">
     </aside>
 </main>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

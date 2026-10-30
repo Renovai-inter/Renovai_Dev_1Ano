@@ -275,5 +275,6 @@
         </form>
     </div>
 </div>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

@@ -24,9 +24,10 @@ return value.toString()
         <div class="layout">
             <%@ include file="/menu.jspf" %>
             <main class="conteudo coop-conteudo">
+                <% Cooperativa cooperativa = (Cooperativa) request.getAttribute("cooperativa"); boolean edicao = cooperativa != null; %>
                 <header class="coop-top">
                     <div>
-                        <h1>Nova cooperativa</h1>
+                        <h1><%= edicao ? "Editar cooperativa" : "Nova cooperativa" %></h1>
                         <p>
                         <a href="cooperativa">‹ Voltar para cooperativas</a>
                     </p>
@@ -43,38 +44,36 @@ return value.toString()
             </div>
             <% } %>
             <form action="cooperativa" method="post">
-                <input type="hidden" name="acao" value="cadastrar">
+                <input type="hidden" name="acao" value="<%= edicao ? "atualizar" : "cadastrar" %>">
+                <% if (edicao) { %><input type="hidden" name="id_cooperativa" value="<%= cooperativa.getIdCooperativa() %>"><% } %>
                 <section class="coop-card">
                     <h3>Dados institucionais</h3>
                     <div class="coop-grid">
-                        <label>Nome da cooperativa *<input type="text" name="nome" required>
+                        <label>Nome da cooperativa *<input type="text" name="nome" value="<%= edicao ? h(cooperativa.getNome()) : "" %>" required maxlength="150">
                         </label>
-                        <label>Nome público *<input type="text" name="nome_publico" required>
+                        <label>Nome público *<input type="text" name="nome_publico" value="<%= edicao ? h(cooperativa.getNomePublico()) : "" %>" required maxlength="150">
                         </label>
-                        <label>CNPJ<input type="text" name="cnpj" >
+                        <label>CNPJ *<input type="text" name="cnpj" value="<%= edicao ? h(cooperativa.getCnpj()) : "" %>" required>
                         </label>
-                        <label>Data de fundação<input type="date" name="data_fundacao" >
+                        <label>E-mail institucional *<input type="email" name="email_institucional" value="<%= edicao ? h(cooperativa.getEmailInstitucional()) : "" %>" required maxlength="150">
                         </label>
-                        <label>E-mail institucional<input type="email" name="email_institucional" >
+                        <label>Telefone / WhatsApp *<input type="text" name="telefone_whatsapp" value="<%= edicao ? h(cooperativa.getTelefoneWhatsapp()) : "" %>" required>
                         </label>
-                        <label>Telefone / WhatsApp<input type="text" name="telefone_whatsapp" >
+                        <label>CEP *<input type="text" name="cep" value="<%= edicao ? h(cooperativa.getCep()) : "" %>" required>
                         </label>
-                        <label>CEP<input type="text" name="cep" >
+                        <label>Endereço *<input type="text" name="endereco" value="<%= edicao ? h(cooperativa.getEndereco()) : "" %>" required maxlength="255">
                         </label>
-                        <label>Endereço<input type="text" name="endereco" >
+                        <label>Cidade *<input type="text" name="cidade" value="<%= edicao ? h(cooperativa.getCidade()) : "" %>" required maxlength="100">
                         </label>
-                        <label>Cidade *<input type="text" name="cidade" required>
+                        <label>UF *<input type="text" name="estado" value="<%= edicao ? h(cooperativa.getEstado()) : "" %>" required maxlength="2">
                         </label>
-                        <label>UF<input type="text" name="estado" >
+                        <label>Logo (URL)<input type="url" name="logo_url" value="<%= edicao ? h(cooperativa.getLogoUrl()) : "" %>" maxlength="500">
                         </label>
-                        <label>Logo (URL)<input type="url" name="logo_url" >
-                        </label>
-                        <label class="coop-wide">Descrição institucional<textarea name="descricao_institucional" rows="3">
-                        </textarea>
+                        <label class="coop-wide">Descrição institucional<textarea name="descricao_institucional" rows="3"><%= edicao ? h(cooperativa.getDescricaoInstitucional()) : "" %></textarea>
                     </label>
                 </div>
             </section>
-            <section class="coop-card">
+            <% if (!edicao) { %><section class="coop-card">
                 <h3>Gestor responsável</h3>
                 <p>Informe os dados do gestor que terá acesso à cooperativa.</p>
                 <div class="coop-grid">
@@ -88,12 +87,14 @@ return value.toString()
                     </label>
                 </div>
             </section>
+            <% } %>
             <div class="coop-actions">
                 <a href="cooperativa">Cancelar</a>
-                <button class="coop-btn" type="submit">Criar cooperativa</button>
+                <button class="coop-btn" type="submit"><%= edicao ? "Salvar alterações" : "Criar cooperativa" %></button>
             </div>
         </form>
     </main>
 </div>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

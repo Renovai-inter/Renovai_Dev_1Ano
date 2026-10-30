@@ -29,6 +29,11 @@
     <%@ include file="menu.jspf" %>
 
     <div class="conteudo">
+        <% if ("inativacao".equals(request.getParameter("sucesso"))) { %><div class="aviso-sucesso" role="status">Cooperado inativado com sucesso.</div><% } %>
+        <% if ("exclusao".equals(request.getParameter("sucesso"))) { %><div class="aviso-sucesso" role="status">Cooperado excluído com sucesso.</div><% } %>
+        <% if ("naoEncontrado".equals(request.getParameter("erro"))) { %><div class="aviso erro" role="alert">Cooperado não encontrado.</div><% } %>
+        <% if ("acaoInvalida".equals(request.getParameter("erro"))) { %><div class="aviso erro" role="alert">Ação inválida.</div><% } %>
+        <% if ("operacao".equals(request.getParameter("erro"))) { %><div class="aviso erro" role="alert">Não foi possível concluir a operação do cooperado.</div><% } %>
         <div class="topo">
             <div>
                 <h1>Cooperados</h1>
@@ -149,5 +154,6 @@
         semResultado.style.display = (achou === 0 && linhas.length > 0) ? '' : 'none';
     });
 </script>
+<%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>
