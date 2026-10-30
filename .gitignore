@@ -44,4 +44,4 @@ build/
 # Variáveis de ambiente e credenciais
 .env
 .env.*
-!.env.example
+!.env.examplesrc/main/resources/email.properties

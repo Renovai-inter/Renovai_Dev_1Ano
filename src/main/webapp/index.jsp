@@ -12,6 +12,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard | Renovaí</title>
     <link rel="stylesheet" href="${ctx}/css/renovai.css">
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
 
     <style>
         .eyebrow { margin: 0; color: var(--texto-suave); font-size: .95rem; text-transform: uppercase; }
