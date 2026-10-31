@@ -201,7 +201,7 @@
 <nav class="menu" aria-label="Menu principal">
 
     <div class="logo">
-        <a href="<%= raizMenu %>/" title="Voltar ao site">
+        <a href="https://renovai-38nc.onrender.com/" title="Voltar ao site">
             <img src="<%= raizMenu %>/img/logo-renovai.png" alt="Renovaí - Área Administrativa (voltar ao site)">
         </a>
     </div>
@@ -265,7 +265,7 @@
         <span>Negociações</span>
     </a>
 
-    <a href="<%= raizMenu %>/" class="voltar-site">
+    <a href="https://renovai-38nc.onrender.com/" class="voltar-site">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
         </svg>
@@ -284,4 +284,3 @@
         </div>
     </div>
 </nav>
- 
