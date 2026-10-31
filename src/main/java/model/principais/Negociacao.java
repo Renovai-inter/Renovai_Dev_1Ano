@@ -154,6 +154,9 @@ public class Negociacao {
         if (status == null) {
             return "";
         }
+        if ("EM_NEGOCIACAO".equals(status)) {
+            return "Em negociação";
+        }
         String texto = status.replace('_', ' ').trim();
         if (!texto.isEmpty() && texto.equals(texto.toUpperCase())) {
             texto = texto.substring(0, 1) + texto.substring(1).toLowerCase();

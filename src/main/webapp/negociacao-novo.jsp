@@ -37,7 +37,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Nova negociação</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=12">]<link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=12"><link rel="shortcut icon" href="${pageContext.request.contextPath}/images/Nimo.svg" type="image/svg+xml">
 
     <style>
         /* Visual da tela Nova negociacao (fica aqui para funcionar mesmo com o estilo.css desatualizado) */

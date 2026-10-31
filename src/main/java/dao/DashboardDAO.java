@@ -25,7 +25,7 @@ public class DashboardDAO {
     }
 
     public int contarNegociacoesEmAndamento() {
-        return contar("SELECT COUNT(*) FROM negociacao WHERE status = 'EM_ANDAMENTO'");
+        return contar("SELECT COUNT(*) FROM negociacao WHERE status IN ('AGUARDANDO_RESPOSTA', 'EM_NEGOCIACAO')");
     }
 
     // === DISTRIBUIÇÃO DOS MATERIAIS (kg por categoria, coletas não canceladas) ===

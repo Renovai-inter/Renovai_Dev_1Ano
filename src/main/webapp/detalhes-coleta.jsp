@@ -199,7 +199,7 @@
 
         <!-- ===== MATERIAIS ===== -->
         <section class="card">
-            <h2>Materiais por módulo</h2>
+            <h2>Materiais da coleta</h2>
 
             <c:choose>
                 <c:when test="${empty materiais}">

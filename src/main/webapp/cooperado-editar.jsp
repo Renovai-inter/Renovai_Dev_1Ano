@@ -177,9 +177,8 @@
                     <div class="campo">
                         <label for="cargo">Cargo</label>
                         <select id="cargo" name="cargo">
-                            <option value="" <%= c.getCargoEnum() == null ? "selected" : "" %>>Selecione o cargo</option>
-                            <% for (String cg : cargos) { %>
-                                <option value="<%= esc(cg) %>" <%= c.getCargoEnum() != null && cg.equals(c.getCargoEnum().name()) ? "selected" : "" %>><%= esc(rotulo(cg)) %></option>
+                                                        <% for (String cg : cargos) { %>
+                                <option value="<%= esc(cg) %>" <%= (c.getCargoEnum() == null ? "COOPERADO".equals(cg) : cg.equals(c.getCargoEnum().name())) ? "selected" : "" %>><%= esc(rotulo(cg)) %></option>
                             <% } %>
                         </select>
                     </div>

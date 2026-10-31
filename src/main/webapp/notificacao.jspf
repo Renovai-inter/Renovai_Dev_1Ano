@@ -231,7 +231,7 @@
     // =====================================================================================
 
     var MENSAGENS = {
-        nova:        ['Nova negociação cadastrada!', 'Acesse a tela Negociações para visualizar a lista de negociações cadastrados.'],
+        nova:        ['Nova negociação cadastrada!', 'Acesse a tela Negociações para visualizar a lista de negociações cadastradas.'],
         atualizada:  ['Negociação atualizada!', 'As informações da negociação foram atualizadas com sucesso.'],
         cancelada:   ['Negociação cancelada!', 'A negociação foi cancelada com sucesso e não estará mais disponível para as operações do sistema.'],
         excluida:    ['Negociação excluída!', 'A negociação foi excluída com sucesso do sistema.'],
