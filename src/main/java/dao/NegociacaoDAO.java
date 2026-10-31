@@ -424,31 +424,25 @@ public class NegociacaoDAO {
 
     // Exclui as propostas e a negociacao, desvinculando as vendas existentes.
 
+    // Exclui a negociação, apaga as propostas e solta a venda em comandos separados, sem transação: uma falha no
+    // meio pode deixar gravações anteriores no banco.
     public int excluirNegociacao(Negociacao negociacao) {
 
         Connection conexao = conn.conectar();
 
-        try {
+        try (PreparedStatement pst0 = conexao.prepareStatement("UPDATE venda SET id_negociacao = NULL WHERE id_negociacao = ?");
+             PreparedStatement pst1 = conexao.prepareStatement("DELETE FROM proposta WHERE id_negociacao = ?");
+             PreparedStatement pst2 = conexao.prepareStatement("DELETE FROM negociacao WHERE id_negociacao = ?")) {
             if (contar(conexao, "SELECT COUNT(*) FROM negociacao WHERE id_negociacao = ?", negociacao.getIdNegociacao()) == 0) {
                 return 0;
             }
-
-            conexao.setAutoCommit(false);
-            try (PreparedStatement pst0 = conexao.prepareStatement("UPDATE venda SET id_negociacao = NULL WHERE id_negociacao = ?");
-                 PreparedStatement pst1 = conexao.prepareStatement("DELETE FROM proposta WHERE id_negociacao = ?");
-                 PreparedStatement pst2 = conexao.prepareStatement("DELETE FROM negociacao WHERE id_negociacao = ?")) {
-                pst0.setLong(1, negociacao.getIdNegociacao());
-                int linhas = pst0.executeUpdate();
-                pst1.setLong(1, negociacao.getIdNegociacao());
-                linhas += pst1.executeUpdate();
-                pst2.setLong(1, negociacao.getIdNegociacao());
-                linhas += pst2.executeUpdate();
-                conexao.commit();
-                return linhas;
-            } catch (SQLException | RuntimeException e) {
-                conexao.rollback();
-                throw e;
-            }
+            pst0.setLong(1, negociacao.getIdNegociacao());
+            int linhas = pst0.executeUpdate();
+            pst1.setLong(1, negociacao.getIdNegociacao());
+            linhas += pst1.executeUpdate();
+            pst2.setLong(1, negociacao.getIdNegociacao());
+            linhas += pst2.executeUpdate();
+            return linhas;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
