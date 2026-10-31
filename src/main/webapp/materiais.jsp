@@ -207,8 +207,8 @@
 
         <section class="painel">
             <div class="filtros">
-                <input type="search" id="busca" placeholder="Buscar material..." aria-label="Buscar material">
-                <select id="filtroCategoria" aria-label="Filtrar por categoria">
+                <input type="search" id="busca" data-busca="#tabelaMateriais" data-busca-filtros="#filtroCategoria" autocomplete="off" placeholder="Buscar material..." aria-label="Buscar material">
+                <select id="filtroCategoria" data-filtra="categoria" aria-label="Filtrar por categoria">
                     <option value="">Todas as categorias</option>
                     <option>PAPEIS</option>
                     <option>PLASTICOS</option>
@@ -255,7 +255,6 @@
             <c:if test="${empty materiais}">
                 <p class="vazio">Nenhum material cadastrado ainda. Clique em “Novo material” para adicionar o primeiro.</p>
             </c:if>
-            <p class="vazio" id="semResultado" hidden>Nenhum material encontrado para essa busca.</p>
         </section>
     </main>
 </div>
@@ -359,30 +358,8 @@
     document.querySelectorAll("[data-fechar]").forEach((el) => {
         el.addEventListener("click", () => el.closest("dialog").close());
     });
-
-    // Busca por nome + filtro por categoria (no navegador)
-    const busca = $("busca");
-    const filtro = $("filtroCategoria");
-    const linhas = document.querySelectorAll("#tabelaMateriais tr");
-
-    function filtrar() {
-        const termo = busca.value.trim().toLowerCase();
-        const categoria = filtro.value;
-        let visiveis = 0;
-
-        linhas.forEach((tr) => {
-            const okNome = tr.dataset.nome.toLowerCase().includes(termo);
-            const okCat = !categoria || tr.dataset.categoria === categoria;
-            tr.hidden = !(okNome && okCat);
-            if (!tr.hidden) visiveis++;
-        });
-
-        $("semResultado").hidden = !(linhas.length > 0 && visiveis === 0);
-    }
-
-    busca.addEventListener("input", filtrar);
-    filtro.addEventListener("change", filtrar);
 </script>
+<script src="${pageContext.request.contextPath}/js/busca-ao-vivo.js?v=1"></script>
 <%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

@@ -99,7 +99,18 @@ public class CooperativaDAO {
         }
         coop.setIdCooperativa(novoId);
         gestor.setIdCooperativa(novoId);
-        int linhasGestor = cooperadoDAO.cadastrarGestor(gestor);
+        int linhasGestor;
+        try {
+            linhasGestor = cooperadoDAO.cadastrarGestor(gestor);
+        } catch (RuntimeException e) {
+            // O gestor falhou (ex.: e-mail já cadastrado): desfaz a cooperativa para não deixá-la sem gestor.
+            try {
+                excluirCooperativa(coop);
+            } catch (RuntimeException ignorada) {
+                e.addSuppressed(ignorada);
+            }
+            throw e;
+        }
         if (linhasGestor == 0) {
             excluirCooperativa(coop);
             return 0;
@@ -315,6 +326,34 @@ public class CooperativaDAO {
             return pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao atualizar cooperativa.", e);
+        } finally {
+            conn.desconectar(conexao);
+        }
+    }
+
+    // Altera o status da cooperativa (ATIVA ou INATIVA); devolve 0 se o ID não existir.
+    public int alterarStatus(Cooperativa coop) {
+
+        // Declaração
+
+        if (coop == null || coop.getIdCooperativa() == null || coop.getIdCooperativa() <= 0
+                || coop.getStatus() == null) {
+            throw new IllegalArgumentException("idCooperativa e status devem ser informados.");
+        }
+        Connection conexao = conn.conectar();
+
+        // Comando SQL
+
+        String sql = "UPDATE cooperativa SET status = ? WHERE id_cooperativa = ?";
+
+        // Executar PreparedStatement
+
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setString(1, coop.getStatus().name());
+            pstmt.setLong(2, coop.getIdCooperativa());
+            return pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Falha ao alterar o status da cooperativa.", e);
         } finally {
             conn.desconectar(conexao);
         }

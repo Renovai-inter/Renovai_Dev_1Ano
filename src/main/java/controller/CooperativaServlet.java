@@ -8,11 +8,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import dao.ColetaDAO;
+import dao.NegociacaoDAO;
+import model.enums.StatusCooperativa;
+import model.principais.Coleta;
 import model.principais.Cooperado;
 import model.principais.Cooperativa;
+import model.principais.Negociacao;
 import util.SenhaAPI;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 @WebServlet("/cooperativa")
@@ -26,6 +32,8 @@ public class CooperativaServlet extends HttpServlet {
 
     private final CooperativaDAO dao = new CooperativaDAO();
     private final CooperadoDAO cooperadoDAO = new CooperadoDAO();
+    private final ColetaDAO coletaDAO = new ColetaDAO();
+    private final NegociacaoDAO negociacaoDAO = new NegociacaoDAO();
 
     // Abre a lista, o formulário de cadastro ou o detalhe da cooperativa, aplicando o filtro informado.
     @Override
@@ -129,6 +137,10 @@ public class CooperativaServlet extends HttpServlet {
             atualizar(request, response);
         } else if ("excluir".equals(acao)) {
             excluir(request, response);
+        } else if ("inativar".equals(acao)) {
+            alterarStatus(request, response, StatusCooperativa.INATIVA);
+        } else if ("reativar".equals(acao)) {
+            alterarStatus(request, response, StatusCooperativa.ATIVA);
         } else {
             redirecionar(request, response, "erro", "Ação inválida.");
         }
@@ -183,6 +195,11 @@ public class CooperativaServlet extends HttpServlet {
         } catch (IllegalArgumentException e) {
             reabrirFormulario(request, response, null, e.getMessage());
         } catch (RuntimeException e) {
+            if (violacao(e, "23505")) {
+                reabrirFormulario(request, response, null,
+                        "Já existe cadastro com este CNPJ, e-mail ou nome de usuário.");
+                return;
+            }
             throw new ServletException("Erro ao cadastrar a cooperativa.", e);
         }
     }
@@ -234,11 +251,15 @@ public class CooperativaServlet extends HttpServlet {
         } catch (IllegalArgumentException e) {
             reabrirFormulario(request, response, id, e.getMessage());
         } catch (RuntimeException e) {
+            if (violacao(e, "23505")) {
+                reabrirFormulario(request, response, id, "Já existe outra cooperativa com este CNPJ.");
+                return;
+            }
             throw new ServletException("Erro ao atualizar a cooperativa.", e);
         }
     }
 
-    // Exclui a cooperativa identificada pelo ID enviado.
+    // Exclui a cooperativa identificada pelo ID enviado, desde que não tenha registros vinculados.
     private void excluir(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
@@ -256,8 +277,19 @@ public class CooperativaServlet extends HttpServlet {
         try {
             // Processamento da ação
 
-            Cooperativa coop = new Cooperativa();
-            coop.setIdCooperativa(id);
+            Cooperativa filtro = new Cooperativa();
+            filtro.setIdCooperativa(id);
+            Cooperativa coop = dao.buscarPorId(filtro);
+            if (coop == null) {
+                redirecionar(request, response, "erro", "Cooperativa não encontrada.");
+                return;
+            }
+            String vinculos = descreverVinculos(coop);
+            if (vinculos != null) {
+                redirecionar(request, response, "erro", "Não é possível excluir: a cooperativa tem "
+                        + vinculos + ". Inative a cooperativa ou remova esses registros antes.");
+                return;
+            }
             int linhas = dao.excluirCooperativa(coop);
 
             // Encaminhamento
@@ -268,8 +300,85 @@ public class CooperativaServlet extends HttpServlet {
                 redirecionar(request, response, "erro", "Cooperativa não encontrada.");
             }
         } catch (RuntimeException e) {
+            if (violacao(e, "23503")) {
+                redirecionar(request, response, "erro",
+                        "Não é possível excluir: ainda existem registros vinculados a esta cooperativa. Inative-a.");
+                return;
+            }
             throw new ServletException("Erro ao excluir a cooperativa.", e);
         }
+    }
+
+    // Inativa ou reativa a cooperativa, mantendo todo o histórico.
+    private void alterarStatus(HttpServletRequest request, HttpServletResponse response,
+                               StatusCooperativa novoStatus) throws ServletException, IOException {
+
+        // Leitura da requisição
+
+        long id = lerId(request);
+
+        // Validação dos dados
+
+        if (id <= 0L) {
+            redirecionar(request, response, "erro", "Cooperativa inválida.");
+            return;
+        }
+
+        try {
+            // Processamento da ação
+
+            Cooperativa coop = new Cooperativa();
+            coop.setIdCooperativa(id);
+            coop.setStatus(novoStatus);
+            int linhas = dao.alterarStatus(coop);
+
+            // Encaminhamento
+
+            if (linhas > 0) {
+                redirecionar(request, response, "mensagem", novoStatus == StatusCooperativa.INATIVA
+                        ? "Cooperativa inativada com sucesso." : "Cooperativa reativada com sucesso.");
+            } else {
+                redirecionar(request, response, "erro", "Cooperativa não encontrada.");
+            }
+        } catch (RuntimeException e) {
+            throw new ServletException("Erro ao alterar o status da cooperativa.", e);
+        }
+    }
+
+    // Resume os registros vinculados (ex.: "4 cooperados, 10 coletas"); devolve null se não houver nenhum.
+    private String descreverVinculos(Cooperativa coop) {
+        int[] totais = {
+                coop.getRelacionamentos().getQtdCooperados(),
+                dao.contarRelacionados("rota", coop),
+                dao.contarRelacionados("coleta", coop),
+                dao.contarRelacionados("negociacao", coop)
+        };
+        String[][] nomes = {{"cooperado", "cooperados"}, {"rota", "rotas"},
+                {"coleta", "coletas"}, {"negociação", "negociações"}};
+        ArrayList<String> partes = new ArrayList<>();
+        for (int i = 0; i < totais.length; i++) {
+            if (totais[i] > 0) {
+                partes.add(totais[i] + " " + (totais[i] == 1 ? nomes[i][0] : nomes[i][1]));
+            }
+        }
+        if (partes.isEmpty()) {
+            return null;
+        }
+        if (partes.size() == 1) {
+            return partes.get(0);
+        }
+        return String.join(", ", partes.subList(0, partes.size() - 1)) + " e " + partes.get(partes.size() - 1);
+    }
+
+    // Informa se a falha veio de uma violação do banco com o código SQLState indicado (23505 = duplicado,
+    // 23503 = registro ainda referenciado).
+    private boolean violacao(Throwable erro, String sqlState) {
+        for (Throwable atual = erro; atual != null; atual = atual.getCause()) {
+            if (atual instanceof SQLException && sqlState.equals(((SQLException) atual).getSQLState())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Preenche a cooperativa pelos setters; na atualização, aplica apenas os campos enviados.
@@ -359,10 +468,25 @@ public class CooperativaServlet extends HttpServlet {
                 }
             }
 
+            ArrayList<Coleta> coletas = new ArrayList<>();
+            for (Coleta coleta : coletaDAO.listarColetas()) {
+                if (coop.getIdCooperativa().equals(coleta.getRelacionamentos().getIdCooperativa())) {
+                    coletas.add(coleta);
+                }
+            }
+            ArrayList<Negociacao> negociacoes = new ArrayList<>();
+            for (Negociacao negociacao : negociacaoDAO.listarNegociacoes(null)) {
+                if (coop.getIdCooperativa().equals(negociacao.getIdCooperativa())) {
+                    negociacoes.add(negociacao);
+                }
+            }
+
             // Preparação da resposta
 
             request.setAttribute("cooperativa", coop);
             request.setAttribute("cooperados", membros);
+            request.setAttribute("coletas", coletas);
+            request.setAttribute("negociacoes", negociacoes);
             request.setAttribute("totalRotas", dao.contarRelacionados("rota", coop));
             request.setAttribute("totalColetas", dao.contarRelacionados("coleta", coop));
             request.setAttribute("totalNegociacoes", dao.contarRelacionados("negociacao", coop));

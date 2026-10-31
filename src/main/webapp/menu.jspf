@@ -55,6 +55,9 @@
         transition: background .15s;
     }
     .layout > .menu a svg { width: 24px; height: 24px; flex-shrink: 0; }
+    .layout > .menu a span { display: inline; }
+    .layout > .menu .logo { justify-content: flex-start; }
+    .layout > .menu .usuario div { display: block; }
     .layout > .menu a:hover { background: rgba(255, 255, 255, .15); }
     .layout > .menu a.ativo { background: #b3cca9; color: #2f4d33; font-weight: 500; }
     .layout > .menu a:focus-visible { outline: 3px solid #f0c24b; outline-offset: 2px; }
@@ -84,25 +87,58 @@
     .layout > .menu .usuario b { display: block; font-size: 15px; font-weight: 600; color: #fff; }
     .layout > .menu .usuario small { display: block; font-size: 12px; color: rgba(255, 255, 255, .85); }
 
-    /* Telas estreitas: o menu deixa de ser fixo e vira uma faixa no topo */
+    /* ===== RESPONSIVIDADE =====
+       Em qualquer largura o conteúdo pode encolher (min-width: 0), então uma tabela larga
+       rola dentro do próprio cartão em vez de esticar a página inteira. */
+    .layout > main,
+    .layout > .conteudo { min-width: 0; max-width: 100%; }
+
+    /* Tablet e celular: o menu deixa de ser lateral e vira uma barra no topo,
+       com os itens rolando para o lado quando não cabem. */
     @media (max-width: 820px) {
-        .layout { flex-direction: column; padding-left: 0; }
+        .layout { flex-direction: column; align-items: stretch; padding-left: 0; }
+        .layout > main,
+        .layout > .conteudo { width: 100%; }
         .layout > .conteudo { padding-left: 16px; padding-right: 16px; }
+
         .layout > .menu {
-            position: static;
+            position: sticky;
+            top: 0;
+            bottom: auto;
             width: 100%;
             height: auto;
             flex-direction: row;
-            flex-wrap: wrap;
             align-items: center;
             gap: 4px;
-            padding: 12px 16px;
+            padding: 10px 12px;
             border-radius: 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
         }
-        .layout > .menu .logo { margin: 0 12px 0 0; width: 100%; }
-        .layout > .menu a { margin: 0; padding: 8px 12px; font-size: 14px; }
+        .layout > .menu::-webkit-scrollbar { display: none; }
+        .layout > .menu .logo { flex: 0 0 auto; margin: 0 12px 0 0; }
+        .layout > .menu .logo img { width: 110px; }
+        .layout > .menu a { flex: 0 0 auto; margin: 0; padding: 8px 12px; font-size: 14px; gap: 8px; }
         .layout > .menu a svg { width: 18px; height: 18px; }
         .layout > .menu .usuario { display: none; }
+
+        /* Tabelas de listagem: as colunas não quebram o texto, a tabela rola para o lado */
+        .tabela th, .tabela td,
+        .coop-table th, .coop-table td,
+        .painel table th, .painel table td { white-space: nowrap; }
+        .painel { overflow-x: auto; }
+        .coop-table { min-width: 560px; }
+    }
+
+    /* Celular */
+    @media (max-width: 480px) {
+        .layout > main,
+        .layout > .conteudo { padding-left: 14px; padding-right: 14px; }
+        .cartao, .pagina-v2 .cartao, .coop-card, .card, .painel-dash { padding: 18px 16px; border-radius: 16px; }
+        .layout h1 { font-size: 1.7rem; }
+        .pagina-v2 .topo h1, .coop-top h1, .topo h1 { font-size: 1.7rem; }
     }
 </style>
 

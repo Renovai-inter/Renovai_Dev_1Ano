@@ -34,11 +34,19 @@ private String campo(jakarta.servlet.http.HttpServletRequest request, String nom
                 <% Cooperativa cooperativa = (Cooperativa) request.getAttribute("cooperativa"); boolean edicao = cooperativa != null; %>
                 <header class="coop-top">
                     <div>
-                        <h1><%= edicao ? "Editar cooperativa" : "Nova cooperativa" %></h1>
+                        <h1><%= edicao ? "Editar " + h(cooperativa.getNome()) : "Nova cooperativa" %></h1>
                         <p>
-                        <a href="cooperativa">‹ Voltar para cooperativas</a>
+                        <a href="<%= edicao ? "cooperativa?pagina=detalhe&id=" + cooperativa.getIdCooperativa() : "cooperativa" %>">‹ Voltar para <%= edicao ? "a cooperativa" : "cooperativas" %></a>
                     </p>
                 </div>
+                <% if (edicao) { %>
+                <div class="coop-actions">
+                    <button class="coop-btn" type="submit" form="formCooperativa">Salvar</button>
+                    <button class="coop-btn danger" type="button" data-id="<%= cooperativa.getIdCooperativa() %>"
+                            data-nome="<%= h(cooperativa.getNome()) %>" data-status="<%= h(cooperativa.getStatus()) %>"
+                            onclick="abrirExcluirCoop(this)">Excluir</button>
+                </div>
+                <% } %>
             </header>
             <% if(request.getAttribute("erro")!=null){ %>
             <div class="coop-alert erro">
@@ -50,7 +58,7 @@ private String campo(jakarta.servlet.http.HttpServletRequest request, String nom
                 <%=h(request.getAttribute("mensagem"))%>
             </div>
             <% } %>
-            <form action="cooperativa" method="post">
+            <form id="formCooperativa" action="cooperativa" method="post">
                 <input type="hidden" name="acao" value="<%= edicao ? "atualizar" : "cadastrar" %>">
                 <% if (edicao) { %><input type="hidden" name="id_cooperativa" value="<%= cooperativa.getIdCooperativa() %>"><% } %>
                 <section class="coop-card">
@@ -82,7 +90,7 @@ private String campo(jakarta.servlet.http.HttpServletRequest request, String nom
             </section>
             <% if (!edicao) { %><section class="coop-card">
                 <h3>Gestor responsável</h3>
-                <p class="coop-info">Informe os dados do gestor que terá acesso à cooperativa.</p>
+                <p class="coop-info">Ao salvar, o sistema cria a cooperativa e o cooperado com o cargo Gestor, gerando usuário e senha temporária.</p>
                 <div class="coop-grid">
                     <label>Nome completo *<input type="text" name="gestor_nome_completo" value="<%= campo(request, "gestor_nome_completo", null) %>" required>
                     </label>
@@ -96,7 +104,7 @@ private String campo(jakarta.servlet.http.HttpServletRequest request, String nom
             </section>
             <% } %>
             <div class="coop-actions">
-                <a class="coop-btn claro" href="cooperativa">Cancelar</a>
+                <a class="coop-btn claro" href="<%= edicao ? "cooperativa?pagina=detalhe&id=" + cooperativa.getIdCooperativa() : "cooperativa" %>">Cancelar</a>
                 <button class="coop-btn" type="submit"><%= edicao ? "Salvar alterações" : "Confirmar" %></button>
             </div>
         </form>
@@ -106,6 +114,7 @@ private String campo(jakarta.servlet.http.HttpServletRequest request, String nom
         </script><% } %>
     </main>
 </div>
+<% if (edicao) { %><%@ include file="/cooperativa-modal-excluir.jspf" %><% } %>
 <%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>
