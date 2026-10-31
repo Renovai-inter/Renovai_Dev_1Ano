@@ -85,6 +85,15 @@ private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd
                                         <a class="coop-icone-btn editar" title="Editar cooperativa" aria-label="Editar <%= h(c.getNome()) %>" href="cooperativa?pagina=editar&id=<%= c.getIdCooperativa() %>">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                         </a>
+                                        <% if ("INATIVA".equals(status)) { %>
+                                        <form method="post" action="cooperativa" style="display:inline">
+                                            <input type="hidden" name="acao" value="reativar">
+                                            <input type="hidden" name="id_cooperativa" value="<%= c.getIdCooperativa() %>">
+                                            <button type="submit" class="coop-icone-btn reativar" title="Reativar cooperativa" aria-label="Reativar <%= h(c.getNome()) %>">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+                                            </button>
+                                        </form>
+                                        <% } %>
                                         <button type="button" class="coop-icone-btn excluir" title="Excluir cooperativa" aria-label="Excluir <%= h(c.getNome()) %>"
                                                 data-id="<%= c.getIdCooperativa() %>" data-nome="<%= h(c.getNome()) %>" data-status="<%= h(status) %>"
                                                 onclick="abrirExcluirCoop(this)">
@@ -100,7 +109,7 @@ private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd
             </main>
         </div>
         <%@ include file="/cooperativa-modal-excluir.jspf" %>
-        <script src="${pageContext.request.contextPath}/scripts/busca-ao-vivo.js?v=1"></script>
+        <script src="${pageContext.request.contextPath}/scripts/busca-ao-vivo.js?v=2"></script>
         <%@ include file="/operacao-ui.jspf" %>
     </body>
 </html>

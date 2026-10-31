@@ -163,6 +163,8 @@ main.conteudo.coop-conteudo {
 }
 .coop-icone-btn.editar { color: #8bb08a; }
 .coop-icone-btn.editar:hover { background: #f1f0ec; color: #4d8a57; }
+.coop-icone-btn.reativar { color: #4d8a57; }
+.coop-icone-btn.reativar:hover { background: #eef4ec; }
 .coop-icone-btn.excluir { color: #8a2450; }
 .coop-icone-btn.excluir:hover { background: #f6e6ec; }
 .coop-icone-btn:focus-visible { outline: 3px solid #f0c24b; outline-offset: 2px; }
