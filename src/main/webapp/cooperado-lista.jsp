@@ -124,7 +124,7 @@
     </div>
 
 </div>
-<script src="${pageContext.request.contextPath}/scripts/busca-ao-vivo.js?v=1"></script>
+<script src="${pageContext.request.contextPath}/scripts/busca-ao-vivo.js?v=2"></script>
 <%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>
