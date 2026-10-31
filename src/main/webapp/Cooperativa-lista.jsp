@@ -68,7 +68,7 @@ private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd
                                 <% } else { for (Cooperativa c : itens) {
                                        String status = String.valueOf(c.getStatus());
                                 %>
-                                <tr>
+                                <tr class="coop-linha-link" onclick="location.href='cooperativa?pagina=detalhe&id=<%= c.getIdCooperativa() %>'">
                                     <td>
                                         <a class="coop-name" href="cooperativa?pagina=detalhe&id=<%= c.getIdCooperativa() %>">
                                             <span class="coop-avatar" aria-hidden="true">
@@ -82,11 +82,11 @@ private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd
                                     <td><%= c.getRelacionamentos().getQtdCooperados() %></td>
                                     <td><%= c.getDataCadastro() == null ? "—" : c.getDataCadastro().format(DATA_BR) %></td>
                                     <td class="coop-acoes">
-                                        <a class="coop-icone-btn editar" title="Editar cooperativa" aria-label="Editar <%= h(c.getNome()) %>" href="cooperativa?pagina=editar&id=<%= c.getIdCooperativa() %>">
+                                        <a class="coop-icone-btn editar" title="Editar cooperativa" aria-label="Editar <%= h(c.getNome()) %>" href="cooperativa?pagina=editar&id=<%= c.getIdCooperativa() %>" onclick="event.stopPropagation()">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
                                         </a>
                                         <% if ("INATIVA".equals(status)) { %>
-                                        <form method="post" action="cooperativa" style="display:inline">
+                                        <form method="post" action="cooperativa" style="display:inline" onclick="event.stopPropagation()">
                                             <input type="hidden" name="acao" value="reativar">
                                             <input type="hidden" name="id_cooperativa" value="<%= c.getIdCooperativa() %>">
                                             <button type="submit" class="coop-icone-btn reativar" title="Reativar cooperativa" aria-label="Reativar <%= h(c.getNome()) %>">
@@ -96,7 +96,7 @@ private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd
                                         <% } %>
                                         <button type="button" class="coop-icone-btn excluir" title="Excluir cooperativa" aria-label="Excluir <%= h(c.getNome()) %>"
                                                 data-id="<%= c.getIdCooperativa() %>" data-nome="<%= h(c.getNome()) %>" data-status="<%= h(status) %>"
-                                                onclick="abrirExcluirCoop(this)">
+                                                onclick="event.stopPropagation(); abrirExcluirCoop(this)">
                                             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
                                         </button>
                                     </td>
