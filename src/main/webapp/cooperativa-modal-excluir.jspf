@@ -1,0 +1,58 @@
+<%@ page pageEncoding="UTF-8" %>
+<%-- Modal de exclusão de cooperativa, usado na lista, no detalhe e na edição.
+     Abra com: abrirExcluirCoop(botao), onde o botão tem data-id, data-nome e data-status. --%>
+<dialog id="excluirCoop" class="coop-modal" aria-labelledby="excluirCoopTitulo">
+    <form method="post" action="${pageContext.request.contextPath}/cooperativa">
+        <input type="hidden" name="id_cooperativa" value="">
+
+        <h3 id="excluirCoopTitulo">Excluir cooperativa</h3>
+        <p>Revise o impacto antes de confirmar a ação sobre "<b data-nome></b>".</p>
+
+        <label class="coop-opcao" id="opcaoInativar">
+            <input type="radio" name="acao" value="inativar" checked>
+            <span>
+                <b>Inativar cooperativa</b>
+                Recomendado: mantém cooperados, coletas e negociações no histórico.
+            </span>
+        </label>
+        <label class="coop-opcao perigo">
+            <input type="radio" name="acao" value="excluir">
+            <span>
+                <b>Excluir permanentemente</b>
+                Ação irreversível. Só é possível se não houver cooperados, rotas, coletas ou negociações vinculados.
+            </span>
+        </label>
+
+        <div class="coop-actions">
+            <button type="button" class="coop-btn claro" data-fechar>Cancelar</button>
+            <button type="submit" class="coop-btn danger" data-confirmar>Inativar</button>
+        </div>
+    </form>
+</dialog>
+<script>
+    (function () {
+        var dialogo = document.getElementById('excluirCoop');
+        var confirmar = dialogo.querySelector('[data-confirmar]');
+        var inativar = dialogo.querySelector('input[value="inativar"]');
+        var excluir = dialogo.querySelector('input[value="excluir"]');
+
+        function atualizarBotao() {
+            confirmar.textContent = excluir.checked ? 'Excluir' : 'Inativar';
+        }
+        inativar.addEventListener('change', atualizarBotao);
+        excluir.addEventListener('change', atualizarBotao);
+        dialogo.querySelector('[data-fechar]').addEventListener('click', function () { dialogo.close(); });
+
+        window.abrirExcluirCoop = function (botao) {
+            dialogo.querySelector('[name="id_cooperativa"]').value = botao.dataset.id;
+            dialogo.querySelector('[data-nome]').textContent = botao.dataset.nome;
+            // Cooperativa já inativa: só resta a exclusão permanente
+            var jaInativa = botao.dataset.status === 'INATIVA';
+            inativar.disabled = jaInativa;
+            document.getElementById('opcaoInativar').style.opacity = jaInativa ? '.5' : '';
+            (jaInativa ? excluir : inativar).checked = true;
+            atualizarBotao();
+            dialogo.showModal();
+        };
+    })();
+</script>

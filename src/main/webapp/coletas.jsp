@@ -258,7 +258,7 @@
 
         <section class="painel">
             <div class="filtros">
-                <input type="search" id="busca" placeholder="Buscar por nome ou código..." aria-label="Buscar coleta">
+                <input type="search" id="busca" data-busca="#tabelaColetas" autocomplete="off" placeholder="Buscar por código, cooperativa, responsável..." aria-label="Buscar coleta">
             </div>
 
             <div class="tabela-rolavel">
@@ -354,7 +354,6 @@
             <c:if test="${empty coletas}">
                 <p class="vazio">Nenhuma coleta cadastrada ainda. Clique em “Nova coleta” para registrar a primeira.</p>
             </c:if>
-            <p class="vazio" id="semResultado" hidden>Nenhuma coleta encontrada para essa busca.</p>
         </section>
     </main>
 </div>
@@ -428,23 +427,8 @@
     document.querySelectorAll("[data-fechar]").forEach((el) => {
         el.addEventListener("click", () => el.closest("dialog").close());
     });
-
-    // Busca por código, cooperativa, responsável etc.
-    const busca = $("busca");
-    const linhas = document.querySelectorAll("#tabelaColetas tr");
-
-    busca.addEventListener("input", () => {
-        const termo = busca.value.trim().toLowerCase();
-        let visiveis = 0;
-
-        linhas.forEach((tr) => {
-            tr.hidden = !tr.textContent.toLowerCase().includes(termo);
-            if (!tr.hidden) visiveis++;
-        });
-
-        $("semResultado").hidden = !(linhas.length > 0 && visiveis === 0);
-    });
 </script>
+<script src="${pageContext.request.contextPath}/js/busca-ao-vivo.js?v=1"></script>
 <%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>

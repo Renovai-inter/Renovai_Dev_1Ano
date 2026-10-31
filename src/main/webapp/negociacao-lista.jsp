@@ -67,11 +67,11 @@
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
                 </svg>
-                <input class="busca" type="text" id="busca" placeholder="Buscar por código..." autocomplete="off">
+                <input class="busca" type="text" id="busca" data-busca="#tabelaNegociacoes" placeholder="Buscar por código, cooperativa, empresa ou material..." autocomplete="off" aria-label="Buscar negociação">
             </div>
 
             <div class="tabela-rolagem">
-            <table class="tabela tabela-negociacoes">
+            <table class="tabela tabela-negociacoes" id="tabelaNegociacoes">
                 <thead>
                     <tr>
                         <th>Código</th>
@@ -116,50 +116,13 @@
                             </td>
                         </tr>
                     <% } } %>
-                    <tr id="semResultado" class="sem-dados" style="display:none">
-                        <td colspan="9">Nenhuma negociação encontrada.</td>
-                    </tr>
                 </tbody>
             </table>
             </div>
         </div>
     </div>
 </div>
-<script>
-    // Tira acentos e deixa minusculo, para a busca nao depender de maiusculas/acentos
-    function normalizar(texto) {
-        return texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    }
-
-    var campoBusca = document.getElementById('busca');
-    var linhas = document.querySelectorAll('.linha-cooperado');
-    var semResultado = document.getElementById('semResultado');
-
-    // Roda a cada letra ou numero digitado
-    campoBusca.addEventListener('input', function () {
-
-        var digitado = normalizar(this.value.trim());
-
-        // escapa caracteres especiais para nao quebrar a expressao regular
-        var padrao = new RegExp(digitado.replace(/[.*+?^$()|\[\]\\{}]/g, '\\$&'));
-
-        var achou = 0;
-
-        linhas.forEach(function (linha) {
-            // procura no codigo (coluna 1)
-            var texto = normalizar(linha.cells[0].textContent);
-
-            if (padrao.test(texto)) {
-                linha.style.display = '';
-                achou++;
-            } else {
-                linha.style.display = 'none';
-            }
-        });
-
-        semResultado.style.display = (achou === 0 && linhas.length > 0) ? '' : 'none';
-    });
-</script>
+<script src="${pageContext.request.contextPath}/js/busca-ao-vivo.js?v=1"></script>
 <%@ include file="notificacao.jspf" %>
 </body>
 </html>
