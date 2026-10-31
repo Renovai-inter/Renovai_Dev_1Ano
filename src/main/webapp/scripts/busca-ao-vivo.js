@@ -109,7 +109,7 @@
 
         function aplicar() {
             var bruto = campo.value.trim();
-            var termos = normalizar(bruto).split(/\s+/).filter(Boolean);
+            var termos = normalizar(bruto).split(/\s+/).filter(function (t) { return /[a-z0-9]/.test(t); });
             var filtrando = termos.length > 0;
             var visiveis = 0;
 

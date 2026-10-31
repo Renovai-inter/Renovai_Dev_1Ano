@@ -198,6 +198,9 @@ public class ColetaServlet extends HttpServlet {
                 String data = request.getParameter("dataAgendada");
                 coleta.setDataAgendada(data == null || data.isBlank() ? null : LocalDate.parse(data));
                 coleta.setObservacoes(request.getParameter("observacoes"));
+                if (request.getParameter("pesoTotalKg") != null) {
+                    coleta.setPesoTotalKg(lerPesoInformado(request));
+                }
                 if (coleta.getTipo() == TipoColeta.ENTREGA_COOPERATIVA) {
                     coleta.setNomeLocalOrigem(request.getParameter("nomeLocalOrigem"));
                 }
@@ -366,6 +369,15 @@ public class ColetaServlet extends HttpServlet {
         mostrarErro(request, response, mensagem);
     }
 
+    // Peso total informado (campo opcional, aceita vírgula)
+    private static BigDecimal lerPesoInformado(HttpServletRequest request) {
+        String texto = request.getParameter("pesoTotalKg");
+        if (texto == null || texto.isBlank()) {
+            return null;
+        }
+        return new BigDecimal(texto.trim().replace(",", "."));
+    }
+
     private void cadastrar(HttpServletRequest request) {
         Coleta coleta = new Coleta();
 
@@ -373,6 +385,7 @@ public class ColetaServlet extends HttpServlet {
                 Long.parseLong(request.getParameter("idCooperativa")));
         coleta.setTipo(TipoColeta.valueOf(request.getParameter("tipo")));
         coleta.setStatus(StatusColeta.AGENDADA);
+        coleta.setPesoTotalKg(lerPesoInformado(request));
         coleta.setObservacoes(request.getParameter("observacoes"));
 
         String data = request.getParameter("dataAgendada");

@@ -167,13 +167,13 @@
             <!-- ===== MATERIAIS ===== -->
             <section class="card">
                 <div class="cab-secao">
-                    <h2>Materiais por módulo</h2>
+                    <h2>Materiais da coleta</h2>
                     <button type="button" class="btn btn-contorno btn-pequeno" id="btnNovoMaterial">+ Novo material</button>
                 </div>
 
                 <div class="campo peso-informado">
                     <label for="pesoInformado">Peso total informado (kg)</label>
-                    <input type="number" id="pesoInformado" min="0" step="0.01" placeholder="0">
+                    <input type="number" id="pesoInformado" name="pesoTotalKg" min="0" step="0.01" placeholder="0">
                 </div>
 
                 <div class="mat-cab" aria-hidden="true">
