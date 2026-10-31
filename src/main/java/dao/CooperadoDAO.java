@@ -584,7 +584,7 @@ public class CooperadoDAO {
 
     // Altera a permissão vinculada ao cooperado identificado.
     public int alterarPermissoesAcesso(CooperadoPermissao anterior,
-                                             CooperadoPermissao nova) {
+                                       CooperadoPermissao nova) {
 
         // Declaração
 
@@ -684,16 +684,24 @@ public class CooperadoDAO {
                 }
                 cooperado.setIdUsuario(rs.getLong("id_usuario"));
             }
-            excluir.setLong(1, cooperado.getIdCooperado());
-            int linhas = excluir.executeUpdate();
-            if (linhas == 0) {
-                return 0;
+            conexao.setAutoCommit(false);
+            try {
+                excluir.setLong(1, cooperado.getIdCooperado());
+                int linhas = excluir.executeUpdate();
+                if (linhas == 0) {
+                    conexao.rollback();
+                    return 0;
+                }
+                int linhasUsuario = usuarioDAO.excluirUsuario(conexao, cooperado.getIdUsuario());
+                if (linhasUsuario == 0) {
+                    throw new IllegalStateException("Conta do cooperado não foi excluída.");
+                }
+                conexao.commit();
+                return linhas + linhasUsuario;
+            } catch (SQLException | RuntimeException e) {
+                conexao.rollback();
+                throw e;
             }
-            int linhasUsuario = usuarioDAO.excluirUsuario(conexao, cooperado.getIdUsuario());
-            if (linhasUsuario == 0) {
-                throw new IllegalStateException("Conta do cooperado não foi excluída.");
-            }
-            return linhas + linhasUsuario;
         } catch (SQLException e) {
             throw new RuntimeException("Falha ao excluir cooperado.", e);
         } finally {

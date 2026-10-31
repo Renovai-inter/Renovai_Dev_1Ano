@@ -433,18 +433,22 @@ public class NegociacaoDAO {
                 return 0;
             }
 
-            PreparedStatement pst0 = conexao.prepareStatement("UPDATE venda SET id_negociacao = NULL WHERE id_negociacao = ?");
-            pst0.setLong(1, negociacao.getIdNegociacao());
-            int linhas = pst0.executeUpdate();
-
-            PreparedStatement pst1 = conexao.prepareStatement("DELETE FROM proposta WHERE id_negociacao = ?");
-            pst1.setLong(1, negociacao.getIdNegociacao());
-            linhas += pst1.executeUpdate();
-
-            PreparedStatement pst2 = conexao.prepareStatement("DELETE FROM negociacao WHERE id_negociacao = ?");
-            pst2.setLong(1, negociacao.getIdNegociacao());
-            linhas += pst2.executeUpdate();
-            return linhas;
+            conexao.setAutoCommit(false);
+            try (PreparedStatement pst0 = conexao.prepareStatement("UPDATE venda SET id_negociacao = NULL WHERE id_negociacao = ?");
+                 PreparedStatement pst1 = conexao.prepareStatement("DELETE FROM proposta WHERE id_negociacao = ?");
+                 PreparedStatement pst2 = conexao.prepareStatement("DELETE FROM negociacao WHERE id_negociacao = ?")) {
+                pst0.setLong(1, negociacao.getIdNegociacao());
+                int linhas = pst0.executeUpdate();
+                pst1.setLong(1, negociacao.getIdNegociacao());
+                linhas += pst1.executeUpdate();
+                pst2.setLong(1, negociacao.getIdNegociacao());
+                linhas += pst2.executeUpdate();
+                conexao.commit();
+                return linhas;
+            } catch (SQLException | RuntimeException e) {
+                conexao.rollback();
+                throw e;
+            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
