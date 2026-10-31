@@ -70,7 +70,13 @@ public class MaterialServlet extends HttpServlet {
             mostrarErro(request, response, e.getMessage());
         } catch (RuntimeException e) {
             getServletContext().log("Erro ao processar o material.", e);
-            mostrarErro(request, response, "Não foi possível concluir a operação do material.");
+            if (violacao(e, "23503")) {
+                mostrarErro(request, response, "Não é possível excluir: este material já é usado em coletas ou negociações.");
+            } else if (violacao(e, "23505")) {
+                mostrarErro(request, response, "Já existe um material com esse nome.");
+            } else {
+                mostrarErro(request, response, "Não foi possível concluir a operação do material.");
+            }
         }
     }
 
@@ -106,5 +112,16 @@ public class MaterialServlet extends HttpServlet {
             throws IOException {
         request.getSession().setAttribute("erroMaterial", mensagem);
         response.sendRedirect(request.getContextPath() + "/material");
+    }
+
+    // Procura, na cadeia de causas, um erro do banco com o SQLState informado.
+    private boolean violacao(Throwable erro, String sqlState) {
+        for (Throwable atual = erro; atual != null; atual = atual.getCause()) {
+            if (atual instanceof java.sql.SQLException
+                    && sqlState.equals(((java.sql.SQLException) atual).getSQLState())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
