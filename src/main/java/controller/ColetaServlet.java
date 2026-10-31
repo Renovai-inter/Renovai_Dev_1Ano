@@ -312,7 +312,15 @@ public class ColetaServlet extends HttpServlet {
             reabrirFormulario(request, response, acao, e.getMessage());
         } catch (RuntimeException e) {
             getServletContext().log("Erro ao processar a coleta.", e);
-            mostrarErro(request, response, "Não foi possível concluir a operação da coleta.");
+            boolean fk = false;
+            for (Throwable t = e; t != null; t = t.getCause()) {
+                if (t instanceof java.sql.SQLException && "23503".equals(((java.sql.SQLException) t).getSQLState())) {
+                    fk = true;
+                }
+            }
+            mostrarErro(request, response, fk && "excluir".equals(acao)
+                    ? "Não é possível excluir: esta coleta tem registros vinculados. Use Cancelar coleta."
+                    : "Não foi possível concluir a operação da coleta.");
         }
     }
 
