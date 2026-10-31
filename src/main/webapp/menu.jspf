@@ -36,6 +36,10 @@
     }
 
     .layout > .menu .logo { margin: 0 0 28px 12px; display: block; }
+    .layout > .menu .logo a { display: block; margin: 0; padding: 0; background: none; border-radius: 0; }
+    .layout > .menu .logo a:hover { background: none; }
+    .layout > .menu a.voltar-site { margin-top: auto; margin-bottom: 12px; }
+    .layout > .menu a.voltar-site + .usuario { margin-top: 0; }
     .layout > .menu .logo img { display: block; width: 150px; max-width: 100%; height: auto; }
 
     .layout > .menu a {
@@ -197,7 +201,9 @@
 <nav class="menu" aria-label="Menu principal">
 
     <div class="logo">
-        <img src="<%= raizMenu %>/img/logo-renovai.png" alt="Renovaí - Área Administrativa">
+        <a href="<%= raizMenu %>/" title="Voltar ao site">
+            <img src="<%= raizMenu %>/img/logo-renovai.png" alt="Renovaí - Área Administrativa (voltar ao site)">
+        </a>
     </div>
 
     <a href="<%= raizMenu %>/dashboard"<%= "dashboard".equals(menuItemAtivo) ? " class=\"ativo\" aria-current=\"page\"" : "" %>>
@@ -259,6 +265,13 @@
         <span>Negociações</span>
     </a>
 
+    <a href="<%= raizMenu %>/" class="voltar-site">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>
+        </svg>
+        <span>Voltar ao site</span>
+    </a>
+
     <div class="usuario">
         <span class="usuario-avatar">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -271,3 +284,4 @@
         </div>
     </div>
 </nav>
+ 
