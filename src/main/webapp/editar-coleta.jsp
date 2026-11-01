@@ -55,11 +55,11 @@
                 </label>
                 <c:if test="${coleta.tipo == 'ENTREGA_COOPERATIVA'}">
                     <label for="nomeLocalOrigem">Nome do local de origem
-                        <input type="text" id="nomeLocalOrigem" name="nomeLocalOrigem" maxlength="150" value="<c:out value='${dadosEnviados ? param.nomeLocalOrigem : coleta.nomeLocalOrigem}'/>">
+                        <input type="text" id="nomeLocalOrigem" name="nomeLocalOrigem" placeholder="Ex: Galpão da cooperativa" maxlength="150" value="<c:out value='${dadosEnviados ? param.nomeLocalOrigem : coleta.nomeLocalOrigem}'/>">
                     </label>
                 </c:if>
                 <label for="observacoes">Observações
-                    <textarea id="observacoes" name="observacoes" maxlength="500"><c:out value="${dadosEnviados ? param.observacoes : coleta.observacoes}"/></textarea>
+                    <textarea id="observacoes" name="observacoes" maxlength="500" placeholder="Informações adicionais sobre a coleta"><c:out value="${dadosEnviados ? param.observacoes : coleta.observacoes}"/></textarea>
                 </label>
             </section>
             <section class="card">
@@ -80,7 +80,7 @@
             <select name="idMaterial" aria-label="Material" required style="flex:2;min-width:180px"><option value="">Selecione o material</option>
                 <c:forEach items="${materiaisCatalogo}" var="material"><option value="${material.idMaterial}"><c:out value="${material.nome}"/></option></c:forEach>
             </select>
-            <input type="number" name="quantidadeKg" min="0" step="0.01" aria-label="Quantidade em kg" required style="flex:1;min-width:120px">
+            <input type="number" name="quantidadeKg" min="0" step="0.01" placeholder="0" aria-label="Quantidade em kg" required style="flex:1;min-width:120px">
             <button type="button" class="btn btn-contorno" data-remover>Remover</button>
         </div></template>
         <script>

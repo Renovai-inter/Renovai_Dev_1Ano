@@ -52,7 +52,7 @@
 
             <div class="campo campo-obs">
                 <label for="obsMov">Observações</label>
-                <textarea id="obsMov" name="observacoes"><%= esc(obsMov) %></textarea>
+                <textarea id="obsMov" name="observacoes" placeholder="Condições ou informações adicionais"><%= esc(obsMov) %></textarea>
             </div>
 
             <div class="rodape">

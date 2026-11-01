@@ -145,11 +145,11 @@
                 <div class="grade">
                     <div class="campo">
                         <label for="nomeCompleto">Nome Completo</label>
-                        <input type="text" id="nomeCompleto" name="nomeCompleto" value="<%= esc(c.getNomeCompleto()) %>">
+                        <input type="text" id="nomeCompleto" name="nomeCompleto" placeholder="Nome completo do cooperado" value="<%= esc(c.getNomeCompleto()) %>">
                     </div>
                     <div class="campo">
                         <label for="email">E-mail</label>
-                        <input type="text" id="email" name="email" value="<%= esc(c.getEmail()) %>">
+                        <input type="text" id="email" name="email" placeholder="cooperado@exemplo.com" value="<%= esc(c.getEmail()) %>">
                     </div>
                     <div class="campo">
                         <label for="status">Status</label>

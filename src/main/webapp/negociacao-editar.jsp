@@ -91,7 +91,7 @@
                     <div class="campo">
                         <label for="quantidade">Quantidade</label>
                         <div class="campo-numero campo-unidade unidade-kg">
-                            <input type="text" id="quantidade" name="quantidade" inputmode="decimal" title="Quantidade em kg" value="<%= esc(numero(negociacao.getQuantidadeKg())) %>">
+                            <input type="text" id="quantidade" name="quantidade" inputmode="decimal" title="Quantidade em kg" placeholder="0kg" value="<%= esc(numero(negociacao.getQuantidadeKg())) %>">
                             <div class="spin" data-alvo="quantidade" data-passo="1">
                                 <button type="button" data-direcao="1" tabindex="-1" aria-label="Aumentar quantidade">
                                     <svg viewBox="0 0 8 6" aria-hidden="true"><path d="M0 6l4-6 4 6z" fill="currentColor"/></svg>
@@ -106,7 +106,7 @@
                     <div class="campo">
                         <label for="valor">Valor atual</label>
                         <div class="campo-numero campo-unidade unidade-real">
-                            <input type="text" id="valor" name="valor" inputmode="decimal" title="Valor em R$ por kg" value="<%= esc(numero(negociacao.getValorKgAtual())) %>">
+                            <input type="text" id="valor" name="valor" inputmode="decimal" title="Valor em R$ por kg" placeholder="R$0,00" value="<%= esc(numero(negociacao.getValorKgAtual())) %>">
                             <div class="spin" data-alvo="valor" data-passo="0.1">
                                 <button type="button" data-direcao="1" tabindex="-1" aria-label="Aumentar valor">
                                     <svg viewBox="0 0 8 6" aria-hidden="true"><path d="M0 6l4-6 4 6z" fill="currentColor"/></svg>
