@@ -4,6 +4,9 @@
 <%
     // "temVenda" so e enviado pelo servlet na tela Ver; na tela Editar vem vazio
     Boolean temVendaModal = (Boolean) request.getAttribute("temVenda");
+    // Negociação já cancelada: "Alterar status" não faz mais sentido, resta só excluir
+    boolean jaCancelada = negociacao.getStatus() != null
+            && negociacao.getStatus().toUpperCase().contains("CANCEL");
 %>
 <div class="modal-fundo" id="excluir">
     <div class="modal modal-neg">
@@ -31,7 +34,7 @@
             <input type="hidden" name="id" value="<%= negociacao.getIdNegociacao() %>">
 
             <label class="opcao">
-                <input type="radio" name="acao" value="cancelar" checked>
+                <input type="radio" name="acao" value="cancelar"<%= jaCancelada ? " disabled" : " checked" %>>
                 <div>
                     <b>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -44,7 +47,7 @@
             </label>
 
             <label class="opcao perigo">
-                <input type="radio" name="acao" value="excluir">
+                <input type="radio" name="acao" value="excluir"<%= jaCancelada ? " checked" : "" %>>
                 <div>
                     <b>
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
