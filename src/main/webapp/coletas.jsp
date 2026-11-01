@@ -382,7 +382,7 @@
         <input type="hidden" name="confirmacao" id="excluirConfirmacao">
 
         <label for="excluirDigitado">Digite <strong id="excluirCodigoLabel"></strong> para confirmar:</label>
-        <input type="text" id="excluirDigitado" autocomplete="off">
+        <input type="text" id="excluirDigitado" placeholder="Digite o código da coleta" autocomplete="off">
 
         <div class="rodape">
             <button type="button" class="btn btn-contorno" data-fechar>Cancelar</button>

@@ -294,7 +294,7 @@
         <input type="hidden" name="acao" value="editar">
         <input type="hidden" name="idMaterial" id="editarId">
         <label for="editarNome">Nome</label>
-        <input type="text" id="editarNome" name="Nome" required maxlength="100">
+        <input type="text" id="editarNome" name="Nome" placeholder="Nome do material" required maxlength="100">
         <label for="editarCategoria">Categoria</label>
         <select id="editarCategoria" name="Categoria" required>
             <option value="" disabled>Selecione a categoria</option>

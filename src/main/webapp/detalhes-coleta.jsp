@@ -254,7 +254,7 @@
         <input type="hidden" name="confirmacao" value="${coleta.idColeta}">
 
         <label for="excluirDigitado">Digite <strong>CO-<c:out value="${coleta.idColeta}"/></strong> para confirmar:</label>
-        <input type="text" id="excluirDigitado" autocomplete="off">
+        <input type="text" id="excluirDigitado" placeholder="Digite o código da coleta" autocomplete="off">
 
         <div class="rodape">
             <button type="button" class="btn btn-contorno" data-fechar>Cancelar</button>
