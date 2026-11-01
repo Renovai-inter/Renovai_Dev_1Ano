@@ -86,5 +86,6 @@
     confirmar.addEventListener("input", conferir);
 </script>
 <%@ include file="/operacao-ui.jspf" %>
+<script src="${ctx}/scripts/olho-senha.js"></script>
 </body>
 </html>
