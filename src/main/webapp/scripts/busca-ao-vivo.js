@@ -7,8 +7,7 @@
  *   <select id="categoria" data-filtra="categoria">         só mostra linhas cujo data-categoria é igual
  *
  * - Ignora maiúsculas e acentos ("joao" acha "João").
- * - Com 1 ou 2 letras, procura palavras que COMEÇAM com elas ("a" acha "Ana", não "gmail").
- *   Com 3 ou mais, procura o trecho em qualquer parte ("unidos" acha "Copperunidos").
+ * - Procura o trecho digitado em qualquer parte do texto, desde a primeira letra ("el" acha "Joel").
  * - O status (Ativo, Inativo, Concluída...) só entra na busca com 3 letras ou mais.
  * - Várias palavras: todas precisam aparecer na linha ("maria santo" acha "Maria ... Santo André").
  * - Números: "11222333" acha o CNPJ "11.222.333/0001-81".
@@ -97,11 +96,8 @@
 
         function combina(termo, i) {
             var t = textos[i];
-            if (termo.length <= 2) {
-                // Poucas letras: só começo de palavra, para a lista realmente diminuir
-                return t.palavras.some(function (palavra) { return palavra.indexOf(termo) === 0; });
-            }
-            if (t.principal.indexOf(termo) !== -1 || t.status.indexOf(termo) !== -1) return true;
+            if (t.principal.indexOf(termo) !== -1) return true;
+            if (termo.length >= 3 && t.status.indexOf(termo) !== -1) return true;
             // "11222333" também acha "11.222.333/0001-81"
             var digitos = soDigitos(termo);
             return digitos.length >= 3 && /^[\d\s.\-\/()]+$/.test(termo) && t.digitos.indexOf(digitos) !== -1;
