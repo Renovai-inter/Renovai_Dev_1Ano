@@ -49,7 +49,7 @@ private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd
                         <button class="coop-btn" type="submit">Buscar</button>
                     </form>
                     <div class="coop-overflow">
-                        <table class="coop-table" id="tabelaCooperativas">
+                        <table class="coop-table" id="tabelaCooperativas" data-responsiva>
                             <thead>
                                 <tr>
                                     <th>Nome</th>
@@ -110,6 +110,7 @@ private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd
         </div>
         <%@ include file="/cooperativa-modal-excluir.jspf" %>
         <script src="${pageContext.request.contextPath}/scripts/busca-ao-vivo.js?v=2"></script>
+        <script src="${pageContext.request.contextPath}/scripts/tabela-responsiva.js?v=1"></script>
         <%@ include file="/operacao-ui.jspf" %>
     </body>
 </html>

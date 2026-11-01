@@ -40,14 +40,79 @@ public class Utilitario {
             return null;
         }
         cnpj = cnpj.strip();
-        if (cnpj.matches("^\\d{14}$")) {
-            return cnpj;
+        if (!cnpj.matches("^\\d{14}$")) {
+            if (!cnpj.matches("^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$")) {
+                throw new IllegalArgumentException("CNPJ deve seguir o formato 00.000.000/0000-00.");
+            }
+            cnpj = cnpj.replace(".", "").replace("/", "").replace("-", "");
         }
-        if (!cnpj.matches("^\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}$")) {
-            throw new IllegalArgumentException("CNPJ deve seguir o formato 00.000.000/0000-00.");
+        if (!cnpjValido(cnpj)) {
+            throw new IllegalArgumentException("CNPJ inválido: confira os dígitos.");
         }
-        cnpj = cnpj.replace(".", "").replace("/", "").replace("-", "");
         return cnpj;
+    }
+
+    // Confere os dois dígitos verificadores do CNPJ (14 dígitos, sem máscara).
+    public boolean cnpjValido(String cnpj) {
+        if (cnpj == null || !cnpj.matches("^\\d{14}$") || cnpj.matches("^(\\d)\\1{13}$")) {
+            return false;
+        }
+        int[] pesos1 = {5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+        int[] pesos2 = {6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2};
+        return digitoVerificador(cnpj, pesos1) == cnpj.charAt(12) - '0'
+                && digitoVerificador(cnpj, pesos2) == cnpj.charAt(13) - '0';
+    }
+
+    // Filtro de CPF - devolve os 11 dígitos, aceitando 000.000.000-00 ou só números.
+    public String filtrarCpf(String cpf) {
+        if (cpf == null) {
+            throw new IllegalArgumentException("CPF é obrigatório.");
+        }
+        cpf = cpf.strip();
+        if (!cpf.matches("^\\d{11}$")) {
+            if (!cpf.matches("^\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}$")) {
+                throw new IllegalArgumentException("CPF deve seguir o formato 000.000.000-00.");
+            }
+            cpf = cpf.replace(".", "").replace("-", "");
+        }
+        if (!cpfValido(cpf)) {
+            throw new IllegalArgumentException("CPF inválido: confira os dígitos.");
+        }
+        return cpf;
+    }
+
+    // Confere os dois dígitos verificadores do CPF (11 dígitos, sem máscara).
+    public boolean cpfValido(String cpf) {
+        if (cpf == null || !cpf.matches("^\\d{11}$") || cpf.matches("^(\\d)\\1{10}$")) {
+            return false;
+        }
+        int[] pesos1 = {10, 9, 8, 7, 6, 5, 4, 3, 2};
+        int[] pesos2 = {11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+        return digitoVerificador(cpf, pesos1) == cpf.charAt(9) - '0'
+                && digitoVerificador(cpf, pesos2) == cpf.charAt(10) - '0';
+    }
+
+    // Formata 11 dígitos de CPF como 000.000.000-00.
+    public String formatarCpf(String cpf) {
+        if (cpf == null) {
+            return null;
+        }
+        cpf = cpf.strip();
+        if (!cpf.matches("^\\d{11}$")) {
+            throw new IllegalArgumentException("CPF armazenado deve ter 11 dígitos.");
+        }
+        return cpf.substring(0, 3) + "." + cpf.substring(3, 6) + "."
+                + cpf.substring(6, 9) + "-" + cpf.substring(9);
+    }
+
+    // Calcula um dígito verificador (módulo 11) com os pesos informados.
+    private int digitoVerificador(String numero, int[] pesos) {
+        int soma = 0;
+        for (int i = 0; i < pesos.length; i++) {
+            soma += (numero.charAt(i) - '0') * pesos[i];
+        }
+        int resto = soma % 11;
+        return resto < 2 ? 0 : 11 - resto;
     }
 
     // Filtro de Telefone/Whatsapp - devolvendo somente os valores numéricos de um dos formatos a seguir:
@@ -57,14 +122,19 @@ public class Utilitario {
             throw new IllegalArgumentException("telefoneWhatsapp é obrigatório.");
         }
         telefoneWhatsapp = telefoneWhatsapp.strip();
-        if (telefoneWhatsapp.matches("^\\d{10,11}$")) {
-            return telefoneWhatsapp;
+        if (!telefoneWhatsapp.matches("^\\d{10,11}$")) {
+            if (!telefoneWhatsapp.matches("^\\(\\d{2}\\) ?\\d{4,5}-\\d{4}$")) {
+                throw new IllegalArgumentException("telefoneWhatsapp deve ter 10 ou 11 dígitos.");
+            }
+            telefoneWhatsapp = telefoneWhatsapp.replace("(", "").replace(")", "")
+                    .replace(" ", "").replace("-", "");
         }
-        if (!telefoneWhatsapp.matches("^\\(\\d{2}\\) ?\\d{4,5}-\\d{4}$")) {
-            throw new IllegalArgumentException("telefoneWhatsapp deve ter 10 ou 11 dígitos.");
+        // DDD de 11 a 99 (sem zero à esquerda); celular com 11 dígitos começa com 9
+        if (!telefoneWhatsapp.matches("^[1-9][1-9](9\\d{8}|[2-5]\\d{7})$")) {
+            throw new IllegalArgumentException(
+                    "telefoneWhatsapp inválido: use DDD válido e, para celular, o 9 após o DDD.");
         }
-        return telefoneWhatsapp.replace("(", "").replace(")", "")
-                .replace(" ", "").replace("-", "");
+        return telefoneWhatsapp;
     }
 
     // Filtrar email institucional seguindo o formato seu-nome@email.com

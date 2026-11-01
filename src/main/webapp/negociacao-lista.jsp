@@ -71,7 +71,7 @@
             </div>
 
             <div class="tabela-rolagem">
-            <table class="tabela tabela-negociacoes" id="tabelaNegociacoes">
+            <table class="tabela tabela-negociacoes" id="tabelaNegociacoes" data-responsiva>
                 <thead>
                     <tr>
                         <th>Código</th>
@@ -123,6 +123,7 @@
     </div>
 </div>
 <script src="${pageContext.request.contextPath}/scripts/busca-ao-vivo.js?v=2"></script>
+<script src="${pageContext.request.contextPath}/scripts/tabela-responsiva.js?v=1"></script>
 <%@ include file="notificacao.jspf" %>
 </body>
 </html>
