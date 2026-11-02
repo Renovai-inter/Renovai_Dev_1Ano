@@ -1,8 +1,12 @@
 # Renovaí
 
-O **Renovaí** é um projeto acadêmico voltado à organização da coleta e da negociação de materiais recicláveis.
-Ele reúne páginas públicas e uma área administrativa para acompanhar cooperativas, cooperados, materiais, coletas e negociações.
-A proposta é tornar mais claros os registros, os responsáveis e o andamento de cada operação.
+O projeto Renovaí consiste em um sistema digital multiplataforma de gestão operacional e financeira de cooperativas de reciclagem, além de um ambiente de negociação de materiais com empresas recicladoras. O nosso objetivo é promover planejamento, eficiência e estrutura para as cooperativas e conectá-las com empresas recicladoras.
+
+Para as cooperativas de reciclagem, garante eficiência, confiança e estrutura em seus processos, dada a necessidade de realizar uma gestão mais controlada e eficaz de seus recursos, sejam eles de materiais ou financeiros – possibilitando uma divisão mais justa de renda e responsabilidades entre os cooperados.
+
+Para empresas recicladoras, como a Ambiental, da JBS Novos Negócios, providencia dados e relatórios relevantes para análises de impacto de sustentabilidade. Contribui também para a logística de troca de materiais, estabelecendo conexão entre empresas e cooperativas.
+
+## Sobre este repositório
 
 Este repositório contém uma aplicação web Java desenvolvida pelo grupo no primeiro ano do projeto interdisciplinar.
 O código está em evolução: a presença de uma tela ou rota não significa que seu fluxo já tenha sido validado de ponta a ponta.
@@ -25,14 +29,14 @@ Algumas combinações de campos, mensagens e destinos ainda exigem conferência 
 ## Tecnologias
 
 Java 17 no `pom.xml`, Maven, aplicação WAR, Jakarta Servlets/JSP/JSTL, JDBC e PostgreSQL.
-O `Dockerfile` usa imagens com Java 21 e Tomcat 11 para construir e servir o WAR.
+O `Dockerfile` usa Java 17 nas etapas de compilação e execução, com Tomcat 11 para servir o WAR.
 
 ## Organização do código
 
 ```text
 src/main/java/model/       Entidades, vínculos, enums e validações
 src/main/java/dao/         Consultas e gravações JDBC
-src/main/java/controller/  Servlets e filtros de autenticação
+src/main/java/servlet/  Servlets e filtros de autenticação
 src/main/java/util/        Conexão, formatação, e-mail e token
 src/main/webapp/           Páginas JSP, fragmentos, CSS, scripts e imagens
 ```
@@ -74,7 +78,7 @@ Configure no processo que executa a aplicação `DB_URL`, `DB_USER` e `DB_PASSWO
 Use uma URL PostgreSQL no formato `jdbc:postgresql://<host>:<porta>/<banco>`; `jdbc:postgres://` não é aceito pelo driver.
 Para recuperação de senha, configure `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM`,
 `RENOVAI_BASE_URL` e `RENOVAI_TOKEN_SECRET` conforme as necessidades do ambiente.
-O arquivo `.env.example` lista as variáveis, mas é explicativo: a aplicação lê variáveis de ambiente e não carrega `.env` por conta própria.
+O arquivo `.env.example` descreve as variáveis, mas é explicativo e não está pronto para uso direto como `--env-file`: contém instruções e espaços em torno de `=`. Crie um `.env` com uma atribuição `NOME=valor` por linha e sem as instruções. A aplicação lê variáveis de ambiente e não carrega `.env` por conta própria.
 Mantenha valores reais fora do Git; o `.gitignore` exclui arquivos `.env`.
 
 ## Execução
@@ -93,6 +97,8 @@ Os relatórios registram quais verificações foram feitas em cada etapa e quais
 
 ## Estado atual
 
-A integração e a apresentação das áreas administrativas continuam em evolução.
-Campos obrigatórios, ações de edição, mensagens de resultado e alguns destinos de tela precisam de conferência em execução.
-Consulte os relatórios mais recentes antes de tratar uma funcionalidade listada acima como concluída.
+A integração e a apresentação das áreas administrativas continuam em evolução. Os testes publicados de 31/10 e 01/11/2026 estão nos relatórios `../Relatórios/61-Testes-Funcionais-e-Padronizacao-Render.md` e `../Relatórios/65-Testes-Administrativos-Validacoes-Placeholders.md`, mantidos fora deste repositório. Eles cobriram os sete módulos administrativos, mas não todos os fluxos, perfis, estados e condições de erro.
+
+Na versão testada em 31/10, foram observados peso informado de coleta exibido como zero, cargo de cooperado ausente na primeira edição e divergência no indicador de negociações em andamento. Essas observações exigem nova conferência após as alterações posteriores no código. A busca pelo nome completo da rota falhou nessa bateria, mas funcionou na de 01/11; o cadastro com CNPJ inválido também foi recusado na bateria mais recente. Dados históricos com CNPJ inválido ainda precisam de avaliação.
+
+O teste de 01/11 apontou ainda possíveis problemas de preenchimento automático de credenciais no cadastro de cooperativa, duplicação de UF na apresentação, estados iniciais de negociação, responsividade e diferenças entre formulários. A persistência após cadastro válido, as transições de todos os estados, o acesso por perfil e os limites dos dados continuam sem cobertura completa. Consulte os relatórios para reproduzir cada achado antes de considerá-lo corrigido ou transformar uma observação em regra de negócio.
