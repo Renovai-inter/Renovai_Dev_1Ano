@@ -92,6 +92,33 @@ public class CooperadoDAO {
         }
     }
 
+    // Recusa um CPF que já pertence a outro cooperado (CPF vazio é sempre aceito).
+    private void exigirCpfLivre(Connection conexao, String cpf, Long idCooperadoAtual) {
+        if (cpf == null) {
+            return;
+        }
+        String sql = "SELECT 1 FROM cooperado WHERE cpf = ? AND (? IS NULL OR id_cooperado <> ?)";
+        try (PreparedStatement pstmt = conexao.prepareStatement(sql)) {
+            pstmt.setString(1, cpf);
+            if (idCooperadoAtual == null) {
+                pstmt.setNull(2, Types.BIGINT);
+                pstmt.setNull(3, Types.BIGINT);
+            } else {
+                pstmt.setLong(2, idCooperadoAtual);
+                pstmt.setLong(3, idCooperadoAtual);
+            }
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    conn.desconectar(conexao);
+                    throw new IllegalArgumentException("Já existe um cooperado com esse CPF.");
+                }
+            }
+        } catch (SQLException e) {
+            conn.desconectar(conexao);
+            throw new RuntimeException("Falha ao conferir o CPF.", e);
+        }
+    }
+
     // Cadastra a conta, o cooperado, suas atividades e permissões.
     public int cadastrarCooperado(Cooperado cooperado) {
         if (cooperado == null || cooperado.getIdCooperativa() == null
@@ -111,9 +138,10 @@ public class CooperadoDAO {
         cooperado.setTipoUsuario(TipoUsuario.COOPERADO);
         cooperado.setStatus(StatusCooperado.ATIVO);
         Connection conexao = conn.conectar();
+        exigirCpfLivre(conexao, cooperado.getCpf(), null);
         String sqlCooperado = "INSERT INTO cooperado " +
-                "(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo, status) " +
-                "VALUES (?, ?, ?, ?, ?, ?)";
+                "(id_cooperado, id_usuario, id_cooperativa, codigo_cooperado, cargo, status, cpf) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement inserirUsuario = conexao.prepareStatement(usuarioDAO.sqlInserirUsuario());
              PreparedStatement inserirCooperado = conexao.prepareStatement(sqlCooperado)) {
             ArrayList<Long> catalogo = listarIdsPermissoes(conexao);
@@ -155,6 +183,11 @@ public class CooperadoDAO {
                 inserirCooperado.setString(5, cooperado.getCargoEnum().name());
             }
             inserirCooperado.setString(6, cooperado.getStatusEnum().name());
+            if (cooperado.getCpf() == null) {
+                inserirCooperado.setNull(7, Types.VARCHAR);
+            } else {
+                inserirCooperado.setString(7, cooperado.getCpf());
+            }
             int linhasCooperado = inserirCooperado.executeUpdate();
             if (linhasCooperado == 0) {
                 throw new IllegalStateException("Cooperado não foi registrado após a conta.");
@@ -252,7 +285,7 @@ public class CooperadoDAO {
         // Comando SQL
 
         String sql = "SELECT c.id_cooperado, c.id_usuario, c.id_cooperativa, " +
-                "c.codigo_cooperado, c.status, c.cargo, u.nome_usuario, " +
+                "c.codigo_cooperado, c.status, c.cargo, c.cpf, u.nome_usuario, " +
                 "u.nome_completo, u.email, coop.nome_publico AS nome_cooperativa " +
                 "FROM cooperado c JOIN usuario u ON c.id_usuario = u.id_usuario " +
                 "JOIN cooperativa coop ON c.id_cooperativa = coop.id_cooperativa";
@@ -270,6 +303,7 @@ public class CooperadoDAO {
                 cooperado.setNomeUsuario(rs.getString("nome_usuario"));
                 cooperado.setNomeCompleto(rs.getString("nome_completo"));
                 cooperado.setEmail(rs.getString("email"));
+                cooperado.setCpfDoBanco(rs.getString("cpf"));
                 cooperado.setNomeCooperativa(rs.getString("nome_cooperativa"));
                 cooperado.setStatus(StatusCooperado.valueOf(rs.getString("status")));
                 String cargo = rs.getString("cargo");
@@ -292,7 +326,7 @@ public class CooperadoDAO {
             throw new IllegalArgumentException("idCooperado é obrigatório.");
         }
         String sql = "SELECT c.id_cooperado, c.id_usuario, c.id_cooperativa, " +
-                "c.codigo_cooperado, c.cargo, c.status, c.data_cadastro, " +
+                "c.codigo_cooperado, c.cargo, c.status, c.data_cadastro, c.cpf, " +
                 "u.nome_completo, u.nome_usuario, u.email, u.senha_temporaria, " +
                 "coop.nome_publico AS nome_cooperativa " +
                 "FROM cooperado c JOIN usuario u ON c.id_usuario = u.id_usuario " +
@@ -314,6 +348,7 @@ public class CooperadoDAO {
                 cooperado.setNomeUsuario(rs.getString("nome_usuario"));
                 cooperado.setEmail(rs.getString("email"));
                 cooperado.setSenhaTemporaria(rs.getBoolean("senha_temporaria"));
+                cooperado.setCpfDoBanco(rs.getString("cpf"));
                 cooperado.setNomeCooperativa(rs.getString("nome_cooperativa"));
                 cooperado.setStatus(StatusCooperado.valueOf(rs.getString("status")));
                 String cargo = rs.getString("cargo");
@@ -465,8 +500,9 @@ public class CooperadoDAO {
             }
         }
         Connection conexao = conn.conectar();
+        exigirCpfLivre(conexao, cooperado.getCpf(), cooperado.getIdCooperado());
         String sqlUsuario = "SELECT id_usuario FROM cooperado WHERE id_cooperado = ?";
-        String sqlCooperado = "UPDATE cooperado SET id_cooperativa = ?, cargo = ?, status = ? " +
+        String sqlCooperado = "UPDATE cooperado SET id_cooperativa = ?, cargo = ?, status = ?, cpf = ? " +
                 "WHERE id_cooperado = ?";
         String sqlAlterarUsuario = "UPDATE usuario SET nome_completo = ?, email = ? " +
                 "WHERE id_usuario = ?";
@@ -489,7 +525,12 @@ public class CooperadoDAO {
                 alterar.setString(2, cooperado.getCargoEnum().name());
             }
             alterar.setString(3, cooperado.getStatusEnum().name());
-            alterar.setLong(4, cooperado.getIdCooperado());
+            if (cooperado.getCpf() == null) {
+                alterar.setNull(4, Types.VARCHAR);
+            } else {
+                alterar.setString(4, cooperado.getCpf());
+            }
+            alterar.setLong(5, cooperado.getIdCooperado());
             int linhas = alterar.executeUpdate();
             if (linhas == 0) {
                 return 0;

@@ -16,6 +16,7 @@ public class Cooperado extends Usuario {
     private Long idCooperativa;
     private String codigoCooperado;
     private CargoCooperado cargo;
+    private String cpf; // 11 dígitos ou null (opcional)
     private StatusCooperado status;
     private LocalDateTime dataCadastro;
     private String nomeCooperativa;
@@ -66,6 +67,26 @@ public class Cooperado extends Usuario {
     }
 
     public CargoCooperado getCargoEnum() { return cargo; }
+
+    // CPF (opcional): só os 11 dígitos ou null.
+    public String getCpf() { return cpf; }
+
+    // CPF no formato 000.000.000-00, ou vazio quando não informado.
+    public String getCpfFormatado() {
+        return cpf == null ? "" : new util.Utilitario().formatarCpf(cpf);
+    }
+
+    // Usado ao ler do banco: não revalida o que já está gravado.
+    public void setCpfDoBanco(String cpf) { this.cpf = (cpf == null || cpf.isBlank()) ? null : cpf; }
+
+    // Vazio vira null; preenchido precisa ter formato e dígitos verificadores válidos.
+    public void setCpf(String cpf) {
+        if (cpf == null || cpf.isBlank()) {
+            this.cpf = null;
+            return;
+        }
+        this.cpf = new util.Utilitario().filtrarCpf(cpf);
+    }
 
     public void setCargo(CargoCooperado cargo) { this.cargo = cargo; }
 

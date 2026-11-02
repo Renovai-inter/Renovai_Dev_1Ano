@@ -96,7 +96,7 @@
                                     </span>
                                     <div>
                                         <b><%= esc(nomeBonito(nome)) %></b>
-                                        <small><%= esc(c.getEmail()) %></small>
+                                        <small><%= esc(c.getEmail()) %></small><span hidden><%= esc(c.getCpf() == null ? "" : c.getCpf() + " " + c.getCpfFormatado()) %></span>
                                     </div>
                                 </div>
                             </td>
