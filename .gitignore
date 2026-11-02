@@ -45,3 +45,7 @@ build/
 .env
 .env.*
 !.env.examplesrc/main/resources/email.properties
+
+# Segredos: nunca versionar (usar variáveis de ambiente, ver .env.example)
+src/main/resources/email.properties
+.env
