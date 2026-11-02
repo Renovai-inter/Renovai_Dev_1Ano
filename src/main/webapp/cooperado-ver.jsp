@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.principais.Cooperado, java.time.format.DateTimeFormatter" %>
+<%@ page import="java.util.*, model.principais.Cooperado, model.enums.AtividadeCooperado, java.time.format.DateTimeFormatter" %>
 <%!
     // Apenas para EXIBIR: textos com acento para os valores que vem do banco (ex.: NEGOCIACOES -> Negociações).
     private static final String[][] ROTULOS = {
@@ -65,6 +65,12 @@
     List<String> atividadesOpcoes = (List<String>) request.getAttribute("atividadesOpcoes");
     if (atividadesOpcoes == null) atividadesOpcoes = new ArrayList<String>();
     String[] atividades = atividadesOpcoes.toArray(new String[0]);
+
+    // Nomes dos enums das atividades do cooperado (ex.: COLETA_EXTERNA), iguais aos valores de atividadesOpcoes
+    List<String> atividadesDoCooperado = new ArrayList<String>();
+    for (AtividadeCooperado a : c.getAtividadesCooperado()) {
+        atividadesDoCooperado.add(a.name());
+    }
 %>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -172,10 +178,10 @@
                 </div>
                 <div class="dado topo-chips"><small>Atividades (múltipla escolha)</small></div>
                 <div class="chips so-leitura">
-                    <% for (String a : atividades) { if (c.getAtividades().contains(a)) { %>
+                    <% for (String a : atividades) { if (atividadesDoCooperado.contains(a)) { %>
                         <label><%= esc(rotulo(a)) %></label>
                     <% } } %>
-                    <% if (c.getAtividades().isEmpty()) { %>
+                    <% if (atividadesDoCooperado.isEmpty()) { %>
                         <label>Nenhuma atividade</label>
                     <% } %>
                 </div>
