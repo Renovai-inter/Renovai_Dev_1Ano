@@ -83,7 +83,7 @@
 <h2>7. Seus direitos (art. 18 da LGPD)</h2>
 <p>Você pode pedir: confirmação de que tratamos seus dados; acesso; correção de dados incompletos ou errados; anonimização,</p>
 <p>bloqueio ou eliminação de dados desnecessários; portabilidade; informação sobre compartilhamento; e revogação de consentimento.</p>
-<p>Para exercer esses direitos, escreva para <strong>[preencher e-mail do grupo]</strong>. Responderemos em prazo razoável.</p>
+<p>Para exercer esses direitos, escreva para <strong>renovai.institutojef@gmail.com</strong>. Responderemos em prazo razoável.</p>
 <h2>8. Cookies</h2>
 <p>O sistema usa apenas o <strong>cookie de sessão</strong>, necessário para manter o login. Não usamos cookies de publicidade ou de rastreamento.</p>
 <h2>9. Mudanças nesta política</h2>
