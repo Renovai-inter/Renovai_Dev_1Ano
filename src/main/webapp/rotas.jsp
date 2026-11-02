@@ -253,7 +253,7 @@
         <input type="hidden" name="acao" value="editar">
         <input type="hidden" name="idRota" id="editarId">
         <label for="editarNome">Nome da rota</label>
-        <input type="text" id="editarNome" name="nomeRota" required maxlength="100">
+        <input type="text" id="editarNome" name="nomeRota" placeholder="Ex: Zona Sul - Segunda" required maxlength="100">
         <label for="editarCoop">Cooperativa</label>
         <select id="editarCoop" name="idCooperativa" required>
             ${opcoesCoop}

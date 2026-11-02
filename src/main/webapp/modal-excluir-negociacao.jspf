@@ -62,7 +62,7 @@
 
             <div class="campo campo-confirmacao">
                 <label for="confirmacao">Digite &ldquo;<%= esc(negociacao.getCodigo()) %>&rdquo; para confirmar:</label>
-                <input type="text" id="confirmacao" name="confirmacao" autocomplete="off">
+                <input type="text" id="confirmacao" name="confirmacao" placeholder="Digite o código da negociação" autocomplete="off">
             </div>
 
             <div class="rodape">

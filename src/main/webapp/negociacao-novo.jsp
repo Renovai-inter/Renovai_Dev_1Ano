@@ -228,7 +228,7 @@
 
                     <div class="campo campo-largo">
                         <label for="observacoes">Observações</label>
-                        <textarea id="observacoes" name="observacoes"><%= esc(observacoes) %></textarea>
+                        <textarea id="observacoes" name="observacoes" placeholder="Condições ou informações adicionais"><%= esc(observacoes) %></textarea>
                     </div>
 
                 </div>

@@ -153,13 +153,13 @@
                     <div class="bloco-tipo" id="blocoEntrega" hidden>
                         <div class="campo">
                             <label for="nomeLocalOrigem">Nome do local de origem</label>
-                            <input type="text" id="nomeLocalOrigem" name="nomeLocalOrigem" data-posted="<c:out value='${param.nomeLocalOrigem}'/>" maxlength="150">
+                            <input type="text" id="nomeLocalOrigem" name="nomeLocalOrigem" placeholder="Ex: Galpão da cooperativa" data-posted="<c:out value='${param.nomeLocalOrigem}'/>" maxlength="150">
                         </div>
                     </div>
 
                     <div class="campo cheio">
                         <label for="observacoes">Observações</label>
-                        <textarea id="observacoes" name="observacoes" maxlength="500"><c:out value="${dadosEnviados ? param.observacoes : ''}"/></textarea>
+                        <textarea id="observacoes" name="observacoes" maxlength="500" placeholder="Informações adicionais sobre a coleta"><c:out value="${dadosEnviados ? param.observacoes : ''}"/></textarea>
                     </div>
                 </div>
             </section>

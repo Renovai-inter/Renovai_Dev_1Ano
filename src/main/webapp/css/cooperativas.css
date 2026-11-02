@@ -118,7 +118,6 @@ main.conteudo.coop-conteudo {
     color: #1c1c1c;
     text-decoration: none;
 }
-.coop-name:hover { text-decoration: underline; }
 .coop-icone { flex-shrink: 0; width: 20px; height: 20px; color: #8a2450; }
 
 .coop-identificacao { display: flex; align-items: center; gap: 10px; }
