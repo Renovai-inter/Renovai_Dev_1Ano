@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, model.principais.Cooperado" %>
+<%@ page import="java.util.*, model.principais.Cooperado, model.enums.AtividadeCooperado" %>
 <%!
     // Apenas para EXIBIR: textos com acento para os valores que vem do banco (ex.: NEGOCIACOES -> Negociações).
     // O value enviado no formulario continua sendo o valor original do banco.
@@ -81,6 +81,10 @@
     List<String> atividadesOpcoes = (List<String>) request.getAttribute("atividadesOpcoes");
     if (atividadesOpcoes == null) atividadesOpcoes = new ArrayList<String>();
     String[] atividades = atividadesOpcoes.toArray(new String[0]);
+        List<String> atividadesDoCooperado = new ArrayList<String>();
+        for (AtividadeCooperado a : c.getAtividadesCooperado()) {
+            atividadesDoCooperado.add(a.name());
+        }
 %>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -191,7 +195,7 @@
                 <div class="campo topo-chips"><label>Atividades (múltipla escolha)</label></div>
                 <div class="chips">
                     <% for (int i = 0; i < atividades.length; i++) { %>
-                        <input type="checkbox" id="a<%= i %>" name="atividades" value="<%= esc(atividades[i]) %>" <%= c.getAtividades().contains(atividades[i]) ? "checked" : "" %>>
+                        <input type="checkbox" id="a<%= i %>" name="atividades" value="<%= esc(atividades[i]) %>" <%= atividadesDoCooperado.contains(atividades[i]) ? "checked" : "" %>
                         <label for="a<%= i %>"><%= esc(rotulo(atividades[i])) %></label>
                     <% } %>
                 </div>
