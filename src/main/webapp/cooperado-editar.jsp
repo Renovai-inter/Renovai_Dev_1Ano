@@ -96,6 +96,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css?v=5">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/v2.css?v=1">
+    <style>
+        .chips { display: flex; flex-wrap: wrap; gap: 10px; }
+        .chips input { display: none; }
+        .chips label {
+            display: inline-block;
+            margin: 0;
+            padding: 8px 18px;
+            border: 1px solid #bdbdbd;
+            border-radius: 8px;
+            background: #ffffff;
+            font-size: 12px;
+            font-weight: 400;
+            color: #555555;
+            cursor: pointer;
+        }
+        .chips input:checked + label {
+            background: #d9e8d1;
+            border-color: #6b9065;
+            color: #2f4a2b;
+            font-weight: 500;
+        }
+    </style>
 </head>
 <body class="pagina-v2">
 <div class="layout">
@@ -195,7 +217,7 @@
                 <div class="campo topo-chips"><label>Atividades (múltipla escolha)</label></div>
                 <div class="chips">
                     <% for (int i = 0; i < atividades.length; i++) { %>
-                        <input type="checkbox" id="a<%= i %>" name="atividades" value="<%= esc(atividades[i]) %>" <%= atividadesDoCooperado.contains(atividades[i]) ? "checked" : "" %>
+                        <input type="checkbox" id="a<%= i %>" name="atividades" value="<%= esc(atividades[i]) %>" <%= atividadesDoCooperado.contains(atividades[i]) ? "checked" : "" %>>
                         <label for="a<%= i %>"><%= esc(rotulo(atividades[i])) %></label>
                     <% } %>
                 </div>
@@ -243,5 +265,3 @@
 <%@ include file="/operacao-ui.jspf" %>
 </body>
 </html>
-
-
