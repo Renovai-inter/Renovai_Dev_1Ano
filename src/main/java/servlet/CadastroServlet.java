@@ -1,4 +1,4 @@
-package controller;
+package servlet;
 
 import dao.UsuarioDAO;
 import model.auxiliares.Usuario;

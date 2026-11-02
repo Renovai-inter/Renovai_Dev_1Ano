@@ -1,4 +1,4 @@
-package controller;
+package servlet;
 
 import dao.CooperadoDAO;
 import dao.CooperativaDAO;

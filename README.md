@@ -32,7 +32,7 @@ O `Dockerfile` usa imagens com Java 21 e Tomcat 11 para construir e servir o WAR
 ```text
 src/main/java/model/       Entidades, vínculos, enums e validações
 src/main/java/dao/         Consultas e gravações JDBC
-src/main/java/controller/  Servlets e filtros de autenticação
+src/main/java/servlet/  Servlets e filtros de autenticação
 src/main/java/util/        Conexão, formatação, e-mail e token
 src/main/webapp/           Páginas JSP, fragmentos, CSS, scripts e imagens
 ```
