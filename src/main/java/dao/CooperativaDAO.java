@@ -176,7 +176,7 @@ public class CooperativaDAO {
                 Cooperativa coop = new Cooperativa();
                 coop.setIdCooperativa(rs.getLong("id_cooperativa"));
                 coop.setNome(rs.getString("nome"));
-                coop.setCnpj(rs.getString("cnpj"));
+                coop.setCnpjDoBanco(rs.getString("cnpj"));
                 coop.setNomePublico(rs.getString("nome_publico"));
                 coop.setDescricaoInstitucional(rs.getString("descricao"));
                 coop.setLogoUrl(rs.getString("logo"));
@@ -255,19 +255,24 @@ public class CooperativaDAO {
             }
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
-                    Cooperativa coop = new Cooperativa();
-                    coop.setIdCooperativa(rs.getLong("id_cooperativa"));
-                    coop.setNome(rs.getString("nome"));
-                    coop.setCnpj(rs.getString("cnpj"));
-                    coop.setCidade(rs.getString("cidade"));
-                    coop.setEstado(rs.getString("estado"));
-                    coop.setStatus(StatusCooperativa.valueOf(rs.getString("status")));
-                    coop.getRelacionamentos().setQtdCooperados(rs.getInt("cooperados"));
-                    Timestamp cadastro = rs.getTimestamp("cadastro");
-                    if (cadastro != null) {
-                        coop.setDataCadastro(cadastro.toLocalDateTime());
+                    try {
+                        Cooperativa coop = new Cooperativa();
+                        coop.setIdCooperativa(rs.getLong("id_cooperativa"));
+                        coop.setNome(rs.getString("nome"));
+                        coop.setCnpjDoBanco(rs.getString("cnpj"));
+                        coop.setCidade(rs.getString("cidade"));
+                        coop.setEstado(rs.getString("estado"));
+                        coop.setStatus(StatusCooperativa.valueOf(rs.getString("status")));
+                        coop.getRelacionamentos().setQtdCooperados(rs.getInt("cooperados"));
+                        Timestamp cadastro = rs.getTimestamp("cadastro");
+                        if (cadastro != null) {
+                            coop.setDataCadastro(cadastro.toLocalDateTime());
+                        }
+                        cooperativas.add(coop);
+                    } catch (IllegalArgumentException | NullPointerException e) {
+                        System.err.println("Cooperativa com dado inválido no banco -> id=" + rs.getLong("id_cooperativa")
+                                + ", nome=" + rs.getString("nome") + ", motivo=" + e.getMessage());
                     }
-                    cooperativas.add(coop);
                 }
             }
             return cooperativas;

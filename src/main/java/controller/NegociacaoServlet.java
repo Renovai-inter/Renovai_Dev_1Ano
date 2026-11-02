@@ -458,6 +458,7 @@ public class NegociacaoServlet extends HttpServlet {
 
     // Opcao "Excluir permanentemente": exige digitar o codigo da negociacao (campo "confirmacao").
     // Funciona direto, sem precisar cancelar antes. Se ja existir uma venda, ela continua registrada (so perde o vinculo).
+    // A venda passa a origem MANUAL: a regra ck_venda_origem_negociacao exige id_negociacao para vendas RENOVAI.
     private void excluir(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
