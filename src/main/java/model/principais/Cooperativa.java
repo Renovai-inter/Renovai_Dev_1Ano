@@ -82,6 +82,12 @@ public class Cooperativa {
     // Retorna o valor de cnpj.
     public String getCnpj() { return utilitario.formatarCnpj(cnpj); }
 
+    // Usado ao ler do banco: aceita o CNPJ já gravado sem conferir os dígitos (cadastros antigos),
+    // para a cooperativa continuar aparecendo, abrindo e podendo ser editada ou excluída.
+    public void setCnpjDoBanco(String cnpj) {
+        this.cnpj = cnpj;
+    }
+
     // Filtra e valida o CNPJ antes de armazená-lo.
     public void setCnpj(String cnpj) {
         if (cnpj == null) {

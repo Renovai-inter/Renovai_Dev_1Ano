@@ -58,7 +58,7 @@
 
             <label class="termos">
                 <input type="checkbox" name="termos" required>
-                <span>Eu concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a></span>
+                <span>Eu concordo com os <a href="${ctx}/pages/termos.jsp" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="${ctx}/pages/privacidade.jsp" target="_blank" rel="noopener">Política de Privacidade</a></span>
             </label>
 
             <button type="submit" class="btn-principal">Cadastrar</button>

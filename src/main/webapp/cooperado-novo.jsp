@@ -64,6 +64,7 @@
 
     String nome = voltouErro ? request.getParameter("nomeCompleto") : "";
     String email = voltouErro ? request.getParameter("email") : "";
+    String cpf = voltouErro ? request.getParameter("cpf") : "";
     String idCoopSel = voltouErro ? request.getParameter("idCooperativa") : "";
     String cargoSel = voltouErro ? request.getParameter("cargo") : "";
 
@@ -155,6 +156,11 @@
                     <div class="campo">
                         <label for="email">E-mail</label>
                         <input type="text" id="email" name="email" placeholder="Insira o e-mail do cooperado" value="<%= esc(email) %>">
+                    </div>
+
+                    <div class="campo">
+                        <label for="cpf">CPF (opcional)</label>
+                        <input type="text" id="cpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" value="<%= esc(cpf) %>">
                     </div>
 
                 </div>

@@ -152,6 +152,10 @@
                         <input type="text" id="email" name="email" placeholder="cooperado@exemplo.com" value="<%= esc(c.getEmail()) %>">
                     </div>
                     <div class="campo">
+                        <label for="cpf">CPF (opcional)</label>
+                        <input type="text" id="cpf" name="cpf" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" value="<%= esc(c.getCpfFormatado()) %>">
+                    </div>
+                    <div class="campo">
                         <label for="status">Status</label>
                         <select id="status" name="status">
                             <% for (String s : statusOpcoes) { %>

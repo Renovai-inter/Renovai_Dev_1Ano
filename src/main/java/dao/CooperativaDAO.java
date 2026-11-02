@@ -176,7 +176,7 @@ public class CooperativaDAO {
                 Cooperativa coop = new Cooperativa();
                 coop.setIdCooperativa(rs.getLong("id_cooperativa"));
                 coop.setNome(rs.getString("nome"));
-                coop.setCnpj(rs.getString("cnpj"));
+                coop.setCnpjDoBanco(rs.getString("cnpj"));
                 coop.setNomePublico(rs.getString("nome_publico"));
                 coop.setDescricaoInstitucional(rs.getString("descricao"));
                 coop.setLogoUrl(rs.getString("logo"));
@@ -259,7 +259,7 @@ public class CooperativaDAO {
                         Cooperativa coop = new Cooperativa();
                         coop.setIdCooperativa(rs.getLong("id_cooperativa"));
                         coop.setNome(rs.getString("nome"));
-                        coop.setCnpj(rs.getString("cnpj"));
+                        coop.setCnpjDoBanco(rs.getString("cnpj"));
                         coop.setCidade(rs.getString("cidade"));
                         coop.setEstado(rs.getString("estado"));
                         coop.setStatus(StatusCooperativa.valueOf(rs.getString("status")));

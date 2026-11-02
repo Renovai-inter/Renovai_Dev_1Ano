@@ -430,7 +430,7 @@ public class NegociacaoDAO {
 
         Connection conexao = conn.conectar();
 
-        try (PreparedStatement pst0 = conexao.prepareStatement("UPDATE venda SET id_negociacao = NULL WHERE id_negociacao = ?");
+        try (PreparedStatement pst0 = conexao.prepareStatement("UPDATE venda SET origem = 'MANUAL', id_negociacao = NULL WHERE id_negociacao = ?");
              PreparedStatement pst1 = conexao.prepareStatement("DELETE FROM proposta WHERE id_negociacao = ?");
              PreparedStatement pst2 = conexao.prepareStatement("DELETE FROM negociacao WHERE id_negociacao = ?")) {
             if (contar(conexao, "SELECT COUNT(*) FROM negociacao WHERE id_negociacao = ?", negociacao.getIdNegociacao()) == 0) {

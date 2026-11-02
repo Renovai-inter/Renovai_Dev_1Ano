@@ -172,6 +172,7 @@ public class CooperadoServlet extends HttpServlet {
             ArrayList<Long> permissoes = lerPermissoes(request.getParameterValues("permissoes"));
             Cooperado entrada = new Cooperado(idCooperativa, nome, email, cargo,
                     atividades, permissoes);
+            entrada.setCpf(request.getParameter("cpf"));
             int linhas = dao.cadastrarCooperado(entrada);
             if (linhas == 0) {
                 request.setAttribute("erro", "Não foi possível cadastrar o cooperado.");
@@ -208,6 +209,7 @@ public class CooperadoServlet extends HttpServlet {
             alteracao.setIdCooperado(id);
             alteracao.setNomeCompleto(nome);
             alteracao.setEmail(email);
+            alteracao.setCpf(request.getParameter("cpf"));
             alteracao.setIdCooperativa(idCooperativa);
             alteracao.setCargo(cargo);
             alteracao.setStatus(status);
@@ -282,7 +284,7 @@ public class CooperadoServlet extends HttpServlet {
             if (restricaoDeReferencia(e)) {
                 request.setAttribute("erro",
                         "Este cooperado tem registros relacionados e não pode ser excluído. " +
-                        "Use a opção Alterar status para inativo.");
+                                "Use a opção Alterar status para inativo.");
                 abrirVer(request, response, id);
             } else {
                 throw e;

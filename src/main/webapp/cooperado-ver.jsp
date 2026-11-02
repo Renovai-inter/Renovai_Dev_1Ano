@@ -159,6 +159,7 @@
                     <div class="dado"><small>Nome completo</small><span><%= esc(c.getNomeCompleto()) %></span></div>
                     <div class="dado"><small>Código</small><span><%= esc(c.getCodigoCooperado()) %></span></div>
                     <div class="dado"><small>E-mail</small><span><%= esc(c.getEmail()) %></span></div>
+                    <div class="dado"><small>CPF</small><span><%= c.getCpf() == null ? "Não informado" : esc(c.getCpfFormatado()) %></span></div>
                     <div class="dado"><small>Data de cadastro</small><span><%= dataCadastro %></span></div>
                     <div class="dado"><small>Status</small><span class="selo selo-<%= esc(rotulo(c.getStatus()).toLowerCase()) %>"><%= esc(rotulo(c.getStatus())) %></span></div>
                 </div>
